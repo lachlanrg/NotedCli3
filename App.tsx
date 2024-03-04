@@ -24,21 +24,16 @@ const MainTabNavigator = () => {
 
           return <FontAwesomeIcon icon={iconName || faHome} size={size} color={color} />;
         },
+        tabBarActiveTintColor: 'tomato',
+        tabBarInactiveTintColor: 'gray',
       })}
-      // @ts-ignore
-      tabBarOptions={{
-        activeTintColor: 'tomato',
-        inactiveTintColor: 'gray',
-        style: {
-          backgroundColor: 'white',
-        },
-      }}
     >
-      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ headerShown: false }}/>
-      <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ headerShown: false }}/>
+      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 };
+
 
 const App = () => {
   return (
