@@ -26,7 +26,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Login - Test new branch</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
