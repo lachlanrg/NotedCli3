@@ -1,37 +1,44 @@
+// SignUpScreen.tsx
 import * as React from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-type LoginScreenProps = {
+type SignUpScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [username, setUsername] = React.useState('');
+  const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const handleLogin = () => {
-    // Hardcoded username and password for demo purposes
-    const validUsername = 'Admin';
-    const validPassword = 'Password';
+  const handleSignUp = () => {
+    // Perform signup logic here
+    // For simplicity, we'll just log the values for now
+    console.log('Username:', username);
+    console.log('Email:', email);
+    console.log('Password:', password);
 
-    if (username === validUsername && password === validPassword) {
-      // Navigate to the MainTabNavigator if login is successful
-      navigation.navigate('Main');
-    } else {
-      // Display an error message if login is unsuccessful
-      Alert.alert('Invalid username or password');
-    }
+    // Navigate to the Main Screen
+    navigation.navigate('Main');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
         autoCapitalize="none"
       />
       <TextInput
@@ -42,9 +49,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         onChangeText={setPassword}
         autoCapitalize="none"
       />
-      <Button title="Login" onPress={handleLogin}/>
-      <Button title="Sign Up" onPress={() => navigation.navigate('SignUp')} />
-
+      <Button title="Sign Up" onPress={handleSignUp} />
+      <Button title="Back to Login" onPress={() => navigation.navigate('Login')}/>
     </View>
   );
 };
@@ -71,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default SignUpScreen;
