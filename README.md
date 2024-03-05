@@ -4,6 +4,24 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 
 >**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
+>**Note**: All progress is tracked and submitted through my [Jira Board](https://lachlanrg.atlassian.net/jira/software/projects/DEV/boards/1)
+
+## To Run Application and All Components Together
+
+```bash
+# using npx
+npx react-native run-ios
+```
+After installing dependencies, ensure you link pods for IOS
+
+```bash
+# using npx
+cd ios
+npx pod-install
+```
+
+## To Run Components Individually:
+
 ## Step 1: Start the Metro Server
 
 First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
@@ -11,7 +29,7 @@ First, you will need to start **Metro**, the JavaScript _bundler_ that ships _wi
 To start Metro, run the following command from the _root_ of your React Native project:
 
 ```bash
-# using npm
+# using npx
 npm start
 
 # OR using Yarn
