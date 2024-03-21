@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type LoginScreenProps = {
@@ -42,10 +42,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         onChangeText={setPassword}
         autoCapitalize="none"
       />
-      <Button title="Login" onPress={handleLogin}/>
-      <Button title="Sign Up" onPress={() => navigation.navigate('SignUp')} />
-
-    </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+      </View>
   );
 };
 
@@ -55,19 +60,52 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#F5F5F5',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: '600',
+    color: '#333',
     marginBottom: 20,
   },
   input: {
     width: '100%',
-    height: 40,
+    height: 50,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    backgroundColor: '#fff',
+    fontSize: 16,
+    color: '#333',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'column', // Change this line
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  button: {
+    width: '40%', // reduced width
+    backgroundColor: '#007BFF',
+    borderRadius: 10,
+    padding: 10, // reduced padding
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
