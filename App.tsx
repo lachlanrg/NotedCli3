@@ -4,13 +4,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHome, faUser, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUser, faSignInAlt, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 //Import Screens
 import HomeScreen from './src/screens/homeScreen';
 import ProfileScreen from './src/screens/profileScreen';
 import LoginScreen from './src/screens/loginScreen'; 
 import SignUpScreen from './src/screens/signupScreen'
+import CreatePostScreen from './src/screens/createPostScreen'; 
+import SearchScreen from './src/screens/searchScreen';
+
+
 
 import { Amplify } from 'aws-amplify';
 
@@ -33,6 +37,10 @@ const MainTabNavigator = () => {
             iconName = focused ? faHome : faHome;
           } else if (route.name === 'ProfileTab') {
             iconName = focused ? faUser : faUser;
+          } else if (route.name === 'CreatePostTab') { 
+          iconName = focused ? faPlus : faPlus;
+          } else if (route.name === 'SearchTab') {
+            iconName = focused ? faSearch : faSearch;
           }
 
           return <FontAwesomeIcon icon={iconName || faHome} size={size} color={color} />;
@@ -43,6 +51,8 @@ const MainTabNavigator = () => {
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeScreen} options={{ headerShown: false}} />
+      <Tab.Screen name="SearchTab" component={SearchScreen} options={{ headerShown: false }} />
+      <Tab.Screen name="CreatePostTab" component={CreatePostScreen} options={{ headerShown: false }} /> 
       <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ headerShown: false}} />
     </Tab.Navigator>
   );
