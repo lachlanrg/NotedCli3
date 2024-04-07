@@ -12,6 +12,13 @@ import ProfileScreen from './src/screens/profileScreen';
 import LoginScreen from './src/screens/loginScreen'; 
 import SignUpScreen from './src/screens/signupScreen'
 
+import { Amplify } from 'aws-amplify';
+
+import { withAuthenticator } from '@aws-amplify/ui-react';
+import awsconfig from './src/aws-exports';
+
+(Amplify as any).configure(awsconfig);
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +49,7 @@ const MainTabNavigator = () => {
 };
 
 const App = () => {
+  
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -53,4 +61,6 @@ const App = () => {
   );
 };
 
+// export default withAuthenticator(App);
 export default App;
+

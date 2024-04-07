@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-notedaws-staging-891be-authRole",
+      "UnauthRoleArn": "arn:aws:iam::223985317176:role/amplify-notedaws-staging-891be-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::223985317176:role/amplify-notedaws-staging-891be-authRole",
+      "Region": "ap-southeast-2",
+      "DeploymentBucketName": "amplify-notedaws-staging-891be-deployment",
+      "UnauthRoleName": "amplify-notedaws-staging-891be-unauthRole",
+      "StackName": "amplify-notedaws-staging-891be",
+      "StackId": "arn:aws:cloudformation:ap-southeast-2:223985317176:stack/amplify-notedaws-staging-891be/5c83bff0-f214-11ee-89c1-06ae57730f07",
+      "AmplifyAppId": "d2wqma0xfh91me"
+    },
+    "categories": {
+      "auth": {
+        "NotedAWS": {}
+      }
+    }
+  }
+}
