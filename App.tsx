@@ -14,14 +14,18 @@ import SignUpScreen from './src/screens/signupScreen'
 import CreatePostScreen from './src/screens/createPostScreen'; 
 import SearchScreen from './src/screens/searchScreen';
 
-
-
 import { Amplify } from 'aws-amplify';
-
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import awsconfig from './src/aws-exports';
 
+import { generateClient } from 'aws-amplify/api';
+import config from './src/amplifyconfiguration.json';
+
 (Amplify as any).configure(awsconfig);
+
+
+const client = generateClient();
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

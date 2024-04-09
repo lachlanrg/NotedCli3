@@ -1,18 +1,37 @@
-// CreatePostScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet, Dimensions } from 'react-native';
+import { generateClient } from 'aws-amplify/api';
+import { createPost } from '../graphql/mutations';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+import { User } from '../models';
 
 const CreatePostScreen = () => {
   const [postContent, setPostContent] = useState('');
-
-  const handlePost = () => {
-    // Handle submitting the post
-    console.log('New Post:', postContent);
-    // You can add code here to submit the post to your backend
-    // For example, using AWS services like Amplify
-    // You can also add validation logic here
-    setPostContent(''); // Clear the input after posting
+  
+  const handlePost = async () => {
+    try {
+      const client = generateClient();
+      const { username, userId } = await getCurrentUser();
+      const PostDetails = { 
+        body: postContent,
+        userPostsId: userId,
+      }
+      await client.graphql({
+        query: createPost,
+        variables: { input: PostDetails }
+      });
+      console.log('New Post created successfully:', postContent, "User ID:", userId);
+      setPostContent('');
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
+  
+
+  // useEffect(() => {
+  //   // Set userId here, e.g., from context or props
+  //   setUserId('your_user_id_here');
+  // }, []);
 
   return (
     <View style={styles.container}>

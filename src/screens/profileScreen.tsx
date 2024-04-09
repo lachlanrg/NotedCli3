@@ -75,15 +75,47 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Profile Screen</Text>
       {userInfo && (
-        <View>
-          <Text>Username: {userInfo.username}</Text>
-          <Text>User ID: {userInfo.userId}</Text>
-          <Text>Sign In Details: {JSON.stringify(userInfo.signInDetails)}</Text>
-          {email && 
-          <Text>Email: {email}</Text>}
+        <View style={styles.userInfoContainer}>
+          <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
+          <Text style={styles.userInfo}>User ID: {userInfo.userId}</Text>
+          <Text style={styles.userInfo}>Sign In Details: {JSON.stringify(userInfo.signInDetails)}</Text>
+          {email && <Text style={styles.userInfo}>Email: {email}</Text>}
         </View>
       )}
-      {/* <View> */}
+      <Button title="Logout" onPress={handleSignOut} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  userInfoContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    alignSelf: 'stretch',
+  },
+  userInfo: {
+    marginBottom: 10,
+  },
+});
+
+export default ProfileScreen;
+
+
+   {/* <View> */}
       {/* <Text>Enter Confirmation Code:</Text>
         <TextInput
         style={styles.input}
@@ -94,32 +126,3 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       />
       <Button title="Confirm" onPress={handleSignUpConfirmation} /> Remove the () from the function call */}   
          {/* </View> */}
-
-      <Button title="Logout" onPress={(handleSignOut)} />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-});
-
-export default ProfileScreen;
