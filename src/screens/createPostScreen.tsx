@@ -5,25 +5,54 @@ import { createPost } from '../graphql/mutations';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { User } from '../models';
 
+import CustomError from '../errorHandling/CustomError';
+import { CustomCreatePostInput } from '../components/CustomTypes';
+
+
 const CreatePostScreen = () => {
   const [postContent, setPostContent] = useState('');
+  const [userInfo, setUserUsername] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    currentAuthenticatedUser();
+  }, []);
+
+  async function currentAuthenticatedUser() {
+    try {
+      const { username  } = await getCurrentUser();
+      console.log(`The username: ${username}`);
   
+      setUserUsername({ username });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const handlePost = async () => {
+   
     try {
       const client = generateClient();
-      const { username, userId } = await getCurrentUser();
+      const { userId, username } = await getCurrentUser();
       const PostDetails = { 
         body: postContent,
-        userPostsId: userId,
+        userPostsId: username, // This used to be 'userId', which showd the userID, but have subsituted the username
+        // username: username,
       }
       await client.graphql({
         query: createPost,
         variables: { input: PostDetails }
       });
-      console.log('New Post created successfully:', postContent, "User ID:", userId);
+      console.log('New Post created successfully:', postContent, "User ID:", userId, "Username:", username);
       setPostContent('');
+
     } catch (error) {
-      console.error('Error creating post:', error);
+      if (error instanceof CustomError) {
+        console.error('Custom error:', error.message, error.code, error.stack);
+      } else if (error instanceof Error) {
+        console.error('Error:', error.message, error.stack);
+      } else {
+        console.error('Unknown error:', error);
+      }
     }
   };
   

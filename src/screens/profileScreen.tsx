@@ -15,7 +15,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [email, setEmail] = React.useState<string | null>(null);
   // const [confirmationCode, setConfirmationCode] = React.useState('');
-  const [username, setUsername] = React.useState('');
+  // const [username, setUsername] = React.useState('');
 
   React.useEffect(() => {
     currentAuthenticatedUser();
