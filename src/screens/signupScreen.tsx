@@ -94,6 +94,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             autoCapitalize="none"
           />
           <Button title="Confirm Sign Up" onPress={handleConfirmation}/>
+          <Button title="Back to Login" onPress={() => navigation.navigate('Login')}/>
+
         </>
       ) : (
         <>

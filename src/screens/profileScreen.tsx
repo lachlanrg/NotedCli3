@@ -5,6 +5,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { confirmSignUp, type ConfirmSignUpInput } from 'aws-amplify/auth';
+import { Linking } from 'react-native';
+import { exchangeCodeForToken } from '../../src/spofityauth/SpotifyAuth';
 
 
 type ProfileScreenProps = {
@@ -15,7 +17,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [email, setEmail] = React.useState<string | null>(null);
   // const [confirmationCode, setConfirmationCode] = React.useState('');
-  const [username, setUsername] = React.useState('');
+  // const [username, setUsername] = React.useState('');
 
   React.useEffect(() => {
     currentAuthenticatedUser();
@@ -58,6 +60,37 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
   }
 
+  const handleSpotifyLogin = async () => {
+    try {
+      // Use a unique URI scheme for the redirect URI to handle the callback
+      const clientId = 'b3b489db22654c94822b6d708396b6df'
+      const redirectUri = 'yourapp://spotify-redirect';
+      const spotifyAuthURL = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=user-read-private%20user-read-email`;
+  
+      // Open the Spotify authentication URL
+      const supported = await Linking.canOpenURL(spotifyAuthURL);
+      if (supported) {
+        await Linking.openURL(spotifyAuthURL);
+  
+        // Listen to the redirect URI for the authorization code
+        (Linking as any).addEventListener('url', async (event: { url: string }) => {
+          const authorizationCode = event.url.split('code=')[1];
+          if (authorizationCode) {
+            // Call handleCodeExchange from SpotifyAuth.js
+            await exchangeCodeForToken(authorizationCode);
+            // Remove the event listener
+            (Linking as any).removeEventListener('url', handleSpotifyLogin);
+          }
+        });
+
+      } else {
+        console.error('Cannot open Spotify authentication URL');
+      }
+    } catch (error) {
+      console.error('Error opening Spotify authentication URL:', error);
+    }
+  };
+
   // const handleSignUpConfirmation = async () => {
   //   try {
   //     const { isSignUpComplete, nextStep } = await confirmSignUp({
@@ -82,6 +115,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           {email && <Text style={styles.userInfo}>Email: {email}</Text>}
         </View>
       )}
+      <Button title="Spotfy LogIn" onPress={handleSpotifyLogin} />
       <Button title="Logout" onPress={handleSignOut} />
     </View>
   );
