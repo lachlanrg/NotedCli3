@@ -1,6 +1,6 @@
 // profileScreen.tsx
 import * as React from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, Alert, TouchableOpacity, useColorScheme } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
@@ -9,11 +9,17 @@ import { Linking } from 'react-native';
 import { exchangeCodeForToken } from '../../src/spofityauth/SpotifyAuth';
 
 
+import { toggleColorScheme } from '../utils/DarkMode'; // ADDED THIS
+import { useTheme } from '../utils/ThemeContext';
+
+
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+  const { colorScheme, toggleColorScheme } = useTheme();
+
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [email, setEmail] = React.useState<string | null>(null);
   // const [confirmationCode, setConfirmationCode] = React.useState('');
@@ -52,9 +58,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   async function handleSignOut() {
     try {
+      const { username } = await getCurrentUser();
+
+      console.log('Attempting to sign out user: ', username);
       await signOut();
       navigation.navigate('Login');
-
+      console.log('User Signed Out');
     } catch (error) {
       console.log('error signing out: ', error);
     }
@@ -105,7 +114,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   // };
 
   return (
-    <View style={styles.container}>
+    
+    <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? 'black' : 'white' }]}>
       <Text style={styles.title}>Profile Screen</Text>
       {userInfo && (
         <View style={styles.userInfoContainer}>
@@ -117,6 +127,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       )}
       <Button title="Spotfy LogIn" onPress={handleSpotifyLogin} />
       <Button title="Logout" onPress={handleSignOut} />
+      <TouchableOpacity onPress={toggleColorScheme}>
+        <Text>Toggle Dark Mode</Text>
+      </TouchableOpacity>
     </View>
   );
 };
