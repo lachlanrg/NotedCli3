@@ -14,11 +14,10 @@ import SignUpScreen from './src/screens/signupScreen'
 import CreatePostScreen from './src/screens/createPostScreen'; 
 import SearchScreen from './src/screens/searchScreen';
 
-
+//Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import awsconfig from './src/aws-exports';
-
 import { generateClient } from 'aws-amplify/api';
 import config from './src/amplifyconfiguration.json';
 
@@ -26,16 +25,12 @@ import { useColorScheme } from 'react-native'; //ADDED THIS
 import { ThemeProvider } from './src/utils/ThemeContext';
 
 
-
 (Amplify as any).configure(awsconfig);
-
 
 const client = generateClient();
 
-
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-const DetailStack = createNativeStackNavigator();
 
 
 const MainTabNavigator = () => {
@@ -71,15 +66,6 @@ const MainTabNavigator = () => {
   );
 };
 
-// const DetailStackNavigator = () => {
-//   return (
-//     <DetailStack.Navigator>
-//       {/* Add screens for each detail screen here */}
-//       {/* For example: */}
-//       <DetailStack.Screen name="ArtistDetail" component={artistDetailScreen} />
-//     </DetailStack.Navigator>
-//   );
-// };
 
 const App = () => {
   const colorScheme = useColorScheme();

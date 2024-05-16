@@ -7,10 +7,16 @@ import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { CLIENT_ID, CLIENT_SECRET } from '../config';
 import { getImageSource } from '../utils/image-utils'; 
 
+import { useNavigation } from '@react-navigation/native';
+import { NavigationProp } from '@react-navigation/native';
+import { RouteProp, ParamListBase } from '@react-navigation/native'; 
+import { RootStackParamList } from "../components/types"
+
 // Importing item button log functions
 import { logArtistInfo } from '../utils/itemButtonLog'
 import { logAlbumInfo } from '../utils/itemButtonLog'
 import { logTrackInfo } from '../utils/itemButtonLog'
+
 
 
 // Exporting types to be used in other files
@@ -66,7 +72,11 @@ interface SearchResult {
   };
 }
 
-const SearchScreen = () => {
+type SearchScreenProps = {
+  navigation: NavigationProp<RootStackParamList, 'Search'>;
+};
+
+const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   const [searchInput, setSearchInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
   // const [albums, setAlbums] = useState<{ id: string, name: string, images: string }[]>([]); // Explicitly define the type of albums state
@@ -80,8 +90,6 @@ const SearchScreen = () => {
   // const [newData, setNewData] = useState<Track[]>([]);
 
   const sortedTracks = tracks.sort((a, b) => b.popularity - a.popularity); // This will take the searched tracks, and sort them by popularity
-
-
 
   useEffect(() => {
     // API Access Token
@@ -98,6 +106,36 @@ const SearchScreen = () => {
     console.log("Access Token: ", accessToken)
   }, [])
 
+
+  // async function newSearch() {
+  //   console.log("Searching input: " + searchInput);
+
+  //   var searchParameters = {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer ' + accessToken,
+  //     }
+  //   }
+
+  //   try {
+     
+  //     var response = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist,album,track&limit=20', searchParameters);
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch search results');
+  //     }
+  //     var newSearchData = await response.json();
+      
+  //     setNewData(newSearchData)
+  //     console.log(newSearchData)
+
+  //   } catch (error) {
+  //     console.error('Error searching:', error);
+  //   }
+  // }
+
+  
+  
   // async function newSearch() {
   //   console.log("Searching input: " + searchInput);
 
@@ -140,12 +178,6 @@ const SearchScreen = () => {
       }
 
       try {
-        // Search for artists, albums, and tracks
-        // var artistLimit = 10;
-        // var albumLimit = 5; 
-        // var trackLimit = 5; 
-        // var response = await fetch(`https://api.spotify.com/v1/search?q=${searchInput}&type=artist,album,track&limit=${artistLimit},${albumLimit},${trackLimit}`, searchParameters);
-            
         var response = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist,album,track', searchParameters);
         if (!response.ok) {
           throw new Error('Failed to fetch search results');
@@ -546,6 +578,3 @@ const styles = StyleSheet.create({
 });
 
 export default SearchScreen;
-
-
-
