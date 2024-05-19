@@ -1,30 +1,25 @@
 // src/types.ts
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Album } from "../screens/searchScreen"
+import { Album } from '../screens/searchScreen'
 
-export type RootStackParamList = {
+export type HomeStackParamList = {
   Home: undefined;
-  Profile: undefined;
-  CreatePostTab: undefined;
-  // Search: undefined;
-  Search: { screen: string }; 
-  // SearchScreenStack: { screen: string }; 
-  // SearchScreenStack: {
-  //   AlbumDetail: undefined;
-  // };
-  // AlbumDetail: undefined;
-  // Album: undefined;
-
-  // AlbumDetailsStack: { screen: string; params: { album: Album } }; // Update the Main type
+  // Add parameters for additional Home screens
 };
 
 export type SearchScreenStackParamList = {
   Search: undefined;
-  AlbumDetail: { albumId: string }; // Define any parameters the AlbumDetail screen might need
+  AlbumDetail: { album: Album }; // Define the album parameter
+  // Add parameters for additional Search screens 
 };
 
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
-  NativeStackScreenProps<RootStackParamList, Screen>;
+export type CreatePostStackParamList = {
+  CreatePost: undefined;
+  // Add parameters for additional Create Post screens 
+};
 
-export type SearchScreenStackScreenProps<Screen extends keyof SearchScreenStackParamList> =
-  NativeStackScreenProps<SearchScreenStackParamList, Screen>;
+export type ProfileStackParamList = {
+  Profile: undefined;
+  // Add parameters for additional Profile screens 
+};
+
