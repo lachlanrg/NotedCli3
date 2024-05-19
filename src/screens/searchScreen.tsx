@@ -10,13 +10,15 @@ import { getImageSource } from '../utils/image-utils';
 import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
 import { RouteProp, ParamListBase } from '@react-navigation/native'; 
-import { RootStackParamList } from "../components/types"
 
 // Importing item button log functions
 import { logArtistInfo } from '../utils/itemButtonLog'
 import { logAlbumInfo } from '../utils/itemButtonLog'
 import { logTrackInfo } from '../utils/itemButtonLog'
+import { SearchScreenStackParamList } from '../components/types';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRecentSearches } from '../components/recentSearchItems';
 
 
 // Exporting types to be used in other files
@@ -73,7 +75,7 @@ interface SearchResult {
 }
 
 type SearchScreenProps = {
-  navigation: NavigationProp<RootStackParamList, 'Search'>;
+  navigation: NavigationProp<SearchScreenStackParamList>;
 };
 
 const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
@@ -87,9 +89,20 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   const [albums, setAlbums] = useState<Album[]>([]); 
   const [tracks, setTracks] = useState<Track[]>([]);
 
+
+  const { recentSearches, saveRecentSearch, clearRecentSearch } = useRecentSearches();
+
+
+
   // const [newData, setNewData] = useState<Track[]>([]);
 
   const sortedTracks = tracks.sort((a, b) => b.popularity - a.popularity); // This will take the searched tracks, and sort them by popularity
+
+  const handleNavigateToAlbumDetail = (album: Album) => {
+    navigation.navigate('AlbumDetail', { album });
+    console.log("Navigating to Album Details Screen with:", album.name,", ", album.id)
+  };
+  
 
   useEffect(() => {
     // API Access Token
@@ -106,67 +119,18 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
     console.log("Access Token: ", accessToken)
   }, [])
 
+  useEffect(() => {
+    if (searchInput === '') {
+      setArtists([]);
+      setAlbums([]);
+      setTracks([]);
+    }
+  }, [searchInput]);
 
-  // async function newSearch() {
-  //   console.log("Searching input: " + searchInput);
-
-  //   var searchParameters = {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer ' + accessToken,
-  //     }
-  //   }
-
-  //   try {
-     
-  //     var response = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist,album,track&limit=20', searchParameters);
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch search results');
-  //     }
-  //     var newSearchData = await response.json();
-      
-  //     setNewData(newSearchData)
-  //     console.log(newSearchData)
-
-  //   } catch (error) {
-  //     console.error('Error searching:', error);
-  //   }
-  // }
-
-  
-  
-  // async function newSearch() {
-  //   console.log("Searching input: " + searchInput);
-
-  //   var searchParameters = {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Bearer ' + accessToken,
-  //     }
-  //   }
-
-  //   try {
-     
-  //     var response = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist,album,track&limit=20', searchParameters);
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch search results');
-  //     }
-  //     var newSearchData = await response.json();
-      
-  //     setNewData(newSearchData)
-  //     console.log(newSearchData)
-
-  //   } catch (error) {
-  //     console.error('Error searching:', error);
-  //   }
-  // }
-
-  
-// Search all function to search for album, tracks and artists off the input
     
     async function searchAll() {
+      saveRecentSearch(searchInput);
+      
       console.log("Searching input: " + searchInput);
 
       var searchParameters = {
@@ -359,24 +323,27 @@ useEffect(() => {
   }
 }, [searchInput]);
 
+const handleRecentSearchPress = (query: string) => {
+  setSearchInput(query);
+  // searchAll();
+};
+
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
+      <View style={styles.searchContainer} >
         <TextInput
-          style={styles.searchInput}
+          style={styles.searchInput} 
           placeholder="Search..."
           value={searchInput}
           onChangeText={setSearchInput}
           //Add Enter key to perform search on keyboard
           onKeyPress={(event) => {
             if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {
-              // searchAlbum();
               searchAll();
 
             }
           }}
-          // onSubmitEditing={searchAlbum} // Adds return keystroke on mac to enter/search, 
           onSubmitEditing={searchAll} // Adds return keystroke on mac to enter/search,
 
         />
@@ -389,6 +356,22 @@ useEffect(() => {
           <FontAwesomeIcon icon={faSearch} size={20} color="#fff" />
         </TouchableOpacity>
       </View>
+
+        {searchInput === '' && recentSearches.length > 0 && (
+          <ScrollView style={styles.recentSearchesContainer}>
+            <Text style={styles.recentSearchesTitle}>Recently Searched</Text>
+            {recentSearches.map((search, index) => (
+             <View key={index} style={styles.recentSearchItemContainer}>
+              <TouchableOpacity style={styles.recentSearchItemText} onPress={() => handleRecentSearchPress(search)}>
+                <Text style={styles.recentSearchItem}>{search}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.recentSearchItemClearButton} onPress={() => clearRecentSearch(search)}>
+                <FontAwesomeIcon icon={faTimes} size={14} color="#888" />
+              </TouchableOpacity>
+           </View>
+            ))}
+          </ScrollView>
+        )}
       {/* Display search results */}
       {/* <ScrollView>
         {albums.map(album => (
@@ -424,7 +407,8 @@ useEffect(() => {
       ))}
       {/* Display search results for albums */}
       {albums.slice(0, 5).map(album => (
-        <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => logAlbumInfo(album)}>
+        <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => handleNavigateToAlbumDetail(album)}
+        >
           <Image
             source={{ uri: album.images[0]?.url }}
             style={styles.albumImage}
@@ -434,7 +418,7 @@ useEffect(() => {
             <View style={styles.itemLowerDetails}>
               <Text style={styles.itemType}>{album.album_type.charAt(0).toUpperCase() + album.album_type.slice(1)}</Text>
               <View style={{ flex: 1 }}>
-                <Text style={styles.artist}>• {album.artists.map(artist => artist.name).join(', ')}
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {album.artists.map(artist => artist.name).join(', ')}
                 </Text>
               </View>
               {/* <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text> */}
@@ -574,6 +558,31 @@ const styles = StyleSheet.create({
   artist: {
     fontSize: 12,
     color: '#888',
+  },
+  recentSearchesContainer: {
+    marginBottom: 20,
+  },
+  recentSearchesTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#404040'
+  },
+  recentSearchItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  recentSearchItemText: {
+    flex: 1,
+  },
+  recentSearchItem: {
+    fontSize: 14,
+    color: '#555',
+    paddingVertical: 6,
+  },
+  recentSearchItemClearButton: {
+    paddingLeft: 10,
   },
 });
 
