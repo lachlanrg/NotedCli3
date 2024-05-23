@@ -5,9 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'; // Import specific icon 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CLIENT_ID, CLIENT_SECRET } from '../config';
-import { Track } from './searchScreen';
-
-
+import { Track } from '../spotifyConfig/itemInterface';
 
 type AlbumDetailsScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'AlbumDetail'>;
 

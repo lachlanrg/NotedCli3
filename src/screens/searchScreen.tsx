@@ -1,8 +1,12 @@
 // SearchScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, KeyboardEvent, Text, ScrollView, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, KeyboardEvent, Text, ScrollView, Image, FlatList, ActivityIndicator } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core'; // Import IconProp type
+
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 
 import { CLIENT_ID, CLIENT_SECRET } from '../config';
 import { getImageSource } from '../utils/image-utils'; 
@@ -20,8 +24,12 @@ import { SearchScreenStackParamList } from '../components/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRecentSearches } from '../components/recentSearchItems';
 
+import { Artist, Track, AlbumOnly, SearchResult } from '../spotifyConfig/itemInterface';
+import { searchSCTracks } from '../soundcloudConfig/scTrackSearch';
+import { scTrack } from '../soundcloudConfig/itemInterface';
+import useSpotifySearch from '../spotifyConfig/spotifySearchAll';
 
-// Exporting types to be used in other files
+//Apparently including this is the only way for it to work in the albumDetailsScreen
 export interface Album {
   id: string;
   name: string;
@@ -31,78 +39,37 @@ export interface Album {
   artists: { name: string }[];
 }
 
-export interface AlbumOnly {
-  name: string;
-  id: string;
-  type: string;
-  artists: { name: string }[];
-  release_date: string;
-  release_date_precision: string;
-  total_tracks: number;
-  images: { url: string }[];
-  external_urls: { spotify: string };
-  href: string;
-  uri: string;
-}
-export interface Artist {
-  name: string;
-  id: string;
-  type: string;
-  images: { url: string }[];
-  popularity: number; 
-}
-
-export interface Track {
-  name: string, 
-  id: string, 
-  type: string, 
-  album: { name: string, images: { url: string }[] }, 
-  artists: { name: string }[],
-  popularity: number; 
-  preview_url: string,
-}
-
-interface SearchResult {
-  type: string;
-  name: string;
-  id: string;
-  images: { url: string }[];  
-  release_date: string;
-  artist: string;
-  album?: {
-    images: { url: string }[];
-  };
-}
-
 type SearchScreenProps = {
   navigation: NavigationProp<SearchScreenStackParamList>;
 };
 
+// Cast icons to IconProp
+const spotifyIcon = faSpotify as IconProp;
+const soundcloudIcon = faSoundcloud as IconProp;
+
 const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   const [searchInput, setSearchInput] = useState('');
   const [accessToken, setAccessToken] = useState('');
-  // const [albums, setAlbums] = useState<{ id: string, name: string, images: string }[]>([]); // Explicitly define the type of albums state
-  const [albumsOnly, setAlbumsOnly] = useState<AlbumOnly[]>([]); // Used with interface Album
-  const [searchData, setSearchData] = useState<SearchResult[]>([]);
+  const [searchMode, setSearchMode] = useState<'spotify' | 'soundcloud'>('spotify'); 
+  const [offset, setOffset] = useState<number>(0);
+  const [totalTracks, setTotalTracks] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   const [artists, setArtists] = useState<Artist[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]); 
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [soundcloudTracks, setSoundcloudTracks] = useState<scTrack[]>([]);
 
 
   const { recentSearches, saveRecentSearch, clearRecentSearch } = useRecentSearches();
 
+  const { searchAll } = useSpotifySearch(searchInput, saveRecentSearch, setArtists, setAlbums, setTracks, setLoading); //For spotifySearchAll Function
 
-
-  // const [newData, setNewData] = useState<Track[]>([]);
-
-  const sortedTracks = tracks.sort((a, b) => b.popularity - a.popularity); // This will take the searched tracks, and sort them by popularity
-
-  const handleNavigateToAlbumDetail = (album: Album) => {
-    navigation.navigate('AlbumDetail', { album });
-    console.log("Navigating to Album Details Screen with:", album.name,", ", album.id)
-  };
-  
+  const sortedTracks = tracks.sort((a, b) => b.popularity - a.popularity);
+ 
+// Get the Spotify Access Token, Also in the spotifySearchAll.tsx, 
+// but might be useful staying here aswell as it wont need 
+// the function searchAll to be called to access the accessToken
 
   useEffect(() => {
     // API Access Token
@@ -116,7 +83,9 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   fetch('https://accounts.spotify.com/api/token', authParameters)
     .then(result => result.json())
     .then(data => setAccessToken(data.access_token))
-    console.log("Access Token: ", accessToken)
+    console.log('\n')
+    console.log("Spotify Access Token: ", accessToken)
+    console.log('\n')
   }, [])
 
   useEffect(() => {
@@ -126,173 +95,6 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
       setTracks([]);
     }
   }, [searchInput]);
-
-    
-    async function searchAll() {
-      saveRecentSearch(searchInput);
-      
-      console.log("Searching input: " + searchInput);
-
-      var searchParameters = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + accessToken,
-        }
-      }
-
-      try {
-        var response = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist,album,track', searchParameters);
-        if (!response.ok) {
-          throw new Error('Failed to fetch search results');
-        }
-        var searchData = await response.json();
-
-        console.log(" ")
-        console.log(" ")
-        console.log("******************************************************************************")
-        console.log("*                                                                            *")
-        console.log("*                         S E A R C H  R E S U L T S                         *")
-        console.log("*                                                                            *")
-        console.log("******************************************************************************")
-
-
-        // Display artists
-        console.log(" ")
-        console.log("******************************* A R T I S T S ********************************")
-        console.log(" ")
-        searchData.artists.items.slice(0, 2).forEach((artist: Artist) => {
-          console.log("Name:", artist.name);
-          console.log("ID:", artist.id);
-          console.log("Type:", artist.type);
-          console.log("Images:", artist.images?.[0]?.url || 'No image available');
-          console.log("Popularity:", artist.popularity);
-
-          console.log("--------------------------------------------");
-        });
-        console.log(" ")
-
-        // Display albums
-        console.log(" ")
-        console.log("********************************* A L B U M S ********************************")
-        console.log(" ")
-        searchData.artists.items.slice(0, 5).forEach((album: Album) => {
-          console.log("Name:", album.name);
-          console.log("ID:", album.id);
-          console.log("Type:", album.album_type);
-          console.log("Images:", album.images[0]?.url || 'No image available');
-          console.log("--------------------------------------------");
-        });
-        console.log(" ")
-
-        // Display search results for tracks
-        if (searchData.tracks) {
-          console.log(" ")
-          console.log("******************************** T R A C K S *********************************")
-          console.log(" ")
-          searchData.tracks.items.slice(0, 20).forEach((track: Track) => {
-
-            console.log("Name:", track.name);
-            console.log("ID:", track.id);
-            console.log("Type:", track.type);
-            console.log("Artists:", track.artists.map(artist => artist.name).join(', '));
-            console.log("Album:", track.album.name);
-            console.log("Images:", track.album.images[0]?.url || 'No image available');
-            console.log("Popularity:", track.popularity);
-            console.log("Preview URL:", track.preview_url);
-
-
-            console.log("--------------------------------------------");
-          });
-          console.log(" ")
-        }
-
-
-        console.log("*******************************     E N D     *******************************")
-        console.log(" ")
-
-        // Update state with search results
-        setArtists(searchData.artists.items);
-        setAlbums(searchData.albums.items);
-        setTracks(searchData.tracks.items);
-
-      } catch (error) {
-        console.error('Error searching:', error);
-      }
-    }
-
-  // searchAlbum takes the artist id to display the artists albums
-  async function searchAlbum() {
-    console.log("Searching input: " + searchInput);
-  
-    var searchParameters = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + accessToken,
-      }
-    }
-  
-    try {
-      // Get request using search to get Artist Id
-      var artistIDResponse = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist', searchParameters);
-      if (!artistIDResponse.ok) {
-        throw new Error('Failed to fetch artist ID');
-      }
-      var artistIDData = await artistIDResponse.json();
-      var artistID = artistIDData.artists.items[0].id;
-  
-      console.log("Artist ID: " + artistID);
-  
-      // Fetch albums for the artist
-      var albumsResponse = await fetch('https://api.spotify.com/v1/artists/' + artistID + '/albums?include_groups=album&market=us&limit=50', searchParameters);
-      if (!albumsResponse.ok) {
-        throw new Error('Failed to fetch albums');
-      }
-      var albumsData = await albumsResponse.json();
-
-      console.log(" ")
-      console.log("************************* A L B U M S *************************")
-      albumsData.items.forEach((album: AlbumOnly) => {
-        // console.log(album);
-        console.log(" ")
-
-        console.log("Name:", album.name);
-        console.log("ID:", album.id);
-        console.log("Type:", album.type);
-        console.log("Artists:", album.artists);
-        console.log("Release Date:", album.release_date);
-        console.log("Release Date Precision:", album.release_date_precision);
-        console.log("Total Tracks:", album.total_tracks);
-        console.log("Images:", album.images[0].url);
-        console.log("Albumn Spotify:", album.external_urls.spotify);
-        console.log("Albumn HREF:", album.href);
-        console.log("URI", album.uri);
-        console.log(" ")
-
-        console.log("--------------------------------------------")
-        // Add more properties as needed
-      });
-      console.log(" ")
-
-      console.log("************************* E N D *************************")
-      console.log(" ")
-
-      // console.log(albumsData);
-      setAlbumsOnly(albumsData.items);
-    } catch (error) {
-      console.error('Error searching:', error);
-    }
-  }
-  
-  
-  const handleSearch = () => {
-    // Handle search functionality
-    console.log('Searching for: ', searchInput);
-    // You can add code here to perform the search
-    // For example, using AWS services like Amplif
-    // You can also add validation logic here
-  };
 
   const handleClearSearch = () => {
     setSearchInput('');
@@ -305,21 +107,22 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
 
 //   useEffect(() => {
 //   if (searchInput !== '') {
-//     searchAll();
+//     handleSearch();
 //   } else {
 //     setArtists([]);
 //     setAlbums([]);
 //     setTracks([]);
+//     setSoundcloudTracks([]);
 //   }
 // }, [searchInput]);
 
 //This useEffect sets results = null when input = null
 useEffect(() => {
   if (searchInput === '') {
-    setAlbumsOnly([]);
     setArtists([]);
     setAlbums([]);
     setTracks([]);
+    setSoundcloudTracks([]);
   }
 }, [searchInput]);
 
@@ -328,10 +131,53 @@ const handleRecentSearchPress = (query: string) => {
   // searchAll();
 };
 
+const handleSearchSCTracks = async () => {
+  const searchResults = await searchSCTracks(searchInput, saveRecentSearch, offset);
+  setSoundcloudTracks(searchResults);
+};
+
+// const loadMoreTracks = async () => {
+//   if (soundcloudTracks.length < totalTracks) {
+//       const newTracks = await searchSCTracks(searchInput, saveRecentSearch, offset + 4);
+//       setSoundcloudTracks([...soundcloudTracks, ...newTracks]);
+//       setOffset(offset + 4);
+//   }
+// };
+// useEffect(() => {
+//   const fetchData = async () => {
+//       const newTracks = await searchSCTracks(searchInput, saveRecentSearch, offset);
+//       setSoundcloudTracks(newTracks);
+//       setTotalTracks(newTracks.length); // Assuming newTracks contains the total count
+//   };
+
+//   fetchData();
+// }, []);
+
+const handleSpotifySearchAll = async () => {
+  await searchAll();
+};
+
+const handleNavigateToAlbumDetail = (album: Album) => {
+  navigation.navigate('AlbumDetail', { album });
+  console.log("Navigating to Album Details Screen with:", album.name,", ", album.id)
+};
+
+const toggleSearchMode = () => {
+  setSearchMode(prevMode => (prevMode === 'spotify' ? 'soundcloud' : 'spotify')); // Toggle between 'spotify' and 'soundcloud'
+};
+
+const handleSearch = async () => {
+  if (searchMode === 'spotify') {
+    await handleSpotifySearchAll();
+  } else {
+    await handleSearchSCTracks();
+  }
+};
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer} >
+      <View style={styles.searchContainer}>
+        <View style={styles.inputContainer}>
         <TextInput
           style={styles.searchInput} 
           placeholder="Search..."
@@ -340,20 +186,28 @@ const handleRecentSearchPress = (query: string) => {
           //Add Enter key to perform search on keyboard
           onKeyPress={(event) => {
             if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {
-              searchAll();
-
+              handleSearch();
             }
           }}
-          onSubmitEditing={searchAll} // Adds return keystroke on mac to enter/search,
-
+          onSubmitEditing={handleSearch} // Adds return keystroke on mac to enter/search,
         />
-        {searchInput.length > 0 && (
-          <TouchableOpacity style={styles.clearButton} onPress={handleClearSearch}>
-            <FontAwesomeIcon icon={faTimes} size={20} color="#888" />
+        {searchInput !== '' && (
+          <TouchableOpacity style={styles.clearButton} onPress={() => setSearchInput('')}>
+            <FontAwesomeIcon icon={faTimes} size={14} style={styles.clearButtonIcon} />
           </TouchableOpacity>
         )}
-        <TouchableOpacity style={styles.searchButton} onPress={searchAll}>
-          <FontAwesomeIcon icon={faSearch} size={20} color="#fff" />
+        </View>
+        <TouchableOpacity style={styles.toggleButton} onPress={toggleSearchMode}>
+        {/* <FontAwesomeIcon
+            icon={searchMode === 'spotify' ? spotifyIcon : soundcloudIcon}
+            size={40}
+            style={{ color: searchMode === 'spotify' ? '#14CF19' : '#28399A' }}
+          />      */}
+          <FontAwesomeIcon
+            icon={searchMode === 'spotify' ? spotifyIcon : soundcloudIcon}
+            size={40}
+            style={{ color: searchMode === 'spotify' ? '#3A3B3E' : '#3A3B3E' }}
+          />      
         </TouchableOpacity>
       </View>
 
@@ -366,30 +220,42 @@ const handleRecentSearchPress = (query: string) => {
                 <Text style={styles.recentSearchItem}>{search}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.recentSearchItemClearButton} onPress={() => clearRecentSearch(search)}>
-                <FontAwesomeIcon icon={faTimes} size={14} color="#888" />
+                <FontAwesomeIcon icon={faTimes} size={12} color="#888" />
               </TouchableOpacity>
            </View>
             ))}
           </ScrollView>
         )}
-      {/* Display search results */}
-      {/* <ScrollView>
-        {albums.map(album => (
-          <View key={album.id} style={styles.albumContainer}>
-          <Image
-            source={{ uri: album.images[0].url }}
-            style={styles.albumImage}
-          />
-          <View style={styles.itemDetails}>
-            <Text style={styles.albumName}>{album.name}</Text>
-            <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text>
-          </View>
-        </View>
-        ))}
-      </ScrollView> */}
-      
-      {/* Display search results for artists */}
-      
+
+
+
+        <FlatList
+            data={soundcloudTracks}
+            renderItem={({ item }: {item: scTrack}) => (
+                <TouchableOpacity key={item.id} style={styles.itemContainer}>
+            <Image source={{ uri: item.artwork_url }} style={styles.albumImage} />
+            <View style={styles.itemDetails}>
+              <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
+                <View style={styles.itemLowerDetails}>
+                    <Text style={styles.itemType}>{item.kind.charAt(0).toUpperCase() + item.kind.slice(1)}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {item.user_id}</Text>
+                      </View>
+                </View>
+            </View>
+          </TouchableOpacity>
+            )}
+            keyExtractor={(item ) => item.id.toString()}
+            // onEndReached={loadMoreTracks}
+            // onEndReachedThreshold={0.1}
+        />
+
+
+    {/* <ScrollView>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <> */}
       <ScrollView>
       {artists.slice(0, 2).map(artist => (
         <TouchableOpacity key={artist.id} style={styles.itemContainer} onPress={() => logArtistInfo(artist)}>
@@ -405,10 +271,9 @@ const handleRecentSearchPress = (query: string) => {
           </View>
         </TouchableOpacity>
       ))}
-      {/* Display search results for albums */}
+
       {albums.slice(0, 5).map(album => (
-        <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => handleNavigateToAlbumDetail(album)}
-        >
+        <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => handleNavigateToAlbumDetail(album)}>
           <Image
             source={{ uri: album.images[0]?.url }}
             style={styles.albumImage}
@@ -426,8 +291,7 @@ const handleRecentSearchPress = (query: string) => {
           </View>
         </TouchableOpacity>
       ))}
-      {/* Display search results for tracks */}
-      {/* {sortedTracks.slice(0, 10).map(track => ( */}
+
       {tracks.slice(0, 10).map(track => (
         <TouchableOpacity key={track.id} style={styles.itemContainer} onPress={() => logTrackInfo(track)}>
           <Image
@@ -442,11 +306,12 @@ const handleRecentSearchPress = (query: string) => {
                 <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {track.artists.map(artist => artist.name).join(', ')}
                 </Text>
               </View>
-              {/* <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text> */}
             </View>
           </View>
        </TouchableOpacity>
       ))}
+      {/* </>
+      )} */}
     </ScrollView>
     </View>
   );
@@ -467,12 +332,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingTop: 40,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    width: '80%',
+    marginRight: 20,
+  },
   searchInput: {
     flex: 1,
     height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
     paddingHorizontal: 10,
     marginRight: 10,
   },
@@ -483,6 +355,9 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     padding: 10,
+  },
+  clearButtonIcon: {
+    color: '#888',
   },
   albumContainer: {
     flexDirection: 'row',
@@ -583,6 +458,13 @@ const styles = StyleSheet.create({
   },
   recentSearchItemClearButton: {
     paddingLeft: 10,
+  },
+  toggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5,
+    padding: 1,
   },
 });
 

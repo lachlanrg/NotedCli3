@@ -1,0 +1,84 @@
+const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
+  // const [albums, setAlbums] = useState<{ id: string, name: string, images: string }[]>([]); // Explicitly define the type of albums state
+  const [albumsOnly, setAlbumsOnly] = useState<AlbumOnly[]>([]); // Used with interface Album
+  const [searchData, setSearchData] = useState<SearchResult[]>([]);
+
+
+
+
+
+  // searchAlbum takes the artist id to display the artists albums
+  async function searchAlbum() {
+    console.log("Searching input: " + searchInput);
+  
+    var searchParameters = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken,
+      }
+    }
+  
+    try {
+      // Get request using search to get Artist Id
+      var artistIDResponse = await fetch('https://api.spotify.com/v1/search?q=' + searchInput + '&type=artist', searchParameters);
+      if (!artistIDResponse.ok) {
+        throw new Error('Failed to fetch artist ID');
+      }
+      var artistIDData = await artistIDResponse.json();
+      var artistID = artistIDData.artists.items[0].id;
+  
+      console.log("Artist ID: " + artistID);
+  
+      // Fetch albums for the artist
+      var albumsResponse = await fetch('https://api.spotify.com/v1/artists/' + artistID + '/albums?include_groups=album&market=us&limit=50', searchParameters);
+      if (!albumsResponse.ok) {
+        throw new Error('Failed to fetch albums');
+      }
+      var albumsData = await albumsResponse.json();
+
+      console.log(" ")
+      console.log("************************* A L B U M S *************************")
+      albumsData.items.forEach((album: AlbumOnly) => {
+        // console.log(album);
+        console.log(" ")
+
+        console.log("Name:", album.name);
+        console.log("ID:", album.id);
+        console.log("Type:", album.type);
+        console.log("Artists:", album.artists);
+        console.log("Release Date:", album.release_date);
+        console.log("Release Date Precision:", album.release_date_precision);
+        console.log("Total Tracks:", album.total_tracks);
+        console.log("Images:", album.images[0].url);
+        console.log("Albumn Spotify:", album.external_urls.spotify);
+        console.log("Albumn HREF:", album.href);
+        console.log("URI", album.uri);
+        console.log(" ")
+
+        console.log("--------------------------------------------")
+        // Add more properties as needed
+      });
+      console.log(" ")
+
+      console.log("************************* E N D *************************")
+      console.log(" ")
+
+      // console.log(albumsData);
+      setAlbumsOnly(albumsData.items);
+    } catch (error) {
+      console.error('Error searching:', error);
+    }
+  }
+
+
+
+
+
+
+  //This useEffect sets results = null when input = null
+useEffect(() => {
+  if (searchInput === '') {
+    setAlbumsOnly([]);
+  }
+}, [searchInput]);
