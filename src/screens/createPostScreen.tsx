@@ -35,14 +35,15 @@ const CreatePostScreen = () => {
       const { userId, username } = await getCurrentUser();
       const PostDetails = { 
         body: postContent,
-        userPostsId: username, // This used to be 'userId', which showd the userID, but have subsituted the username
+        userPostsId: userId, //Needs user id to associate @belongs to with user
         // username: username,
       }
       await client.graphql({
         query: createPost,
         variables: { input: PostDetails }
       });
-      console.log('New Post created successfully:', postContent, "User ID:", userId, "Username:", username);
+      console.log('New Post created successfully:', postContent, "User:", userId);
+      
       setPostContent('');
 
     } catch (error) {

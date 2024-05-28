@@ -118,12 +118,12 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
 
 //This useEffect sets results = null when input = null
 useEffect(() => {
-  if (searchInput === '') {
+  // if (searchInput === '') {
     setArtists([]);
     setAlbums([]);
     setTracks([]);
     setSoundcloudTracks([]);
-  }
+  // }
 }, [searchInput]);
 
 const handleRecentSearchPress = (query: string) => {
