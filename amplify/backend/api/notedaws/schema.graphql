@@ -1,8 +1,4 @@
-# This "input" configures a global authorization rule to enable public access to
-# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
-
-type User @model {
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   username: String!
   email: String!
@@ -13,38 +9,37 @@ type User @model {
   receivedFriendRequests: [FriendRequest] @hasMany
 }
 
-type Friendship @model {
+type Friendship @model @auth(rules: [{allow: public}]) {
   id: ID!
   user: User @belongsTo
   friend: User @belongsTo
 }
 
-type FriendRequest @model {
+type FriendRequest @model @auth(rules: [{allow: public}]) {
   id: ID!
   sender: User! @belongsTo
   recipient: User! @belongsTo
   status: String!
 }
 
-type Post @model {
+type Post @model @auth(rules: [{allow: public}]) {
   id: ID!
-  body: String!  # Add a body field to the Post type
+  body: String!
   likes: [Like] @hasMany
   comments: [Comment] @hasMany
-  user: User @belongsTo  # Modify the user field to associate it with the username field
-
+  user: User @belongsTo
 }
 
-type Comment @model {
+type Comment @model @auth(rules: [{allow: public}]) {
   id: ID!
   post: Post @belongsTo
   content: String!
   likes: [Like] @hasMany
 }
 
-type Like @model {
+type Like @model @auth(rules: [{allow: public}]) {
   id: ID!
   post: Post @belongsTo
   user: User @belongsTo
 }
-
+ 

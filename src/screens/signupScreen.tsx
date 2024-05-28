@@ -2,12 +2,18 @@
 import * as React from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { 
+  signUp,
+  autoSignIn,
+  getCurrentUser,
+  confirmSignUp,
+  signIn,
+} from 'aws-amplify/auth';
 
-import { signUp } from 'aws-amplify/auth';
-import { autoSignIn } from 'aws-amplify/auth';
-import { signIn } from 'aws-amplify/auth';
-import { confirmSignUp, type ConfirmSignUpInput } from 'aws-amplify/auth';
+import { generateClient } from 'aws-amplify/api';
+import { createUser } from '../graphql/mutations';
 
+const client = generateClient();
 
 type SignUpScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -43,7 +49,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       
       setIsConfirmationStep(true);
 
-      console.log('Sign up successful for user:', username);
+      console.log('Input - Sign up successful for user:', username);
 
     } catch (error: any) {
       console.error('Error signing up:', error);
@@ -61,13 +67,39 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       });
 
       await handleAutoSignIn();
+      console.log('Cognito - Sign up confirmed for user:', username);
+
+      const { userId } = await getCurrentUser();
+      await createUserInGraphQL(userId);
+
       navigation.navigate('Main');
 
-      console.log('Sign up confirmed for user:', username);
 
     } catch (error: any) {
       console.error('Error confirming sign up:', error);
       Alert.alert('Error confirming sign up:', error.message);
+    }
+  };
+
+  const createUserInGraphQL = async (userId: string) => {
+    try {
+      const client = generateClient();
+      const user = {
+        id: userId,
+        username: username,
+        email: email,
+      };
+
+      await client.graphql({
+        query: createUser,
+        variables: { input: user }
+      });
+
+      console.log('GraphQL - User successfully created with:', user, "userId:", userId, "username:", username, "email:", email);
+
+    } catch (error: any) {
+      console.error('Error creating user in GraphQL:', error);
+      Alert.alert('Error creating user in GraphQL:', error.message);
     }
   };
 

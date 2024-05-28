@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../components/types';
+import { HomeStackParamList } from '../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { formatDistanceToNow } from 'date-fns';
@@ -21,7 +21,7 @@ import { getCurrentUser } from '@aws-amplify/auth';
 Amplify.configure(awsconfig);
 
 type HomeScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+  navigation: NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {

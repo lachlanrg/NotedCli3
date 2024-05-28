@@ -55,6 +55,22 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
     }
   }, [accessToken]);
 
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <Image source={{ uri: album.images[0]?.url }} style={styles.albumImage} />
+      <Text style={styles.artistNames}>{album.artists.map(artist => artist.name).join(', ')}</Text>
+      <Text style={styles.releaseDate}>{new Date(album.release_date).getFullYear()}</Text>
+    </View>
+  );
+
+  const renderItem = ({ item }: {item: Track}) => (
+    <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => logTrack(item)}>
+      <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -66,18 +82,13 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <Image source={{ uri: album.images[0]?.url }} style={styles.albumImage} />
-        <Text style={styles.artistNames}>{album.artists.map(artist => artist.name).join(', ')}</Text>
-        <Text style={styles.releaseDate}>{new Date(album.release_date).getFullYear()}</Text>
-        {tracks.map((track) => (
-          <TouchableOpacity key={track.id} style={styles.itemContainer} onPress={() => logTrack(track)}>
-            <Text key={track.id} style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
-              {track.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <FlatList
+        data={tracks}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.scrollViewContainer}
+      />
     </View>
   );
 };
@@ -106,9 +117,10 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   scrollViewContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
     padding: 20,
+  },
+  headerContainer: {
+    alignItems: 'center',
   },
   albumImage: {
     width: 200,
@@ -119,7 +131,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
     fontWeight: 'bold',
-
   },
   releaseDate: {
     fontSize: 16,

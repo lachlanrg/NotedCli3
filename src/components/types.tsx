@@ -4,6 +4,7 @@ import { Album } from '../screens/searchScreen'
 
 export type HomeStackParamList = {
   Home: undefined;
+  CreatePostTab: undefined
   // Add parameters for additional Home screens
 };
 
