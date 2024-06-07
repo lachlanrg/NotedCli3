@@ -316,6 +316,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           setIsModalVisible(false);
         }}
       >
+      <View style={styles.modalBackgroundContainer}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>
@@ -338,6 +339,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
               </TouchableOpacity>
             </View>
           </View>
+        </View>
         </View>
       </Modal>
     </View>
@@ -420,15 +422,24 @@ const styles = StyleSheet.create({
 
   // Modal Styles
   modalContainer: {
-    flex: 1,
-    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    alignItems: 'center',
+    position: 'absolute', 
+    top: 0, 
+    bottom: 100,
+    left: 0,
+    right: 0,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackgroundContainer: {
+    flex: 1, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)' 
   },
   modalContent: {
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 10, // Added rounded corners for a modern look
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -437,12 +448,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5, // For Android shadow
-    maxWidth: '90%', // Added maximum width to make modal responsive
+    maxWidth: '90%',
   },
   modalText: {
     fontSize: 16,
     marginBottom: 20,
-    textAlign: 'center', // Centered text
+    textAlign: 'center', 
   },
   modalButtonContainer: {
     flexDirection: 'row',
