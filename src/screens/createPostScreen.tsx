@@ -6,8 +6,6 @@ import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { User } from '../models';
 
 import CustomError from '../errorHandling/CustomError';
-import { CustomCreatePostInput } from '../components/CustomTypes';
-
 
 const CreatePostScreen = () => {
   const [postContent, setPostContent] = useState('');
@@ -72,6 +70,8 @@ const CreatePostScreen = () => {
           placeholderTextColor="#888"
           value={postContent}
           onChangeText={setPostContent}
+          autoCapitalize="none"   
+          autoCorrect={false}  
           multiline
           numberOfLines={6}
         />

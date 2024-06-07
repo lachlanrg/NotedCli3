@@ -183,6 +183,8 @@ const handleSearch = async () => {
           placeholder="Search..."
           value={searchInput}
           onChangeText={setSearchInput}
+          autoCapitalize="none"   
+          autoCorrect={false}  
           //Add Enter key to perform search on keyboard
           onKeyPress={(event) => {
             if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {

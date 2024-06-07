@@ -5,17 +5,18 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { formatDistanceToNow } from 'date-fns';
+
+import { formatRelativeTime } from '../components/formatComponents';
 
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
-
 import awsconfig from '../aws-exports';
+import { getCurrentUser } from '@aws-amplify/auth';
+
 import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import { Post } from '../API';
 import { User } from '../models';
-import { getCurrentUser } from '@aws-amplify/auth';
 
 
 Amplify.configure(awsconfig);
@@ -99,11 +100,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     } catch (error) {
       console.error('Error deleting post:', error);
     }
-  };
-
-  const formatRelativeTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return formatDistanceToNow(date, { addSuffix: true });
   };
   
   return (
