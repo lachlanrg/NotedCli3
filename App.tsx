@@ -14,6 +14,9 @@ import SignUpScreen from './src/screens/signupScreen'
 import CreatePostScreen from './src/screens/createPostScreen'; 
 import SearchScreen from './src/screens/searchScreen';
 import AlbumDetailsScreen from './src/screens/albumDetailsScreen';
+import UserSearchScreen from './src/screens/userSearchScreen';
+import UserSearchProfileScreen from './src/screens/userSearchProfileScreen';
+import NotificationsScreen from './src/screens/notificationsScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -24,7 +27,12 @@ import config from './src/amplifyconfiguration.json';
 
 import { useColorScheme } from 'react-native'; 
 import { ThemeProvider } from './src/utils/ThemeContext';
+
+// Import Stack ParamLists
 import { SearchScreenStackParamList } from './src/components/types';
+import { ProfileStackParamList } from './src/components/types';
+import { CreatePostStackParamList } from './src/components/types';
+import { HomeStackParamList } from './src/components/types';
 
 
 (Amplify as any).configure(awsconfig);
@@ -33,10 +41,10 @@ const client = generateClient();
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-const HomeStack = createNativeStackNavigator();
+const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>(); // Stack for Search screens
-const CreatePostStack = createNativeStackNavigator(); // Stack for Create Post screens
-const ProfileStack = createNativeStackNavigator(); // Stack for Profile screens
+const CreatePostStack = createNativeStackNavigator<CreatePostStackParamList>(); // Stack for Create Post screens
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>(); // Stack for Profile screens
 
 const HomeStackNavigator = () => {
   return (
@@ -70,6 +78,11 @@ const ProfileStackNavigator = () => {
   return (
     <ProfileStack.Navigator>
       <ProfileStack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="UserSearch" component={UserSearchScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="UserSearchProfile" component={UserSearchProfileScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+
+
       {/* Add more screens related to Profile here */}
     </ProfileStack.Navigator>
   );

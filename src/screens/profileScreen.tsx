@@ -1,15 +1,18 @@
-// profileScreen.tsx
 import * as React from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert, TouchableOpacity, useColorScheme } from 'react-native';
+import { useRef } from 'react';
+import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, PanResponderGestureState} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NavigationProp } from '@react-navigation/native';
+import { ProfileStackParamList } from '../components/types';
+
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { IconProp } from '@fortawesome/fontawesome-svg-core'; // Import IconProp type
+import { faCog, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons'; // Import faUserPlus
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+
 
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
-import { confirmSignUp, type ConfirmSignUpInput } from 'aws-amplify/auth';
-import { Linking } from 'react-native';
-
-
-import { toggleColorScheme } from '../utils/DarkMode'; // ADDED THIS
-import { useTheme } from '../utils/ThemeContext';
+import SettingsDropdown from '../components/settingsDropdown';
 
 
 type ProfileScreenProps = {
@@ -17,25 +20,68 @@ type ProfileScreenProps = {
 };
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
-  const { colorScheme, toggleColorScheme } = useTheme();
 
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [email, setEmail] = React.useState<string | null>(null);
-  // const [confirmationCode, setConfirmationCode] = React.useState('');
-  // const [username, setUsername] = React.useState('');
+  const [showSearchBox, setShowSearchBox] = React.useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const searchBoxHeight = React.useRef(new Animated.Value(0)).current;
+  const [menuVisible, setMenuVisible] = React.useState<boolean>(false);
+  const [overlayVisible, setOverlayVisible] = React.useState<boolean>(false);
+
+  const menuWidth = Dimensions.get('window').width / 2.3;
+  const menuPosition = useRef(new Animated.Value(-menuWidth)).current;
+
+  const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+    setOverlayVisible(!overlayVisible);
+    Animated.timing(menuPosition, {
+      toValue: menuVisible ? -menuWidth : 0,
+      duration: 300,
+      easing: Easing.ease,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const panResponder = React.useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (evt, gestureState) => {
+        // Check if touch starts from the left 50 pixels
+        return gestureState.dx < 30;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dx > 50) {
+          toggleMenu();
+        }
+      },
+      onPanResponderRelease: () => {},
+    })
+  ).current;
+
 
   React.useEffect(() => {
     currentAuthenticatedUser();
     UserAttributes();
   }, []);
 
+  // React.useEffect(() => {
+  //   Animated.timing(searchBoxHeight, {
+  //     toValue: showSearchBox ? 50 : 0,
+  //     duration: 300,
+  //     easing: Easing.ease,
+  //     useNativeDriver: false,
+  //   }).start();
+  // }, [showSearchBox]);
+
   async function currentAuthenticatedUser() {
     try {
       const { username, userId, signInDetails } = await getCurrentUser();
-      console.log(`The username: ${username}`);
+      console.log('___________________________________')
+      console.log(`Current Authenticated User Info:`);
+      console.log(`The Username: ${username}`);
       console.log(`The userId: ${userId}`);
       console.log(`The signInDetails: ${signInDetails}`);
-
+      console.log('___________________________________')
       setUserInfo({ username, userId, signInDetails });
     } catch (err) {
       console.log(err);
@@ -68,54 +114,66 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
   }
 
-  // const handleSpotifyLogin = async () => {
-  //   try {
-  //     // Use a unique URI scheme for the redirect URI to handle the callback
-  //     const clientId = 'b3b489db22654c94822b6d708396b6df'
-  //     const redirectUri = 'yourapp://spotify-redirect';
-  //     const spotifyAuthURL = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=user-read-private%20user-read-email`;
-  
-  //     // Open the Spotify authentication URL
-  //     const supported = await Linking.canOpenURL(spotifyAuthURL);
-  //     if (supported) {
-  //       await Linking.openURL(spotifyAuthURL);
-  
-  //       // Listen to the redirect URI for the authorization code
-  //       (Linking as any).addEventListener('url', async (event: { url: string }) => {
-  //         const authorizationCode = event.url.split('code=')[1];
-  //         if (authorizationCode) {
-  //           // Call handleCodeExchange from SpotifyAuth.js
-  //           await exchangeCodeForToken(authorizationCode);
-  //           // Remove the event listener
-  //           (Linking as any).removeEventListener('url', handleSpotifyLogin);
-  //         }
-  //       });
+  const handleSearchToggle = () => {
+    setShowSearchBox(!showSearchBox);
+  };
 
-  //     } else {
-  //       console.error('Cannot open Spotify authentication URL');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error opening Spotify authentication URL:', error);
-  //   }
-  // };
+  const handleNavigateToUserSearch = () =>{
+    navigation.navigate('UserSearch');
+    console.log("Navigating to UserSearch Screen")
+    };
 
-  // const handleSignUpConfirmation = async () => {
-  //   try {
-  //     const { isSignUpComplete, nextStep } = await confirmSignUp({
-  //       username,
-  //       confirmationCode, // Pass the confirmationCode state here
-  //     });
-  //     // Handle successful confirmation
-  //   } catch (error: any) {
-  //     console.error('Error confirming sign up', error);
-  //     Alert.alert('Error confirming sign up', error.message);
-  //   }
-  // };
+  const handleSettingsMenu = () => {
+    console.log("Opened settings")
+    toggleMenu();
+  };
+
+  const handleNotificationPress = () => {
+    console.log("Notification button pressed");
+    navigation.navigate('Notifications');
+    // Navigate to the notifications screen or handle notifications logic
+  };
+  
 
   return (
-    
-    <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? 'black' : 'white' }]}>
-      <Text style={styles.title}>Profile Screen</Text>
+    <View style={[styles.container]}>
+      {overlayVisible && (
+        <TouchableOpacity style={styles.overlay} onPress={toggleMenu} />
+      )}
+      <View style={styles.header}>
+        <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
+        <View style={styles.icons}>
+          <TouchableOpacity style={styles.createPostButton} onPress={() => navigation.navigate('CreatePostTab')}>
+            <FontAwesomeIcon icon={faEdit} size={25} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
+            <FontAwesomeIcon icon={faBell} size={25} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.createPostButton} onPress={(handleSettingsMenu)}>
+            <FontAwesomeIcon icon={faCog} size={25} color="black" />
+          </TouchableOpacity>
+          {/* <SettingsDropdown /> */}
+        </View>
+      </View>
+      <View style={styles.statsContainer}>
+        <View style={styles.stat}>
+          <Text style={styles.statText}>Followers: 120</Text>
+        </View>
+        <View style={styles.stat}>
+          <Text style={styles.statText}>Following: 300</Text>
+        </View>
+        <TouchableOpacity onPress={handleNavigateToUserSearch}>
+          <FontAwesomeIcon icon={faUserPlus} size={20} color="black" />
+        </TouchableOpacity>
+      </View>
+      <Animated.View style={[styles.searchContainer, { height: searchBoxHeight }]}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search users..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </Animated.View>
       {userInfo && (
         <View style={styles.userInfoContainer}>
           <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
@@ -124,26 +182,75 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           {email && <Text style={styles.userInfo}>Email: {email}</Text>}
         </View>
       )}
-      {/* <Button title="Spotfy LogIn" onPress={handleSpotifyLogin} /> */}
-      <Button title="Logout" onPress={handleSignOut} />
-      <TouchableOpacity onPress={toggleColorScheme}>
-        <Text>Toggle Dark Mode</Text>
-      </TouchableOpacity>
+  
+      <Animated.View {...panResponder.panHandlers} style={[styles.settingsMenu, { right: menuPosition, width: menuWidth }]}>
+        {/* Your settings menu content here */}
+        <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+          <Text style={styles.closeButtonText}>Close</Text>
+        </TouchableOpacity>
+        <Button title="Logout" onPress={handleSignOut} />
+      </Animated.View>
     </View>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 20,
   },
-  title: {
+  usernameWelcome: {
     fontSize: 24,
-    marginBottom: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    justifyContent: 'flex-start', // username far left
+  },
+  icons: {
+    justifyContent: 'flex-end', // icons far right
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  settingsButton: {
+    padding: 10,
+    borderRadius: 50,
+  },
+  createPostButton: {
+    padding: 10,
+    borderRadius: 50,
+  },
+  bellIconButton: {
+    padding: 10,
+    borderRadius: 50,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 20,
+  },
+  stat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statText: {
+    fontSize: 18,
+    marginRight: 5,
+  },
+  searchContainer: {
+    marginHorizontal: 20,
+    marginVertical: 10,
+    overflow: 'hidden',
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
   },
   userInfoContainer: {
     borderWidth: 1,
@@ -152,23 +259,44 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     alignSelf: 'stretch',
+    marginHorizontal: 20,
   },
   userInfo: {
     marginBottom: 10,
   },
+  settingsMenu: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'white',
+    elevation: 8,
+    shadowColor: '#000',
+    borderBottomLeftRadius: 25,
+    borderTopLeftRadius: 25,
+    paddingTop: 20, 
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    justifyContent: 'flex-start',
+  },
+  closeButton: {
+    alignSelf: 'flex-end', // Align the button to the right
+    marginRight: 10, // Add some margin for better spacing
+    padding: 10,
+  },
+  closeButtonText: {
+    color: 'black',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
 });
 
 export default ProfileScreen;
-
-
-   {/* <View> */}
-      {/* <Text>Enter Confirmation Code:</Text>
-        <TextInput
-        style={styles.input}
-        placeholder="Confirmation Code"
-        value={confirmationCode}
-        onChangeText={setConfirmationCode}
-        autoCapitalize="none"
-      />
-      <Button title="Confirm" onPress={handleSignUpConfirmation} /> Remove the () from the function call */}   
-         {/* </View> */}
