@@ -1,19 +1,19 @@
 import * as React from 'react';
-import { useRef } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, PanResponderGestureState} from 'react-native';
+import { useRef, useState } from 'react';
+import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, PanResponderGestureState, Modal} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { NavigationProp } from '@react-navigation/native';
 import { ProfileStackParamList } from '../components/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { IconProp } from '@fortawesome/fontawesome-svg-core'; // Import IconProp type
-import { faCog, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons'; // Import faUserPlus
+import { IconProp } from '@fortawesome/fontawesome-svg-core'; 
+import { faCog, faTimes, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons'; 
 import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
-import SettingsDropdown from '../components/settingsDropdown';
+import { resetPassword, confirmResetPassword, type ResetPasswordOutput, type ConfirmResetPasswordInput } from 'aws-amplify/auth';
 
+import SettingsDropdown from '../components/settingsDropdown';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -31,6 +31,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const menuWidth = Dimensions.get('window').width / 2.3;
   const menuPosition = useRef(new Animated.Value(-menuWidth)).current;
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [resetUsername, setResetUsername] = useState('');
+  const [confirmationCode, setConfirmationCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+  const [showConfirmationError, setShowConfirmationError] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState('start'); // 'start', 'codeSent', 'done'
+
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -133,7 +143,65 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     navigation.navigate('Notifications');
     // Navigate to the notifications screen or handle notifications logic
   };
-  
+
+  const handleResetPassword = async (username: string) => {
+    try {
+      const output: ResetPasswordOutput = await resetPassword({ username });
+      handleResetPasswordNextSteps(output);
+      setIsConfirmingReset(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleResetPasswordNextSteps = (output: ResetPasswordOutput) => {
+    const { nextStep } = output;
+    switch (nextStep.resetPasswordStep) {
+      case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
+        console.log(`Confirmation code was sent to ${nextStep.codeDeliveryDetails.deliveryMedium}`);
+        setCurrentPhase('codeSent');
+        break;
+      case 'DONE':
+        console.log('Successfully reset password.');
+        setCurrentPhase('done');
+        break;
+    }
+  };
+
+  const handleConfirmResetPassword = async ({ username, confirmationCode, newPassword }: ConfirmResetPasswordInput) => {
+    try {
+      await confirmResetPassword({ username, confirmationCode, newPassword });
+      console.log('Password reset successful.');
+      setCurrentPhase('done');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleConfirmReset = () => {
+    if (newPassword !== confirmNewPassword) {
+      setShowConfirmationError(true);
+      return; 
+    }
+
+    setShowConfirmationError(false); // Reset error if passwords match
+    handleConfirmResetPassword({ username: resetUsername, confirmationCode, newPassword });
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setResetUsername('');
+    setConfirmationCode('');
+    setNewPassword('');
+    setIsConfirmingReset(false);
+    setCurrentPhase('start');
+  };
+
+  const handleResetCloseMenu = () => {
+    setResetUsername(userInfo.username); // Set the initial username
+    setIsModalVisible(true);
+    toggleMenu();
+  }
 
   return (
     <View style={[styles.container]}>
@@ -166,14 +234,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <FontAwesomeIcon icon={faUserPlus} size={20} color="black" />
         </TouchableOpacity>
       </View>
-      <Animated.View style={[styles.searchContainer, { height: searchBoxHeight }]}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search users..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </Animated.View>
       {userInfo && (
         <View style={styles.userInfoContainer}>
           <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
@@ -183,16 +243,95 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         </View>
       )}
   
-      <Animated.View {...panResponder.panHandlers} style={[styles.settingsMenu, { right: menuPosition, width: menuWidth }]}>
-        {/* Your settings menu content here */}
-        <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-          <Text style={styles.closeButtonText}>Close</Text>
+  <Animated.View
+      {...panResponder.panHandlers}
+      style={[styles.settingsMenu, { right: menuPosition, width: menuWidth }]}
+    >
+      <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
+        <FontAwesomeIcon icon={faTimes} size={24} color="black" />
+      </TouchableOpacity>
+      <View style={styles.settingsContainer}> 
+        <TouchableOpacity onPress={() => {}}>
+          <Text style={styles.settingsText}>Settings</Text>
         </TouchableOpacity>
-        <Button title="Logout" onPress={handleSignOut} />
-      </Animated.View>
-    </View>
-  );  
-};
+        <TouchableOpacity onPress={handleResetCloseMenu}>
+          <Text style={styles.settingsText}>Reset Password</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.logoutButtonContainer}> 
+        <Button 
+          title="Logout" 
+          onPress={handleSignOut}
+          color="red" 
+        /> 
+      </View>
+    </Animated.View>
+
+      <Modal
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalBackgroundContainer}>
+          <View style={styles.modalContainer}>
+            <View style={[styles.modalContent, currentPhase === 'start' 
+              ? styles.startPhaseHeight 
+              : styles.codeSentPhaseHeight, 
+              currentPhase === 'done' ? styles.donePhaseHeight : null]}
+            >
+              {currentPhase === 'start' && (
+                <View>
+                  <Text style={styles.userInfo}>
+                  Reset Password for <Text style={{ fontWeight: 'bold' }}>{resetUsername}</Text>
+                </Text>
+                  <Button title="Send Reset Code" onPress={() => handleResetPassword(resetUsername)} />
+                  <Button title="Close" onPress={closeModal} color="red" />
+                </View>
+              )}
+              {currentPhase === 'codeSent' && (
+                <View>
+                  <Text style={styles.modalText}>Enter Confirmation Code and New Password</Text>
+                  <TextInput
+                    placeholder="Confirmation Code"
+                    value={confirmationCode}
+                    onChangeText={setConfirmationCode}
+                    style={styles.input}
+                  />
+                  <TextInput
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    secureTextEntry
+                    style={styles.input}
+                  />
+                  <TextInput
+                    placeholder="Confirm New Password"
+                    value={confirmNewPassword}
+                    onChangeText={setConfirmNewPassword}
+                    secureTextEntry
+                    style={styles.input}
+                  />
+                  {showConfirmationError && (
+                    <Text style={styles.errorText}>Passwords do not match</Text>
+                  )}
+                  <Button title="Confirm Reset" onPress={handleConfirmReset} />
+                  <Button title="Close" onPress={closeModal} color="red" />
+                </View>
+              )}
+              {currentPhase === 'done' && (
+                <View>
+                  <Text style={styles.doneModalText}>Password reset successful!</Text>
+                  <Button title="Close" onPress={closeModal} />
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
+      </View>
+    );
+  };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -203,7 +342,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 20,
+    paddingTop: 20,
+    paddingLeft: 20,
+    paddingBottom: 20,
+    paddingRight: 8,
   },
   usernameWelcome: {
     fontSize: 24,
@@ -273,22 +415,34 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     borderBottomLeftRadius: 25,
     borderTopLeftRadius: 25,
-    paddingTop: 20, 
+    paddingTop: 20,
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    justifyContent: 'flex-start',
+    paddingHorizontal: 20, // Add some padding around the settings
+    justifyContent: 'flex-start', // Space between settings and logout
+  },
+  settingsContainer: {
+    alignItems: 'flex-end', // Align settings to the right
+    marginTop: 20, // Add top margin to settings
+    flex: 1, // Take up all remaining space
   },
   closeButton: {
-    alignSelf: 'flex-end', // Align the button to the right
-    marginRight: 10, // Add some margin for better spacing
-    padding: 10,
+    alignSelf: 'flex-end', 
+    paddingTop: 10,
   },
-  closeButtonText: {
-    color: 'black',
+  settingsText: {
+    marginBottom: 10, // Add space between settings items
+  },
+  logoutButtonContainer: {
+    marginBottom: 20, // Add space at the bottom
+  },
+  logoutButton: {
+    backgroundColor: 'red', // Red background for logout button
+    marginBottom: 20, // Add space at the bottom
   },
   overlay: {
     position: 'absolute',
@@ -296,6 +450,79 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    },
+  modalContainer: {
+    position: 'absolute', 
+    top: 0, 
+    bottom: 50,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackgroundContainer: {
+    flex: 1, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)' 
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: 300,
+    // Adjust initial and final height as needed
+    // The initial height should accommodate the content of the first phase
+    height: 200, 
+    bottom: '12%',  
+  },
+  startPhaseHeight: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 150, 
+  },
+  codeSentPhaseHeight: {
+    top: 0, 
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 320, 
+  },
+  donePhaseHeight: {
+    height: 100, 
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  doneModalText: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 2,
+    textAlign: 'center',
+    fontSize: 12,
   },
 });
 
