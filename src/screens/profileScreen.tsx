@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core'; 
 import { faCog, faTimes, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons'; 
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-
+import { dark, light, placeholder, lgray, dgray, gray, error } from '../components/colorModes';
 
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { resetPassword, confirmResetPassword, type ResetPasswordOutput, type ConfirmResetPasswordInput } from 'aws-amplify/auth';
@@ -212,13 +212,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
         <View style={styles.icons}>
           <TouchableOpacity style={styles.createPostButton} onPress={() => navigation.navigate('CreatePostTab')}>
-            <FontAwesomeIcon icon={faEdit} size={25} color="black" />
+            <FontAwesomeIcon icon={faEdit} size={25} color={light} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
-            <FontAwesomeIcon icon={faBell} size={25} color="black" />
+            <FontAwesomeIcon icon={faBell} size={25} color={light} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.createPostButton} onPress={(handleSettingsMenu)}>
-            <FontAwesomeIcon icon={faCog} size={25} color="black" />
+            <FontAwesomeIcon icon={faCog} size={25} color={light} />
           </TouchableOpacity>
           {/* <SettingsDropdown /> */}
         </View>
@@ -231,7 +231,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <Text style={styles.statText}>Following: 300</Text>
         </View>
         <TouchableOpacity onPress={handleNavigateToUserSearch}>
-          <FontAwesomeIcon icon={faUserPlus} size={20} color="black" />
+          <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
         </TouchableOpacity>
       </View>
       {userInfo && (
@@ -248,7 +248,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       style={[styles.settingsMenu, { right: menuPosition, width: menuWidth }]}
     >
       <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-        <FontAwesomeIcon icon={faTimes} size={24} color="black" />
+        <FontAwesomeIcon icon={faTimes} size={24} color={light} />
       </TouchableOpacity>
       <View style={styles.settingsContainer}> 
         <TouchableOpacity onPress={() => {}}>
@@ -262,7 +262,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         <Button 
           title="Logout" 
           onPress={handleSignOut}
-          color="red" 
+          color={error} 
         /> 
       </View>
     </Animated.View>
@@ -282,10 +282,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               {currentPhase === 'start' && (
                 <View>
                   <Text style={styles.userInfo}>
-                  Reset Password for <Text style={{ fontWeight: 'bold' }}>{resetUsername}</Text>
+                  Reset Password for <Text style={{ fontWeight: 'bold', color: light }}>{resetUsername}</Text>
                 </Text>
                   <Button title="Send Reset Code" onPress={() => handleResetPassword(resetUsername)} />
-                  <Button title="Close" onPress={closeModal} color="red" />
+                  <Button title="Close" onPress={closeModal} color={error} />
                 </View>
               )}
               {currentPhase === 'codeSent' && (
@@ -296,6 +296,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     value={confirmationCode}
                     onChangeText={setConfirmationCode}
                     style={styles.input}
+                    placeholderTextColor={placeholder}
                   />
                   <TextInput
                     placeholder="New Password"
@@ -303,6 +304,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     onChangeText={setNewPassword}
                     secureTextEntry
                     style={styles.input}
+                    placeholderTextColor={placeholder}
                   />
                   <TextInput
                     placeholder="Confirm New Password"
@@ -310,12 +312,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     onChangeText={setConfirmNewPassword}
                     secureTextEntry
                     style={styles.input}
+                    placeholderTextColor={placeholder}
                   />
                   {showConfirmationError && (
                     <Text style={styles.errorText}>Passwords do not match</Text>
                   )}
                   <Button title="Confirm Reset" onPress={handleConfirmReset} />
-                  <Button title="Close" onPress={closeModal} color="red" />
+                  <Button title="Close" onPress={closeModal} color={error} />
                 </View>
               )}
               {currentPhase === 'done' && (
@@ -336,7 +339,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   header: {
     flexDirection: 'row',
@@ -350,7 +353,7 @@ const styles = StyleSheet.create({
   usernameWelcome: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'black',
+    color: light,
     justifyContent: 'flex-start', // username far left
   },
   icons: {
@@ -382,6 +385,7 @@ const styles = StyleSheet.create({
   statText: {
     fontSize: 18,
     marginRight: 5,
+    color: light,
   },
   searchContainer: {
     marginHorizontal: 20,
@@ -393,26 +397,28 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
+    color: light,
   },
   userInfoContainer: {
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
     marginBottom: 20,
     alignSelf: 'stretch',
     marginHorizontal: 20,
+    borderColor: gray,
   },
   userInfo: {
     marginBottom: 10,
+    color: light,
   },
   settingsMenu: {
     position: 'absolute',
     top: 0,
     bottom: 0,
-    backgroundColor: 'white',
+    backgroundColor: gray,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: dark,
     borderBottomLeftRadius: 25,
     borderTopLeftRadius: 25,
     paddingTop: 20,
@@ -436,6 +442,7 @@ const styles = StyleSheet.create({
   },
   settingsText: {
     marginBottom: 10, // Add space between settings items
+    color: light,
   },
   logoutButtonContainer: {
     marginBottom: 20, // Add space at the bottom
@@ -467,10 +474,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)' 
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: gray,
     padding: 20,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: gray,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -505,15 +512,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center',
+    color: light,
   },
   doneModalText: {
     fontSize: 16,
     marginBottom: 10,
     textAlign: 'center',
+    color: light,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: placeholder,
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,

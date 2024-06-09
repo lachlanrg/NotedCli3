@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHome, faUser, faSignInAlt, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { dark, light, gray, error, placeholder, lgray } from './src/components/colorModes';
 
 //Import Screens
 import HomeScreen from './src/screens/homeScreen';
@@ -107,9 +108,10 @@ const MainTabNavigator = () => {
 
           return <FontAwesomeIcon icon={iconName || faHome} size={size} color={color} />;
         },
-        tabBarActiveTintColor: 'tomato',
-        tabBarInactiveTintColor: 'gray',  
+        tabBarActiveTintColor: light,
+        tabBarInactiveTintColor: lgray,  
         tabBarLabel: () => null, // Remove the label from below the icons
+        tabBarStyle: { backgroundColor: gray, borderTopWidth: 0 },
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ headerShown: false }} />

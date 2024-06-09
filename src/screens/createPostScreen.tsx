@@ -4,7 +4,7 @@ import { generateClient } from 'aws-amplify/api';
 import { createPost } from '../graphql/mutations';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { User } from '../models';
-
+import { dark, light, placeholder, error, lgray, gray, dgray } from '../components/colorModes';
 import CustomError from '../errorHandling/CustomError';
 
 const CreatePostScreen = () => {
@@ -67,7 +67,7 @@ const CreatePostScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Create a new post.."
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholder}
           value={postContent}
           onChangeText={setPostContent}
           autoCapitalize="none"   
@@ -86,17 +86,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     paddingTop: 100, // Add padding at the top
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   inputContainer: {
     marginBottom: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: gray,
     borderRadius: 8,
     padding: 10,
   },
   input: {
     fontSize: 16,
-    color: '#333',
+    color: light,
   },
 });
 

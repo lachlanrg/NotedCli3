@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, KeyboardEvent, Text, ScrollView, Image, FlatList, ActivityIndicator } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core'; // Import IconProp type
-
 import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
+import { dark, gray, light, error, placeholder, lgray, dgray } from '../components/colorModes';
 
 import { CLIENT_ID, CLIENT_SECRET } from '../config';
 import { getImageSource } from '../utils/image-utils'; 
@@ -37,6 +36,7 @@ export interface Album {
   images: { url: string }[]; 
   release_date: string;
   artists: { name: string }[];
+  total_tracks: string;
 }
 
 type SearchScreenProps = {
@@ -164,6 +164,10 @@ const handleNavigateToAlbumDetail = (album: Album) => {
 
 const toggleSearchMode = () => {
   setSearchMode(prevMode => (prevMode === 'spotify' ? 'soundcloud' : 'spotify')); // Toggle between 'spotify' and 'soundcloud'
+  setArtists([]);
+  setAlbums([]);
+  setTracks([]);
+  setSoundcloudTracks([]);
 };
 
 const handleSearch = async () => {
@@ -185,6 +189,7 @@ const handleSearch = async () => {
           onChangeText={setSearchInput}
           autoCapitalize="none"   
           autoCorrect={false}  
+          placeholderTextColor={placeholder}
           //Add Enter key to perform search on keyboard
           onKeyPress={(event) => {
             if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {
@@ -208,7 +213,7 @@ const handleSearch = async () => {
           <FontAwesomeIcon
             icon={searchMode === 'spotify' ? spotifyIcon : soundcloudIcon}
             size={40}
-            style={{ color: searchMode === 'spotify' ? '#3A3B3E' : '#3A3B3E' }}
+            style={{ color: searchMode === 'spotify' ? light : light }}
           />      
         </TouchableOpacity>
       </View>
@@ -222,7 +227,7 @@ const handleSearch = async () => {
                 <Text style={styles.recentSearchItem}>{search}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.recentSearchItemClearButton} onPress={() => clearRecentSearch(search)}>
-                <FontAwesomeIcon icon={faTimes} size={12} color="#888" />
+                <FontAwesomeIcon icon={faTimes} size={12} color={error} />
               </TouchableOpacity>
            </View>
             ))}
@@ -326,7 +331,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
     paddingBottom: 0,
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -338,7 +343,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: lgray,
     borderRadius: 12,
     paddingHorizontal: 10,
     width: '80%',
@@ -349,6 +354,7 @@ const styles = StyleSheet.create({
     height: 40,
     paddingHorizontal: 10,
     marginRight: 10,
+    color: light,
   },
   searchButton: {
     backgroundColor: '#4CAF50',
@@ -359,13 +365,13 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   clearButtonIcon: {
-    color: '#888',
+    color: light,
   },
   albumContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: dgray,
     borderRadius: 8,
     marginBottom: 10,
     shadowColor: '#000',
@@ -381,10 +387,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: dark,
     borderRadius: 8,
     marginBottom: 10,
-    shadowColor: '#000',
+    // shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -397,6 +403,7 @@ const styles = StyleSheet.create({
     fontSize: 16, // Adjust the font size as needed
     fontWeight: 'bold',
     marginBottom: 5,
+    color: light,
   },
   itemType: {
     fontSize: 12, // Adjust the font size as needed
@@ -443,7 +450,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#404040'
+    color: lgray,
   },
   recentSearchItemContainer: {
     flexDirection: 'row',
@@ -455,7 +462,7 @@ const styles = StyleSheet.create({
   },
   recentSearchItem: {
     fontSize: 14,
-    color: '#555',
+    color: dgray,
     paddingVertical: 6,
   },
   recentSearchItemClearButton: {

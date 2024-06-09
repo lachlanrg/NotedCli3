@@ -13,6 +13,7 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import { ListFriendRequestsQuery, FriendRequest } from '../API'; // Import types from your API.ts file
 import { getUser } from '../graphql/queries'; // Import the getUser query
 import { formatRelativeTime } from '../components/formatComponents';
+import { dark, light, gray, lgray, placeholder, dgray } from '../components/colorModes';
 
 Amplify.configure(awsconfig);
 
@@ -86,8 +87,6 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     if (item.status !== 'Cancelled') {
       return (
         <View style={styles.friendRequestItem}>
-          {/* Assuming you have a way to get the username from item.userSentFriendRequestsId 
-              (e.g., by fetching the user's data from the sent request ID) */}
           {/* <Text style={styles.friendRequestUsername}>{item.userSentFriendRequestsId} </Text> */}
           {item.status === 'Pending' ? (
             <Text style={styles.friendRequestStatus}>Sent a friend request</Text>
@@ -111,7 +110,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <FontAwesomeIcon icon={faChevronLeft} size={18} color="black" />
+        <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
       </TouchableOpacity>
       <View style={styles.friendRequestList}>
         <FlatList
@@ -130,7 +129,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   backButton: {
     marginRight: 10,
@@ -144,13 +143,13 @@ const styles = StyleSheet.create({
   noMoreNotifications: {
     textAlign: 'center',
     marginTop: 20,
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: lgray,
   },
   friendRequestItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: gray,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -160,7 +159,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   friendRequestStatus: {
-    fontSize: 14,
+    fontSize: 16,
+    color: light,
+    paddingBottom: 8,
   },
   noFriendRequests: {
     textAlign: 'center',
@@ -170,11 +171,11 @@ const styles = StyleSheet.create({
   },
   approveButton: {
     backgroundColor: '#007AFF',
-    padding: 8,
+    paddingBottom: 10,
     borderRadius: 5,
   },
   approveButtonText: {
-    color: 'white',
+    color: light,
     fontWeight: 'bold',
     fontSize: 14,
   },
