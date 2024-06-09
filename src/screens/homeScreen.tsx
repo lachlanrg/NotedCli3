@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { dark, light, gray, error } from '../components/colorModes';
 
 import { formatRelativeTime } from '../components/formatComponents';
 
@@ -17,6 +18,7 @@ import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import { Post } from '../API';
 import { User } from '../models';
+import { DarkTheme } from '@react-navigation/native';
 
 
 Amplify.configure(awsconfig);
@@ -104,24 +106,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the Home Screen!</Text>
+      {/* <Text style={styles.title}>Welcome to the Home Screen!</Text> */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('CreatePostTab')}>
-          <FontAwesomeIcon icon={faEdit} size={20} color="#007AFF" />
+          <FontAwesomeIcon icon={faEdit} size={20} color={light} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.refreshButton} onPress={refreshPosts}>
-          <FontAwesomeIcon icon={faSync} size={20} color="#007AFF" />
+          <FontAwesomeIcon icon={faSync} size={20} color={light} />
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.postsContainer}>
         {posts.map(post => (
           <View key={post.id} style={styles.post}>
-            <Text>{post.body}</Text>
-            <Text>{post.userPostsId}</Text>
+            <Text style={styles.bodytext}>{post.body}</Text>
+            <Text style={styles.user}>{post.userPostsId}</Text>
             <Text>{post.user?.username}</Text>
-            <Text>{formatRelativeTime(post.createdAt)}</Text>
+            <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
             <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeletePost(post.id)}>
-              <FontAwesomeIcon icon={faTimes} size={20} color="#007AFF" />
+              <FontAwesomeIcon icon={faTimes} size={20} color={error} />
             </TouchableOpacity>
           </View>
         ))}
@@ -135,45 +137,59 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: dark,
+    paddingTop: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
+    paddingTop: 10,
+    color: light,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'stretch',
     marginBottom: 20,
+    backgroundColor: dark,
   },
   button: {
-    backgroundColor: '#f9f9f9',
     borderRadius: 8,
     padding: 10,
     marginRight: 10,
   },
   refreshButton: {
-    backgroundColor: '#f9f9f9',
     borderRadius: 8,
     padding: 10,
   },
   postsContainer: {
     flex: 1,
     alignSelf: 'stretch',
+    backgroundColor: dark,
   },
   post: {
     marginBottom: 10,
     padding: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: dark,
     borderRadius: 8,
+  },
+  bodytext: {
+    color: light,
+  },
+  date: {
+    color: light,
+    fontSize: 12,
+  },
+  user: {
+    color: light,
   },
   deleteButton: {
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: dark,
     borderRadius: 8,
     padding: 10,
   },

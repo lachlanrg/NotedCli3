@@ -1,6 +1,6 @@
 // SignUpScreen.tsx
 import * as React from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { 
   signUp,
@@ -9,6 +9,7 @@ import {
   confirmSignUp,
   signIn,
 } from 'aws-amplify/auth';
+import { dark, light, error, gray, placeholder } from '../components/colorModes';
 
 import { generateClient } from 'aws-amplify/api';
 import { createUser } from '../graphql/mutations';
@@ -124,6 +125,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             onChangeText={setConfirmationCode}
             keyboardType="numeric"
             autoCapitalize="none"
+            placeholderTextColor={placeholder}
           />
           <Button title="Confirm Sign Up" onPress={handleConfirmation}/>
           <Button title="Back to Login" onPress={() => navigation.navigate('Login')}/>
@@ -138,6 +140,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
+            placeholderTextColor={placeholder}
           />
           <TextInput
             style={styles.input}
@@ -146,6 +149,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholderTextColor={placeholder}
           />
           <TextInput
             style={styles.input}
@@ -154,8 +158,12 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             value={password}
             onChangeText={setPassword}
             autoCapitalize="none"
+            placeholderTextColor={placeholder}
           />
-          <Button title="Sign Up" onPress={handleSignUp}/>
+          <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => handleSignUp()}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+
           <Button title="Back to Login" onPress={() => navigation.navigate('Login')}/>
         </>
       )}
@@ -169,19 +177,46 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: dark,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
+    fontWeight: '400',
+    color: light,
     marginBottom: 20,
   },
   input: {
     width: '100%',
-    height: 40,
+    height: 50,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+    borderColor: dark,
+    borderRadius: 10,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    backgroundColor: gray,
+    fontSize: 16,
+    color: light,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  button: {
+    width: '40%', // reduced width
+    backgroundColor: '#007BFF',
+    borderRadius: 10,
+    padding: 10, // reduced padding
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: light,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

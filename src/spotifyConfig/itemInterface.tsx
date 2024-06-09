@@ -7,6 +7,7 @@ export interface Album {
     images: { url: string }[]; 
     release_date: string;
     artists: { name: string }[];
+    total_tracks: string;
   }
   
   export interface AlbumOnly {

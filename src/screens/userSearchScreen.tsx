@@ -4,6 +4,7 @@ import { View, TextInput, TouchableOpacity, StyleSheet, Text, FlatList } from 'r
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faTimes, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { dark, light, gray, lgray, placeholder, dgray, error } from '../components/colorModes';
 import { ProfileStackParamList} from '../components/types';
 
 import { User } from '../API';
@@ -46,10 +47,10 @@ const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesomeIcon icon={faChevronLeft} size={18} color="black" />
+          <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
         </TouchableOpacity>
         <View style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faUserPlus} size={18} color="black" style={styles.userPlusIcon} />
+          <FontAwesomeIcon icon={faUserPlus} size={18} color={light} style={styles.userPlusIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Find a friend..."
@@ -57,6 +58,7 @@ const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }
             onChangeText={handleInputChange}
             autoCapitalize="none"       // Disable auto-capitalization
             autoCorrect={false}         // Disable auto-correction
+            placeholderTextColor={placeholder}
             onKeyPress={(event) => {
               if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {
                 handleUserSearch();
@@ -77,7 +79,7 @@ const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleUserPress(item)} style={styles.itemContainer}>
-            <Text>{item.username}</Text>
+            <Text style={styles.username}>{item.username}</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={() => (
@@ -95,7 +97,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 12,
     paddingBottom: 0,
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -113,7 +115,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: gray,
     borderRadius: 12,
     paddingHorizontal: 10,
     width: '90%',
@@ -125,21 +127,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginRight: 10,
     marginLeft: 1,
+    color: light,
   },
   clearButton: {
     padding: 10,
   },
   clearButtonIcon: {
-    color: '#888',
+    color: lgray,
   },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: gray,
     borderRadius: 8,
     marginBottom: 10,
-    shadowColor: '#000',
+    shadowColor: dark,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -148,9 +151,12 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  username: {
+    color: light,
+  },
   noResultsText: {
     textAlign: 'center',
-    color: '#888',
+    color: lgray,
     marginTop: 20,
   },
 });

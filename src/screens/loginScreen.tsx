@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { signIn, type SignInInput } from 'aws-amplify/auth';
 import { signOut} from 'aws-amplify/auth';
+import { dark, light, error, gray, placeholder } from '../components/colorModes';
 
 
 type LoginScreenProps = {
@@ -52,6 +53,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
+        placeholderTextColor={placeholder}
       />
       <TextInput
         style={styles.input}
@@ -60,6 +62,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         value={password}
         onChangeText={setPassword}
         autoCapitalize="none"
+        placeholderTextColor={placeholder}
       />
       <View style={styles.buttonContainer}>
         <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => handleSignIn()}>
@@ -82,25 +85,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: dark,
   },
   title: {
     fontSize: 28,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '400',
+    color: light,
     marginBottom: 20,
   },
   input: {
     width: '100%',
     height: 50,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: dark,
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 15,
-    backgroundColor: '#fff',
+    backgroundColor: gray,
     fontSize: 16,
-    color: '#333',
+    color: light,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: light,
     fontSize: 16,
     fontWeight: '600',
   },

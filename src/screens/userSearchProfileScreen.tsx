@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert } fr
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { dark, light, lgray, dgray, gray, placeholder, error } from '../components/colorModes';
 import { ProfileStackParamList } from '../components/types';
 
 import * as queries from '../graphql/queries';
@@ -270,7 +271,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesomeIcon icon={faChevronLeft} size={18} color="black" />
+          <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
         </TouchableOpacity>
           <Text style={styles.username}>{user.username}</Text>
       </View>
@@ -349,16 +350,17 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   header: {
-    backgroundColor: 'white',
+    backgroundColor: dark,
     flexDirection: 'row',
     paddingBottom: 10,
     alignItems: 'center',
     paddingTop: 24,
     paddingHorizontal: 20,
-
+    borderBottomWidth: 2,
+    borderBottomColor: gray,
   },
   backButton: {
   },
@@ -375,23 +377,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     paddingRight: 15,
+    color: light,
   },
   email: {
     fontSize: 18,
     marginTop: 10,
+    color: light,
   },
   postContainer: {
     marginBottom: 15,
     padding: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: dark,
     borderRadius: 5,
   },
   postBody: {
     fontSize: 16,
+    color: light,
   },
   postDate: {
     fontSize: 12,
-    color: '#666',
+    color: lgray,
     marginTop: 5,
   },
   followButton: {
@@ -404,7 +409,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   followButtonText: {
-    color: 'white',
+    color: light,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -417,7 +422,7 @@ const styles = StyleSheet.create({
   },
   noPostsText: {
     fontSize: 16,
-    color: '#666',
+    color: lgray,
   },
 
   // Modal Styles
@@ -437,10 +442,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)' 
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: gray,
     padding: 20,
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: dark,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -454,6 +459,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center', 
+    color: light,
   },
   modalButtonContainer: {
     flexDirection: 'row',
@@ -471,10 +477,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF', // Primary color for confirm button
   },
   modalButtonCancel: {
-    backgroundColor: '#ccc', // Gray color for cancel button
+    backgroundColor: error, // Gray color for cancel button
   },
   modalButtonText: {
-    color: '#fff',
+    color: light,
     fontWeight: 'bold',
   },
 });
