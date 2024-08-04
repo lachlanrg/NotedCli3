@@ -66,7 +66,7 @@ This is one way to run your app — you can also run it directly from within And
 
 # Troubleshooting
 
-If you get error, or similar to:
+1. If you get error, or similar to:
 
 ```bash
 # Error fetching posts: {"data": {}, "errors": [[GraphQLError: Unauthorized]]}
@@ -77,6 +77,16 @@ Navigate to AWS AppSync Console, create a new API Key, and copy the key into:
 aws-exports.js
 #"aws_appsync_apiKey":
 ```
+
+
+2. If you get error, or similar when searching on SoundCloud:
+
+```bash
+ ERROR  Error fetching search results: [Error: Failed to fetch search results]
+```
+
+Navigate to SoundCloud.com --> Network --> Either session, or search, client_id --> Replace client ID in scTrackSearch.tsx
+
 
 
 
