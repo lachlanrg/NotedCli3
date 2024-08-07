@@ -33,7 +33,13 @@ const CreatePostScreen = () => {
       const { userId, username } = await getCurrentUser();
       const PostDetails = { 
         body: postContent,
-        userPostsId: userId, //Needs user id to associate @belongs to with user
+        userPostsId: userId, 
+        spotifyTrackName: "track 2",
+        spotifyTrackArtists: "Artists",
+        spotifyTrackId: "143443423",
+
+        
+        //Needs user id to associate @belongs to with user
         // username: username,
       }
       await client.graphql({

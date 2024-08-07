@@ -5,7 +5,7 @@ import { scTrack } from './itemInterface';
 export async function searchSCTracks(searchInput: string, saveRecentSearch: any, offset: number): Promise<scTrack[]> {
     saveRecentSearch(searchInput);
 
-    const client_id = "OIsWw9OgHPy6tzlFcAi8uToacFBpKHHg"
+    const client_id = "lPP5wRG1UkRxNZhnYd7OVc4umoqzySTZ"
     const limit = '15'
 
     console.log("SoundCloud Search input: " + searchInput);

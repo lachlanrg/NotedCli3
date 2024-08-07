@@ -4,13 +4,13 @@ import { View, TextInput, TouchableOpacity, StyleSheet, Text, FlatList } from 'r
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faTimes, faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, gray, lgray, placeholder, dgray, error } from '../components/colorModes';
-import { ProfileStackParamList} from '../components/types';
+import { dark, light, gray, lgray, placeholder, dgray, error } from '../../components/colorModes';
+import { ProfileStackParamList} from '../../components/types';
 
-import { User } from '../API';
+import { User } from '../../API';
 
 
-import useSearchUsers from '../components/userSearch';
+import useSearchUsers from '../../components/userSearch';
 
 type UserSearchProfileScreenProps = {
     navigation: NativeStackNavigationProp<ProfileStackParamList, 'UserSearch'>;

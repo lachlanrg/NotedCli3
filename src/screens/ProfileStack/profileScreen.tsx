@@ -2,18 +2,18 @@ import * as React from 'react';
 import { useRef, useState } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, PanResponderGestureState, Modal} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ProfileStackParamList } from '../components/types';
+import { ProfileStackParamList } from '../../components/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core'; 
 import { faCog, faTimes, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons'; 
 import { faBell } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, placeholder, lgray, dgray, gray, error } from '../components/colorModes';
+import { dark, light, placeholder, lgray, dgray, gray, error } from '../../components/colorModes';
 
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { resetPassword, confirmResetPassword, type ResetPasswordOutput, type ConfirmResetPasswordInput } from 'aws-amplify/auth';
 
-import SettingsDropdown from '../components/settingsDropdown';
+import SettingsDropdown from '../../components/settingsDropdown';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -47,7 +47,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     setOverlayVisible(!overlayVisible);
     Animated.timing(menuPosition, {
       toValue: menuVisible ? -menuWidth : 0,
-      duration: 300,
+      duration: 200,
       easing: Easing.ease,
       useNativeDriver: false,
     }).start();

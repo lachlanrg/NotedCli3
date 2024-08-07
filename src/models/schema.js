@@ -352,7 +352,7 @@ export const schema = {
                     "name": "body",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
                     "attributes": []
                 },
                 "likes": {
@@ -402,6 +402,146 @@ export const schema = {
                         ]
                     }
                 },
+                "userPostsId": {
+                    "name": "userPostsId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "spotifyAlbumId": {
+                    "name": "spotifyAlbumId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumName": {
+                    "name": "spotifyAlbumName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumType": {
+                    "name": "spotifyAlbumType",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumImageUrl": {
+                    "name": "spotifyAlbumImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumReleaseDate": {
+                    "name": "spotifyAlbumReleaseDate",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumArtists": {
+                    "name": "spotifyAlbumArtists",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumTotalTracks": {
+                    "name": "spotifyAlbumTotalTracks",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackId": {
+                    "name": "spotifyTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackName": {
+                    "name": "spotifyTrackName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackAlbumName": {
+                    "name": "spotifyTrackAlbumName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackImageUrl": {
+                    "name": "spotifyTrackImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackArtists": {
+                    "name": "spotifyTrackArtists",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackId": {
+                    "name": "scTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackTitle": {
+                    "name": "scTrackTitle",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackArtworkUrl": {
+                    "name": "scTrackArtworkUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackUserId": {
+                    "name": "scTrackUserId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackUsername": {
+                    "name": "scTrackUsername",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackLikes": {
+                    "name": "scTrackLikes",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackGenre": {
+                    "name": "scTrackGenre",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -417,13 +557,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "userPostsId": {
-                    "name": "userPostsId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 }
             },
             "syncable": true,
@@ -664,5 +797,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "e9fdd95c93e37a0f1e5f8f61d72455db"
+    "version": "84dd0f19b0c3790106117e2a36d74489"
 };

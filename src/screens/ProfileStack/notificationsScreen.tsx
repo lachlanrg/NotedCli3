@@ -3,17 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import { ProfileStackParamList } from '../components/types';
-import * as queries from '../graphql/queries';
-import * as mutations from '../graphql/mutations';
+import { ProfileStackParamList } from '../../components/types';
+import * as queries from '../../graphql/queries';
+import * as mutations from '../../graphql/mutations';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
-import awsconfig from '../aws-exports';
+import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { ListFriendRequestsQuery, FriendRequest } from '../API'; // Import types from your API.ts file
-import { getUser } from '../graphql/queries'; // Import the getUser query
-import { formatRelativeTime } from '../components/formatComponents';
-import { dark, light, gray, lgray, placeholder, dgray } from '../components/colorModes';
+import { ListFriendRequestsQuery, FriendRequest } from '../../API'; // Import types from your API.ts file
+import { getUser } from '../../graphql/queries'; // Import the getUser query
+import { formatRelativeTime } from '../../components/formatComponents';
+import { dark, light, gray, lgray, placeholder, dgray } from '../../components/colorModes';
 
 Amplify.configure(awsconfig);
 

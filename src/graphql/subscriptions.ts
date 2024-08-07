@@ -405,12 +405,31 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       _lastChangedAt
       __typename
     }
+    userPostsId
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -443,12 +462,31 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       _lastChangedAt
       __typename
     }
+    userPostsId
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -481,12 +519,31 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       _lastChangedAt
       __typename
     }
+    userPostsId
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -500,12 +557,31 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     content
@@ -533,12 +609,31 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     content
@@ -566,12 +661,31 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     content
@@ -599,12 +713,31 @@ export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: Mo
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {
@@ -639,12 +772,31 @@ export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: Mo
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {
@@ -679,12 +831,31 @@ export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: Mo
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {

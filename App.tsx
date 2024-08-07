@@ -8,16 +8,20 @@ import { faHome, faUser, faSignInAlt, faPlus, faSearch } from '@fortawesome/free
 import { dark, light, gray, error, placeholder, lgray } from './src/components/colorModes';
 
 //Import Screens
-import HomeScreen from './src/screens/homeScreen';
-import ProfileScreen from './src/screens/profileScreen';
+import HomeScreen from './src/screens/HomeStack/homeScreen';
+import ProfileScreen from './src/screens/ProfileStack/profileScreen';
 import LoginScreen from './src/screens/loginScreen'; 
 import SignUpScreen from './src/screens/signupScreen'
 import CreatePostScreen from './src/screens/createPostScreen'; 
-import SearchScreen from './src/screens/searchScreen';
-import AlbumDetailsScreen from './src/screens/albumDetailsScreen';
-import UserSearchScreen from './src/screens/userSearchScreen';
-import UserSearchProfileScreen from './src/screens/userSearchProfileScreen';
-import NotificationsScreen from './src/screens/notificationsScreen';
+import SearchScreen from './src/screens/SearchStack/searchScreen';
+import AlbumDetailsScreen from './src/screens/SearchStack/albumDetailsScreen';
+import UserSearchScreen from './src/screens/ProfileStack/userSearchScreen';
+import UserSearchProfileScreen from './src/screens/ProfileStack/userSearchProfileScreen';
+import NotificationsScreen from './src/screens/ProfileStack/notificationsScreen';
+import PostSpotifyTrackScreen from './src/screens/SearchStack/postSpotifyTrackScreen';
+import PostSpotifyAlbumScreen from './src/screens/SearchStack/postSpotifyAlbumScreen';
+import PostSCTrackScreen from './src/screens/SearchStack/postSCTrackScreen';
+
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -61,6 +65,10 @@ const SearchStackNavigator = () => {
     <SearchStack.Navigator>
       <SearchStack.Screen name="Search" component={SearchScreen} options={{ headerShown: false }} />
       <SearchStack.Screen name="AlbumDetail" component={AlbumDetailsScreen} options={{ headerShown: false }} />
+      <SearchStack.Screen name="PostSpotifyTrack" component={PostSpotifyTrackScreen} options={{ headerShown: false }} />
+      <SearchStack.Screen name="PostSpotifyAlbum" component={PostSpotifyAlbumScreen} options={{ headerShown: false }} />
+      <SearchStack.Screen name="PostSCTrack" component={PostSCTrackScreen} options={{ headerShown: false }} />
+
       {/* Add more screens related to Search here */}
     </SearchStack.Navigator>
   );

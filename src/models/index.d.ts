@@ -120,13 +120,32 @@ type EagerPost = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly body: string;
+  readonly body?: string | null;
   readonly likes?: (Like | null)[] | null;
   readonly comments?: (Comment | null)[] | null;
   readonly user?: User | null;
+  readonly userPostsId: string;
+  readonly spotifyAlbumId?: string | null;
+  readonly spotifyAlbumName?: string | null;
+  readonly spotifyAlbumType?: string | null;
+  readonly spotifyAlbumImageUrl?: string | null;
+  readonly spotifyAlbumReleaseDate?: string | null;
+  readonly spotifyAlbumArtists?: string | null;
+  readonly spotifyAlbumTotalTracks?: string | null;
+  readonly spotifyTrackId?: string | null;
+  readonly spotifyTrackName?: string | null;
+  readonly spotifyTrackAlbumName?: string | null;
+  readonly spotifyTrackImageUrl?: string | null;
+  readonly spotifyTrackArtists?: string | null;
+  readonly scTrackId?: string | null;
+  readonly scTrackTitle?: string | null;
+  readonly scTrackArtworkUrl?: string | null;
+  readonly scTrackUserId?: string | null;
+  readonly scTrackUsername?: string | null;
+  readonly scTrackLikes?: number | null;
+  readonly scTrackGenre?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly userPostsId?: string | null;
 }
 
 type LazyPost = {
@@ -135,13 +154,32 @@ type LazyPost = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly body: string;
+  readonly body?: string | null;
   readonly likes: AsyncCollection<Like>;
   readonly comments: AsyncCollection<Comment>;
   readonly user: AsyncItem<User | undefined>;
+  readonly userPostsId: string;
+  readonly spotifyAlbumId?: string | null;
+  readonly spotifyAlbumName?: string | null;
+  readonly spotifyAlbumType?: string | null;
+  readonly spotifyAlbumImageUrl?: string | null;
+  readonly spotifyAlbumReleaseDate?: string | null;
+  readonly spotifyAlbumArtists?: string | null;
+  readonly spotifyAlbumTotalTracks?: string | null;
+  readonly spotifyTrackId?: string | null;
+  readonly spotifyTrackName?: string | null;
+  readonly spotifyTrackAlbumName?: string | null;
+  readonly spotifyTrackImageUrl?: string | null;
+  readonly spotifyTrackArtists?: string | null;
+  readonly scTrackId?: string | null;
+  readonly scTrackTitle?: string | null;
+  readonly scTrackArtworkUrl?: string | null;
+  readonly scTrackUserId?: string | null;
+  readonly scTrackUsername?: string | null;
+  readonly scTrackLikes?: number | null;
+  readonly scTrackGenre?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly userPostsId?: string | null;
 }
 
 export declare type Post = LazyLoading extends LazyLoadingDisabled ? EagerPost : LazyPost
