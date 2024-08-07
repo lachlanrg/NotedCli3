@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView } from 'react-native';
-import { SearchScreenStackParamList } from '../components/types';
+import { SearchScreenStackParamList } from '../../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'; // Import specific icon 
-import { dark, light, gray, placeholder, lgray, dgray, error } from '../components/colorModes';
+import { dark, light, gray, placeholder, lgray, dgray, error } from '../../components/colorModes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { CLIENT_ID, CLIENT_SECRET } from '../config';
-import { Track } from '../spotifyConfig/itemInterface';
+import { CLIENT_ID, CLIENT_SECRET } from '../../config';
+import { Track } from '../../spotifyConfig/itemInterface';
+import { Album } from '../../spotifyConfig/itemInterface';
 
 type AlbumDetailsScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'AlbumDetail'>;
 
@@ -81,6 +82,11 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
     </View>
   );
 
+  const navigateToPostScreen = (album: Album) => {
+    navigation.navigate('PostSpotifyAlbum', { album }); 
+    console.log("Navigating to Post with:", album.name,", ", album.id)
+  };
+
 
 
   return (
@@ -92,6 +98,9 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
         <View style={styles.albumNameContainer}>
           <Text style={styles.albumName} numberOfLines={1} ellipsizeMode="tail">{album.name}</Text>
         </View>
+        <TouchableOpacity >
+          <Text style={styles.postButtonText} onPress={() => navigateToPostScreen(album)}>Share</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -187,6 +196,11 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     width: '100%',
+  },
+  postButtonText: {
+    color: 'lightblue',
+    fontWeight: 'bold',
+    justifyContent: 'flex-end',
   },
 });
 

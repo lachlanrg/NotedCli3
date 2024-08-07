@@ -24,10 +24,33 @@ type FriendRequest @model @auth(rules: [{allow: public}]) {
 
 type Post @model @auth(rules: [{allow: public}]) {
   id: ID!
-  body: String!
+  body: String
   likes: [Like] @hasMany
   comments: [Comment] @hasMany
   user: User @belongsTo
+  userPostsId: String!
+
+  spotifyAlbumId: ID
+  spotifyAlbumName: String
+  spotifyAlbumType: String
+  spotifyAlbumImageUrl: String
+  spotifyAlbumReleaseDate: String
+  spotifyAlbumArtists: String
+  spotifyAlbumTotalTracks: String
+
+  spotifyTrackId: ID
+  spotifyTrackName: String
+  spotifyTrackAlbumName: String
+  spotifyTrackImageUrl: String
+  spotifyTrackArtists: String
+
+  scTrackId: ID
+  scTrackTitle: String
+  scTrackArtworkUrl: String
+  scTrackUserId: ID
+  scTrackUsername: String
+  scTrackLikes: Int
+  scTrackGenre: String
 }
 
 type Comment @model @auth(rules: [{allow: public}]) {

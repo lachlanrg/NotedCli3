@@ -3,21 +3,21 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert } fr
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, lgray, dgray, gray, placeholder, error } from '../components/colorModes';
-import { ProfileStackParamList } from '../components/types';
+import { dark, light, lgray, dgray, gray, placeholder, error } from '../../components/colorModes';
+import { ProfileStackParamList } from '../../components/types';
 
-import * as queries from '../graphql/queries';
-import * as mutations from '../graphql/mutations';
+import * as queries from '../../graphql/queries';
+import * as mutations from '../../graphql/mutations';
 
-import { createFriendRequest, updateFriendRequest } from '../graphql/mutations'; // Import updateFriendRequest mutation
+import { createFriendRequest, updateFriendRequest } from '../../graphql/mutations'; // Import updateFriendRequest mutation
 
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
-import awsconfig from '../aws-exports';
+import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
 
 
-import { formatRelativeTime } from '../components/formatComponents';
+import { formatRelativeTime } from '../../components/formatComponents';
 
 
 Amplify.configure(awsconfig);

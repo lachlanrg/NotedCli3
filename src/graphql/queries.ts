@@ -318,12 +318,31 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       _lastChangedAt
       __typename
     }
+    userPostsId
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -337,12 +356,31 @@ export const listPosts = /* GraphQL */ `query ListPosts(
     items {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     nextToken
@@ -366,12 +404,31 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
     items {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     nextToken
@@ -386,12 +443,31 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     content
@@ -477,12 +553,31 @@ export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
     post {
       id
       body
+      userPostsId
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {
