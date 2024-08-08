@@ -132,11 +132,14 @@ type EagerPost = {
   readonly spotifyAlbumReleaseDate?: string | null;
   readonly spotifyAlbumArtists?: string | null;
   readonly spotifyAlbumTotalTracks?: string | null;
+  readonly spotifyAlbumExternalUrl?: string | null;
   readonly spotifyTrackId?: string | null;
   readonly spotifyTrackName?: string | null;
   readonly spotifyTrackAlbumName?: string | null;
   readonly spotifyTrackImageUrl?: string | null;
   readonly spotifyTrackArtists?: string | null;
+  readonly spotifyTrackPreviewUrl?: string | null;
+  readonly spotifyTrackExternalUrl?: string | null;
   readonly scTrackId?: string | null;
   readonly scTrackTitle?: string | null;
   readonly scTrackArtworkUrl?: string | null;
@@ -144,6 +147,8 @@ type EagerPost = {
   readonly scTrackUsername?: string | null;
   readonly scTrackLikes?: number | null;
   readonly scTrackGenre?: string | null;
+  readonly scTrackPermalinkUrl?: string | null;
+  readonly scTrackWaveformUrl?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -166,11 +171,14 @@ type LazyPost = {
   readonly spotifyAlbumReleaseDate?: string | null;
   readonly spotifyAlbumArtists?: string | null;
   readonly spotifyAlbumTotalTracks?: string | null;
+  readonly spotifyAlbumExternalUrl?: string | null;
   readonly spotifyTrackId?: string | null;
   readonly spotifyTrackName?: string | null;
   readonly spotifyTrackAlbumName?: string | null;
   readonly spotifyTrackImageUrl?: string | null;
   readonly spotifyTrackArtists?: string | null;
+  readonly spotifyTrackPreviewUrl?: string | null;
+  readonly spotifyTrackExternalUrl?: string | null;
   readonly scTrackId?: string | null;
   readonly scTrackTitle?: string | null;
   readonly scTrackArtworkUrl?: string | null;
@@ -178,6 +186,8 @@ type LazyPost = {
   readonly scTrackUsername?: string | null;
   readonly scTrackLikes?: number | null;
   readonly scTrackGenre?: string | null;
+  readonly scTrackPermalinkUrl?: string | null;
+  readonly scTrackWaveformUrl?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

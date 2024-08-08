@@ -9,4 +9,5 @@ export interface scTrack {
     title: string;
     user_id: string;
     kind: string;
+    waveform_url: string;
   }

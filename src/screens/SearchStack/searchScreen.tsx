@@ -52,6 +52,7 @@ export interface Album {
   release_date: string;
   artists: { name: string }[];
   total_tracks: string;
+  external_urls: {spotify: string };
 }
 
 type SearchScreenProps = {

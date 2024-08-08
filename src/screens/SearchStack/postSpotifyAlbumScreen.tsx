@@ -53,6 +53,7 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
         spotifyAlbumArtists: album.artists.map(artist => artist.name).join(', '),
         spotifyAlbumTotalTracks: album.total_tracks,
         spotifyAlbumImageUrl: album.images[0]?.url,
+        spotifyAlbumExternalUrl: album.external_urls.spotify,
       };
 
       await client.graphql({
@@ -60,6 +61,8 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
         variables: { input: PostDetails },
       });
       console.log('New Post created successfully!');
+      console.log('External url - spotify: ', album.external_urls.spotify);
+
       setPostText('');
       navigation.goBack()
     } catch (error) {

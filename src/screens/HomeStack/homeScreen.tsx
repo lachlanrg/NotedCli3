@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   NativeSyntheticEvent, 
   NativeScrollEvent,
+  Image,
 } from 'react-native';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -68,157 +69,185 @@ const HomeScreen: React.FC = () => {
     }).start();
   };
 
-  const renderPostItem = ({ item }: { item: any }) => (
-    <View style={styles.postContainer}>
-      <View style={styles.post}>
-        {item.scTrackId && (
-          <View>
-            <Text style={styles.user}>{item.userPostsId}</Text>
-            <Text style={styles.bodytext}>{item.body}</Text>
-            <Text style={styles.date}>SoundCloud Track: {item.scTrackTitle}</Text>
-            <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-        )}
 
-        {item.spotifyAlbumId && (
-          <View>
-            <Text style={styles.user}>{item.userPostsId}</Text>
-            <Text style={styles.bodytext}>{item.body}</Text>
-            <Text style={styles.bodytext}>Album: {item.spotifyAlbumName}</Text>
-            <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
-            <Text style={styles.date}>{item.spotifyAlbumReleaseDate}</Text>
-            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumArtists}</Text>
-            <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-        )}
+  const renderPostItem = ({ item }: {item: any}) => {
+    const isSoundCloud = item.scTrackId;
+    const isSpotifyAlbum = item.spotifyAlbumId;
+    const isSpotifyTrack = item.spotifyTrackId;
+  
+    return (
+      <View style={styles.postContainer}>
+        <View style={styles.post}>
+          <Text style={styles.user}>{item.userPostsId}</Text>
+          <Text style={styles.bodytext}>{item.body}</Text>
+  
+          {isSoundCloud && (
+            <View style={styles.soundCloudPost}>
+              <View style={styles.main}>
+                <Image source={{ uri: item.scTrackArtworkUrl }} style={styles.image} />
+              </View>
+              <Text style={styles.trackTitle}>{item.scTrackTitle}</Text>
+              <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+            </View>
+          )}
+  
+          {isSpotifyAlbum && (
+            <View style={styles.spotifyPost}>
+              <View style={styles.main}>
+                <Image source={{ uri: item.spotifyAlbumImageUrl }} style={styles.image} />
+              </View>
+              <Text style={styles.albumTitle}>Album: {item.spotifyAlbumName}</Text>
+              <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumArtists}</Text>
+              <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
+              <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
+              <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+            </View>
+          )}
+  
+          {isSpotifyTrack && (
+            <View style={styles.spotifyPost}>
+              <View style={styles.main}>
+                <Image source={{ uri: item.spotifyTrackImageUrl }} style={styles.image} />
+              </View>
+              <Text style={styles.trackTitle}>Track: {item.spotifyTrackName}</Text>
+              <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
+              <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+              <Text style={styles.date}>{item.preview_url}</Text>
 
-        {item.spotifyTrackId && (
-          <View>
-            <Text style={styles.user}>{item.userPostsId}</Text>
-            <Text style={styles.bodytext}>{item.body}</Text>
-            <Text style={styles.date}>Track: {item.spotifyTrackName}</Text>
-            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
-            <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-        )}
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <FontAwesomeIcon icon={faEdit} size={20} color={light}/>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.refreshButton}>
-          <FontAwesomeIcon icon={faSync} size={20} color={light}/>
-        </TouchableOpacity>
+    );
+  };
+  
+    return (
+      <View style={styles.container}>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button}>
+            <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.refreshButton}>
+            <FontAwesomeIcon icon={faSync} size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+  
+        <Animated.View
+          style={[
+            styles.refreshIconContainer,
+            {
+              opacity: showRefreshIcon,
+              transform: [
+                {
+                  translateY: showRefreshIcon.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-30, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <ActivityIndicator size="small" color="#fff" />
+        </Animated.View>
+  
+        <FlatList
+          data={posts}
+          renderItem={renderPostItem}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+        />
       </View>
-
-      <Animated.View 
-        style={[
-          styles.refreshIconContainer,
-          { 
-            opacity: showRefreshIcon, // Control opacity for fade-in/out 
-            transform: [
-              {
-                translateY: showRefreshIcon.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-30, 0], // Adjust translation for smoother effect
-                }),
-              },
-            ],
-          }
-        ]}
-      >
-        <ActivityIndicator size="small" color={light} /> 
-      </Animated.View>
-
-      <FlatList
-        data={posts}
-        renderItem={renderPostItem}
-        keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onScroll={handleScroll} // Add scroll event listener
-        scrollEventThrottle={16} // Adjust throttle for performance
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: dark,
-    paddingTop: 20,
-    paddingLeft: 0,
-    paddingRight: 0,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    paddingTop: 10,
-    color: light,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignSelf: 'stretch',
-    marginBottom: 10,
-    backgroundColor: dark,
-  },
-  button: {
-    borderRadius: 8,
-    padding: 10,
-    marginRight: 10,
-  },
-  refreshButton: {
-    borderRadius: 8,
-    padding: 10,
-  },
-  postContainer: {
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  post: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  user: {
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  bodytext: {
-    color: '#ccc',
-    marginBottom: 5,
-  },
-  date: {
-    color: '#888',
-    fontSize: 12,
-  },
-  artist: {
-    fontSize: 12,
-    color: '#888',
-  },
-  separator: {
-    height: 0.5,
-    backgroundColor: '#333',
-  },
-  refreshIconContainer: {
-    position: 'absolute',
-    top: 40, 
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 1,
-  },
-});
-
-export default HomeScreen;
+    );
+  };
+  
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#121212',
+      paddingTop: 20,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      padding: 10,
+    },
+    button: {
+      padding: 10,
+      marginRight: 10,
+    },
+    refreshButton: {
+      padding: 10,
+    },
+    postContainer: {
+      margin: 10,
+      backgroundColor: '#1e1e1e',
+      borderRadius: 8,
+      shadowColor: '#000',
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 2 },
+    },
+    post: {
+      padding: 15,
+    },
+    main: {
+      flex: 1,
+    },
+    user: {
+      color: '#fff',
+      fontWeight: 'bold',
+      marginBottom: 5,
+    },
+    bodytext: {
+      color: '#ccc',
+      marginBottom: 10,
+    },
+    soundCloudPost: {
+    },
+    spotifyPost: {
+    },
+    image: {
+      height: 100,
+      width: 100,
+      borderRadius: 8,
+      marginBottom: 10,
+    },
+    trackTitle: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    albumTitle: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    artist: {
+      color: '#ccc',
+      fontSize: 14,
+    },
+    date: {
+      color: '#888',
+      fontSize: 12,
+      marginTop: 5,
+    },
+    separator: {
+      height: 0.5,
+      backgroundColor: '#333',
+      marginVertical: 10,
+    },
+    refreshIconContainer: {
+      position: 'absolute',
+      top: 40,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+      zIndex: 1,
+    },
+  });
+  
+  export default HomeScreen;

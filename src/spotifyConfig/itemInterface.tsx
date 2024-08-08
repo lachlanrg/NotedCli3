@@ -8,6 +8,7 @@ export interface Album {
     release_date: string;
     artists: { name: string }[];
     total_tracks: string;
+    external_urls: { spotify: string };
   }
   
   export interface AlbumOnly {
@@ -39,6 +40,7 @@ export interface Album {
     artists: { name: string }[],
     popularity: number; 
     preview_url: string,
+    external_urls: { spotify: string },
   }
   
   export interface SearchResult {
