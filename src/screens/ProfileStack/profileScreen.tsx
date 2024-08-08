@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useRef, useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, PanResponderGestureState, Modal} from 'react-native';
+import { useRef, useState, useCallback } from 'react';
+import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, Modal, ScrollView, ActivityIndicator, RefreshControl} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
@@ -13,7 +13,11 @@ import { dark, light, placeholder, lgray, dgray, gray, error } from '../../compo
 import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { resetPassword, confirmResetPassword, type ResetPasswordOutput, type ConfirmResetPasswordInput } from 'aws-amplify/auth';
 
+import { getFollowCounts } from '../../components/currentUserFollowerFollowingCount';
+import { handleScrollRefresh, showRefreshIcon, refreshing, setRefreshing } from '../../components/scrollRefresh';
+
 import SettingsDropdown from '../../components/settingsDropdown';
+import UserPostList from '../../components/userPostsList';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -40,6 +44,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [showConfirmationError, setShowConfirmationError] = useState(false);
   const [currentPhase, setCurrentPhase] = useState('start'); // 'start', 'codeSent', 'done'
+  const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
+
 
 
   const toggleMenu = () => {
@@ -72,7 +78,24 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   React.useEffect(() => {
     currentAuthenticatedUser();
     UserAttributes();
+    fetchFollowCounts();
+  }, []); 
+
+  const fetchFollowCounts = useCallback(async () => {
+    try {
+      const counts = await getFollowCounts();
+      setFollowCounts(counts);
+    } catch (error) {
+      console.error('Error fetching follow counts:', error); 
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchFollowCounts(); // Await the promise
+  }, [fetchFollowCounts]); 
 
   // React.useEffect(() => {
   //   Animated.timing(searchBoxHeight, {
@@ -203,6 +226,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     toggleMenu();
   }
 
+
   return (
     <View style={[styles.container]}>
       {overlayVisible && (
@@ -223,25 +247,56 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           {/* <SettingsDropdown /> */}
         </View>
       </View>
-      <View style={styles.statsContainer}>
-        <View style={styles.stat}>
-          <Text style={styles.statText}>Followers: 120</Text>
+
+      <Animated.View 
+        style={[
+          styles.refreshIconContainer,
+          { 
+            opacity: showRefreshIcon, 
+            transform: [
+              {
+                translateY: showRefreshIcon.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-30, 0], 
+                }),
+              },
+            ],
+          }
+        ]}
+      >
+        <ActivityIndicator size="small" color={light} /> 
+      </Animated.View>
+
+      <ScrollView
+          style={styles.scrollViewContent}
+          onScroll={handleScrollRefresh}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          scrollEventThrottle={16}
+        >
+        <View style={styles.statsContainer}>
+          <View style={styles.stat}>
+            {/* Display followers count from state */}
+            <Text style={styles.statText}>Followers: {followCounts.followers}</Text>
+          </View>
+          <View style={styles.stat}>
+            {/* Display following count from state */}
+            <Text style={styles.statText}>Following: {followCounts.following}</Text>
+          </View>
+          <TouchableOpacity onPress={handleNavigateToUserSearch}>
+            <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
+          </TouchableOpacity>
         </View>
-        <View style={styles.stat}>
-          <Text style={styles.statText}>Following: 300</Text>
-        </View>
-        <TouchableOpacity onPress={handleNavigateToUserSearch}>
-          <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
-        </TouchableOpacity>
-      </View>
-      {userInfo && (
-        <View style={styles.userInfoContainer}>
-          <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
-          <Text style={styles.userInfo}>User ID: {userInfo.userId}</Text>
-          <Text style={styles.userInfo}>Sign In Details: {JSON.stringify(userInfo.signInDetails)}</Text>
-          {email && <Text style={styles.userInfo}>Email: {email}</Text>}
-        </View>
-      )}
+
+        {userInfo && (
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
+            <Text style={styles.userInfo}>User ID: {userInfo.userId}</Text>
+            <Text style={styles.userInfo}>Sign In Details: {JSON.stringify(userInfo.signInDetails)}</Text>
+            {email && <Text style={styles.userInfo}>Email: {email}</Text>}
+          </View>
+        )}
+        <UserPostList userId={userInfo?.userId} />
+      </ScrollView>
   
   <Animated.View
       {...panResponder.panHandlers}
@@ -532,6 +587,17 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     textAlign: 'center',
     fontSize: 12,
+  },
+  scrollViewContent: {
+    flex: 1,
+  },
+  refreshIconContainer: {
+    position: 'absolute',
+    top: 70, 
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 1,
   },
 });
 
