@@ -37,12 +37,15 @@ type Post @model @auth(rules: [{allow: public}]) {
   spotifyAlbumReleaseDate: String
   spotifyAlbumArtists: String
   spotifyAlbumTotalTracks: String
+  spotifyAlbumExternalUrl: String
 
   spotifyTrackId: ID
   spotifyTrackName: String
   spotifyTrackAlbumName: String
   spotifyTrackImageUrl: String
   spotifyTrackArtists: String
+  spotifyTrackPreviewUrl: String
+  spotifyTrackExternalUrl: String
 
   scTrackId: ID
   scTrackTitle: String
@@ -51,6 +54,8 @@ type Post @model @auth(rules: [{allow: public}]) {
   scTrackUsername: String
   scTrackLikes: Int
   scTrackGenre: String
+  scTrackPermalinkUrl: String
+  scTrackWaveformUrl: String
 }
 
 type Comment @model @auth(rules: [{allow: public}]) {

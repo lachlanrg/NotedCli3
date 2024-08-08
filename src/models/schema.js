@@ -458,6 +458,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "spotifyAlbumExternalUrl": {
+                    "name": "spotifyAlbumExternalUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "spotifyTrackId": {
                     "name": "spotifyTrackId",
                     "isArray": false,
@@ -488,6 +495,20 @@ export const schema = {
                 },
                 "spotifyTrackArtists": {
                     "name": "spotifyTrackArtists",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackPreviewUrl": {
+                    "name": "spotifyTrackPreviewUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackExternalUrl": {
+                    "name": "spotifyTrackExternalUrl",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -537,6 +558,20 @@ export const schema = {
                 },
                 "scTrackGenre": {
                     "name": "scTrackGenre",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackPermalinkUrl": {
+                    "name": "scTrackPermalinkUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackWaveformUrl": {
+                    "name": "scTrackWaveformUrl",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -797,5 +832,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "84dd0f19b0c3790106117e2a36d74489"
+    "version": "ce89d5fdf6a21a2ce4bb513c2013e76c"
 };

@@ -42,6 +42,8 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
     try {
       const client = generateClient();
       const { userId } = await getCurrentUser();
+      
+      // const openInApp = "soundcloud://tracks/" + id + "?utm_source=direct&utm_content=download_button_header&utm_medium=mobi&utm_campaign=no_campaign&mt=8&at=direct&pt=mobi&ct=no_campaign"
     
       const PostDetails = {
         body: postText,
@@ -50,6 +52,8 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         scTrackId: sctrack.id,
         scTrackUserId: sctrack.user_id,
         scTrackArtworkUrl: sctrack.artwork_url,
+        scTrackPermalinkUrl: sctrack.permalink_url,
+        scTrackWaveformUrl: sctrack.waveform_url,
       };
 
       await client.graphql({
@@ -57,6 +61,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         variables: { input: PostDetails },
       });
       console.log('New SC Post created successfully!');
+      console.log('Permalink URL: ', sctrack.permalink_url)
       setPostText('');
       navigation.goBack()
     } catch (error) {

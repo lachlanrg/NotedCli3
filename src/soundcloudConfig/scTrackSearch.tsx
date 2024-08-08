@@ -28,6 +28,7 @@ export async function searchSCTracks(searchInput: string, saveRecentSearch: any,
         title: sctrack.title,
         user_id: sctrack.user_id,
         kind: sctrack.kind,
+        waveform_url: sctrack.waveform_url,
       }));
       
     //   console.log('--------------------------------------------'); 

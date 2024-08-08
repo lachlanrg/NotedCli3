@@ -50,7 +50,9 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         spotifyTrackArtists: track.artists.map(artist => artist.name).join(', '), 
         spotifyTrackId: track.id,
         spotifyTrackAlbumName: track.album.name,
-        // spotifyTrackImageUrl: track.album.images[0]?.url // Track image URL
+        spotifyTrackImageUrl: track.album.images[0]?.url,
+        spotifyTrackPreviewUrl: track.preview_url,
+        spotifyTrackExternalUrl: track.external_urls.spotify,
       };
 
       await client.graphql({
@@ -58,6 +60,8 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         variables: { input: PostDetails },
       });
       console.log('New Post created successfully!');
+      console.log('PreviewUrl: ', track.preview_url);
+      console.log('External url - spotify: ', track.external_urls.spotify);
       setPostText('');
       navigation.goBack()
     } catch (error) {

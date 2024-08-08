@@ -326,11 +326,14 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     spotifyAlbumReleaseDate
     spotifyAlbumArtists
     spotifyAlbumTotalTracks
+    spotifyAlbumExternalUrl
     spotifyTrackId
     spotifyTrackName
     spotifyTrackAlbumName
     spotifyTrackImageUrl
     spotifyTrackArtists
+    spotifyTrackPreviewUrl
+    spotifyTrackExternalUrl
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -338,6 +341,8 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     scTrackUsername
     scTrackLikes
     scTrackGenre
+    scTrackPermalinkUrl
+    scTrackWaveformUrl
     createdAt
     updatedAt
     _version
@@ -364,11 +369,14 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       spotifyAlbumReleaseDate
       spotifyAlbumArtists
       spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
       spotifyTrackId
       spotifyTrackName
       spotifyTrackAlbumName
       spotifyTrackImageUrl
       spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -376,6 +384,8 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       scTrackUsername
       scTrackLikes
       scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
@@ -412,11 +422,14 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       spotifyAlbumReleaseDate
       spotifyAlbumArtists
       spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
       spotifyTrackId
       spotifyTrackName
       spotifyTrackAlbumName
       spotifyTrackImageUrl
       spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -424,6 +437,8 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       scTrackUsername
       scTrackLikes
       scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
@@ -451,11 +466,14 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       spotifyAlbumReleaseDate
       spotifyAlbumArtists
       spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
       spotifyTrackId
       spotifyTrackName
       spotifyTrackAlbumName
       spotifyTrackImageUrl
       spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -463,6 +481,8 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       scTrackUsername
       scTrackLikes
       scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
@@ -561,11 +581,14 @@ export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
       spotifyAlbumReleaseDate
       spotifyAlbumArtists
       spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
       spotifyTrackId
       spotifyTrackName
       spotifyTrackAlbumName
       spotifyTrackImageUrl
       spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -573,6 +596,8 @@ export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
       scTrackUsername
       scTrackLikes
       scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
