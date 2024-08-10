@@ -1,11 +1,14 @@
 // App.tsx
 import * as React from 'react';
+import { useRef } from 'react';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHome, faUser, faSignInAlt, faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faSignInAlt, faPlus, faSearch, faUser, faCompass } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, gray, error, placeholder, lgray } from './src/components/colorModes';
+// import { faCompass } from '@fortawesome/free-regular-svg-icons';
+
 
 //Import Screens
 import HomeScreen from './src/screens/HomeStack/homeScreen';
@@ -21,6 +24,8 @@ import NotificationsScreen from './src/screens/ProfileStack/notificationsScreen'
 import PostSpotifyTrackScreen from './src/screens/SearchStack/postSpotifyTrackScreen';
 import PostSpotifyAlbumScreen from './src/screens/SearchStack/postSpotifyAlbumScreen';
 import PostSCTrackScreen from './src/screens/SearchStack/postSCTrackScreen';
+import ExploreScreen from './src/screens/ExploreStack/exploreScreen';
+import ItemDetailsExploreScreen from './src/screens/ExploreStack/itemDetailsExploreScreen';
 
 
 //Initialise Amplify Config
@@ -38,6 +43,7 @@ import { SearchScreenStackParamList } from './src/components/types';
 import { ProfileStackParamList } from './src/components/types';
 import { CreatePostStackParamList } from './src/components/types';
 import { HomeStackParamList } from './src/components/types';
+import { ExploreStackParamList } from './src/components/types';
 
 
 (Amplify as any).configure(awsconfig);
@@ -50,6 +56,7 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>(); // Stack for Search screens
 const CreatePostStack = createNativeStackNavigator<CreatePostStackParamList>(); // Stack for Create Post screens
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>(); // Stack for Profile screens
+const ExploreStack = createNativeStackNavigator<ExploreStackParamList>();
 
 const HomeStackNavigator = () => {
   return (
@@ -97,7 +104,18 @@ const ProfileStackNavigator = () => {
   );
 };
 
+const ExploreStackNavigator = () => {
+  return (
+    <ExploreStack.Navigator>
+      <ExploreStack.Screen name="Explore" component={ExploreScreen} options={{ headerShown: false }} />
+      <ExploreStack.Screen name="ItemDetailsExplore" component={ItemDetailsExploreScreen} options={{ headerShown: false }} />
+    </ExploreStack.Navigator>
+  )
+}
+
 const MainTabNavigator = () => {
+  const homeScreenRef = useRef(null);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -110,6 +128,8 @@ const MainTabNavigator = () => {
             iconName = focused ? faUser : faUser;
           } else if (route.name === 'CreatePostTab') { 
           iconName = focused ? faPlus : faPlus;
+          } else if (route.name === 'ExploreTab') { 
+          iconName = focused ? faCompass : faCompass;
           } else if (route.name === 'SearchTab') {
             iconName = focused ? faSearch : faSearch;
           }
@@ -125,6 +145,7 @@ const MainTabNavigator = () => {
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="CreatePostTab" component={CreatePostStackNavigator} options={{ headerShown: false }} /> 
+      <Tab.Screen name="ExploreTab" component={ExploreStackNavigator} options={{ headerShown: false }} /> 
       <Tab.Screen name="ProfileTab" component={ProfileStackNavigator} options={{ headerShown: false }} />
     </Tab.Navigator>
   );

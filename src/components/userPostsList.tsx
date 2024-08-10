@@ -55,9 +55,9 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
     fetchUserPosts();
   }, [fetchUserPosts]);
 
-  if (isLoading) {
-    return <Text>Loading posts...</Text>; 
-  }
+  // if (isLoading) {
+  //   return <Text>Loading posts...</Text>; 
+  // }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
