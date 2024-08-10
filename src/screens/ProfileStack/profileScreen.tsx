@@ -18,6 +18,7 @@ import { handleScrollRefresh, showRefreshIcon, refreshing, setRefreshing } from 
 
 import SettingsDropdown from '../../components/settingsDropdown';
 import UserPostList from '../../components/userPostsList';
+import { scrollViewRef, handleTopScrollViewPress } from '../../components/topScreenScrollRef';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -46,6 +47,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [currentPhase, setCurrentPhase] = useState('start'); // 'start', 'codeSent', 'done'
   const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
 
+  const scrollViewRef = useRef<ScrollView>(null);
 
 
   const toggleMenu = () => {
@@ -226,12 +228,19 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     toggleMenu();
   }
 
+  const handleTopPress = () => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  };
+
 
   return (
     <View style={[styles.container]}>
       {overlayVisible && (
         <TouchableOpacity style={styles.overlay} onPress={toggleMenu} />
       )}
+      <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
+        <View style={styles.topButtonArea} />
+      </TouchableOpacity>
       <View style={styles.header}>
         <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
         <View style={styles.icons}>
@@ -267,7 +276,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         <ActivityIndicator size="small" color={light} /> 
       </Animated.View>
 
-      <ScrollView
+      <ScrollView   
+          ref={scrollViewRef}
           style={styles.scrollViewContent}
           onScroll={handleScrollRefresh}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -404,6 +414,20 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingBottom: 20,
     paddingRight: 8,
+  },
+  topButton: {
+    position: 'absolute',
+    alignItems: 'center',
+    top: 0,
+    left: '36%',
+    height: 43,
+    width: 100,
+    zIndex: 1,
+    borderColor: 'white',
+    borderWidth: 0.5,
+  },
+  topButtonArea: {
+    flex: 1,
   },
   usernameWelcome: {
     fontSize: 24,
