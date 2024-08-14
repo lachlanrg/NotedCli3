@@ -12,39 +12,47 @@ import {
   NativeScrollEvent,
   Image,
   Linking,
+  TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { useFocusEffect, useRoute } from '@react-navigation/native';
-
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { dark, light, gray, error, lgray, dgray } from '../../components/colorModes';
-import { faEdit, faSync, faTimes } from '@fortawesome/free-solid-svg-icons';
-
+import { faEdit, faSync, faTimes, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import {faHeart, faComment } from '@fortawesome/free-regular-svg-icons'
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import * as queries from '../../graphql/queries';
 import awsconfig from '../../aws-exports';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { User } from '../../models';
-
+import CommentsBottomSheet from '../../components/CommentsBottomSheet';
 
 Amplify.configure(awsconfig);
+
+const commentIcon = faComment as IconProp;
+const likeIcon = faHeart as IconProp;
 
 const HomeScreen: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
-
   const [refreshing, setRefreshing] = useState(false);
   const showRefreshIcon = useRef(new Animated.Value(0)).current;
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
-  
   const flatListRef = useRef<FlatList>(null);
+  
+  const [showCommentMenu, setShowCommentMenu] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const commentMenuHeight = useRef(new Animated.Value(0)).current;
+
+
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await client.graphql({ query: queries.listPosts });
-      // Sort posts by createdAt in descending order
       const sortedPosts = response.data.listPosts.items.sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
@@ -53,7 +61,7 @@ const HomeScreen: React.FC = () => {
       console.error('Error fetching posts:', error);
     } finally {
       setIsLoading(false);
-      setRefreshing(false); // Stop refreshing indicator
+      setRefreshing(false);
     }
   }, []);
 
@@ -69,7 +77,7 @@ const HomeScreen: React.FC = () => {
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     Animated.timing(showRefreshIcon, {
       toValue: event.nativeEvent.contentOffset.y <= -50 ? 1 : 0,
-      duration: 100, // Adjust animation duration as needed
+      duration: 100,
       useNativeDriver: true,
     }).start();
   };
@@ -83,14 +91,13 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleDetailsPress = () => {
-    // TODO: Implement navigation to details screen for selectedTrack
     console.log('Details pressed for:', selectedTrack);
   };
 
   const handleListenPress = () => {
     if (selectedTrack) {
-      const url = selectedTrack.scTrackPermalinkUrl 
-                  || selectedTrack.spotifyAlbumExternalUrl 
+      const url = selectedTrack.scTrackPermalinkUrl
+                  || selectedTrack.spotifyAlbumExternalUrl
                   || selectedTrack.spotifyTrackExternalUrl;
 
       if (url) {
@@ -101,6 +108,21 @@ const HomeScreen: React.FC = () => {
       }
     }
   };
+
+  const toggleCommentMenu = (postId: string | null) => {
+    setSelectedPostId(postId);
+    setShowCommentMenu((prevState) => !prevState);
+  };
+
+  useEffect(() => {
+    Animated.timing(commentMenuHeight, {
+      toValue: showCommentMenu ? 300 : 0, // Adjust height as needed
+      duration: 300,
+
+      useNativeDriver: false, // You might need to use 'false' for Android
+    }).start();
+  }, [showCommentMenu]);
+
 
   const renderPostItem = ({ item }: { item: any }) => {
     const isSoundCloud = item.scTrackId;
@@ -125,6 +147,14 @@ const HomeScreen: React.FC = () => {
                   <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.scTrackTitle}</Text>
                 </TouchableOpacity>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+                  <View style={styles.commentLikeSection}>
+                    <TouchableOpacity style={styles.likeIcon}>
+                      <FontAwesomeIcon icon={likeIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
+                      <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
               </View>
           )}
 
@@ -145,11 +175,18 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
                 <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+                  <View style={styles.commentLikeSection}>
+                    <TouchableOpacity style={styles.likeIcon}>
+                      <FontAwesomeIcon icon={likeIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
+                      <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
               </View>
           )}
 
           {isSpotifyTrack && (
-            <TouchableOpacity onPress={() => handleTrackPress(item)}>
               <View style={styles.spotifyPost}>
                 <View style={styles.main}>
                   <Image
@@ -164,18 +201,24 @@ const HomeScreen: React.FC = () => {
                   {item.spotifyTrackArtists}
                 </Text>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-                <Text style={styles.date}>{item.preview_url}</Text>
+                  <View style={styles.commentLikeSection}>
+                    <TouchableOpacity style={styles.likeIcon}>
+                      <FontAwesomeIcon icon={likeIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
+                      <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
               </View>
-            </TouchableOpacity>
           )}
         </View>
       </View>
     );
   };
 
-    const handleTopPress = () => {
-      flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-    };
+  const handleTopPress = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
 
   return (
     <View style={styles.container}>
@@ -221,6 +264,20 @@ const HomeScreen: React.FC = () => {
         scrollEventThrottle={16}
       />
 
+      <Animated.View 
+          style={[
+            styles.commentMenuContainer,
+            { height: commentMenuHeight }
+          ]}
+        >
+          {selectedPostId && (
+            <View style={styles.commentMenu}>
+              <Text>Comments for Post ID: {selectedPostId}</Text>
+              {/* Here you will add the comment list and input later */}
+            </View>
+          )}
+        </Animated.View>
+
       {selectedTrack && (
         <View style={styles.trackMenu}>
           <TouchableOpacity
@@ -236,14 +293,14 @@ const HomeScreen: React.FC = () => {
               selectedTrack.spotifyTrackName}
           </Text>
 
-          <View style={styles.menuButtonContainer}> 
+          <View style={styles.menuButtonContainer}>
           <TouchableOpacity style={styles.menuDetailsButton} onPress={handleDetailsPress}>
               <Text style={styles.buttonText}>Details</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.menuListenButton, { 
-                borderColor: selectedTrack.scTrackId ? 'orange' : 'green' 
-              }]} 
+            <TouchableOpacity
+              style={[styles.menuListenButton, {
+                borderColor: selectedTrack.scTrackId ? 'orange' : 'green'
+              }]}
               onPress={handleListenPress}
             >
               <Text style={styles.buttonText}>
@@ -361,45 +418,73 @@ const styles = StyleSheet.create({
     backgroundColor: light,
     padding: 15,
     borderRadius: 15,
-    alignItems: 'center', 
+    alignItems: 'center',
   },
   closeButton: {
     position: 'absolute',
-    top: 10, 
+    top: 10,
     right: 10,
     padding: 3,
     color: dark,
   },
   trackMenuText: {
     color: dark,
-    marginBottom: 15, 
-    textAlign: 'center', 
+    marginBottom: 15,
+    textAlign: 'center',
     width: '80%',
   },
   menuButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '70%', 
+    width: '70%',
   },
   menuDetailsButton: {
     backgroundColor: light,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
-    borderWidth: 1, 
-    borderColor: lgray, 
+    borderWidth: 1,
+    borderColor: lgray,
   },
   menuListenButton: {
-    backgroundColor: light, 
+    backgroundColor: light,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
   },
   buttonText: {
-    color: dark, // Set button text color to dark
+    color: dark,
     fontWeight: 'bold',
+  },
+  commentLikeSection: {
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  commentIcon: {
+    marginLeft: 20,
+  },
+  likeIcon: {
+    marginLeft: 2,
+  },
+
+  commentMenuContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white', 
+    borderRadius: 18,
+  },
+  commentMenu: {
+    flex: 1,
+    padding: 10,
+  },
+  bottomSheetContent: { 
+    padding: 20,
   },
 });
 
 export default HomeScreen;
+

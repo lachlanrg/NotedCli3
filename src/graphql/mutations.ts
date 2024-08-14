@@ -41,6 +41,11 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -86,6 +91,11 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -127,6 +137,11 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       __typename
     }
     receivedFriendRequests {
+      nextToken
+      startedAt
+      __typename
+    }
+    comments {
       nextToken
       startedAt
       __typename
@@ -637,11 +652,24 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }
@@ -697,11 +725,24 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }
@@ -757,11 +798,24 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }

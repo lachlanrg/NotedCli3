@@ -19,6 +19,7 @@ type EagerUser = {
   readonly friends?: (Friendship | null)[] | null;
   readonly sentFriendRequests?: (FriendRequest | null)[] | null;
   readonly receivedFriendRequests?: (FriendRequest | null)[] | null;
+  readonly comments?: (Comment | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -36,6 +37,7 @@ type LazyUser = {
   readonly friends: AsyncCollection<Friendship>;
   readonly sentFriendRequests: AsyncCollection<FriendRequest>;
   readonly receivedFriendRequests: AsyncCollection<FriendRequest>;
+  readonly comments: AsyncCollection<Comment>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -207,8 +209,11 @@ type EagerComment = {
   readonly post?: Post | null;
   readonly content: string;
   readonly likes?: (Like | null)[] | null;
+  readonly user?: User | null;
+  readonly userPostsId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly userCommentsId?: string | null;
   readonly postCommentsId?: string | null;
 }
 
@@ -221,8 +226,11 @@ type LazyComment = {
   readonly post: AsyncItem<Post | undefined>;
   readonly content: string;
   readonly likes: AsyncCollection<Like>;
+  readonly user: AsyncItem<User | undefined>;
+  readonly userPostsId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly userCommentsId?: string | null;
   readonly postCommentsId?: string | null;
 }
 

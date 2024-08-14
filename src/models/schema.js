@@ -104,6 +104,22 @@ export const schema = {
                         ]
                     }
                 },
+                "comments": {
+                    "name": "comments",
+                    "isArray": true,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "userCommentsId"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -667,6 +683,28 @@ export const schema = {
                         ]
                     }
                 },
+                "user": {
+                    "name": "user",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "userCommentsId"
+                        ]
+                    }
+                },
+                "userPostsId": {
+                    "name": "userPostsId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -682,6 +720,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
+                },
+                "userCommentsId": {
+                    "name": "userCommentsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
                 },
                 "postCommentsId": {
                     "name": "postCommentsId",
@@ -832,5 +877,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "ce89d5fdf6a21a2ce4bb513c2013e76c"
+    "version": "9fe3fb707a3b457c1e14657f05032347"
 };

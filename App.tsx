@@ -157,7 +157,6 @@ const App = () => {
 
   return (
     <ThemeProvider>
-
     <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator>
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
