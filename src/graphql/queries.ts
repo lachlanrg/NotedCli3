@@ -38,6 +38,11 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -496,11 +501,24 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }
@@ -518,11 +536,13 @@ export const listComments = /* GraphQL */ `query ListComments(
     items {
       id
       content
+      userPostsId
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
+      userCommentsId
       postCommentsId
       __typename
     }
@@ -550,11 +570,13 @@ export const syncComments = /* GraphQL */ `query SyncComments(
     items {
       id
       content
+      userPostsId
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
+      userCommentsId
       postCommentsId
       __typename
     }

@@ -19,5 +19,26 @@
         "notedaws": {}
       }
     }
+  },
+  "stagingtwo": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-notedaws-stagingtwo-50fbd-authRole",
+      "UnauthRoleArn": "arn:aws:iam::223985317176:role/amplify-notedaws-stagingtwo-50fbd-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::223985317176:role/amplify-notedaws-stagingtwo-50fbd-authRole",
+      "Region": "ap-southeast-2",
+      "DeploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
+      "UnauthRoleName": "amplify-notedaws-stagingtwo-50fbd-unauthRole",
+      "StackName": "amplify-notedaws-stagingtwo-50fbd",
+      "StackId": "arn:aws:cloudformation:ap-southeast-2:223985317176:stack/amplify-notedaws-stagingtwo-50fbd/e9a598b0-5a1d-11ef-9ed4-060b2b5a6719",
+      "AmplifyAppId": "d2wqma0xfh91me"
+    },
+    "categories": {
+      "auth": {
+        "NotedAWS": {}
+      },
+      "api": {
+        "notedaws": {}
+      }
+    }
   }
 }

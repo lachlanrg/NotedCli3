@@ -38,6 +38,11 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -80,6 +85,11 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -118,6 +128,11 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       __typename
     }
     receivedFriendRequests {
+      nextToken
+      startedAt
+      __typename
+    }
+    comments {
       nextToken
       startedAt
       __typename
@@ -610,11 +625,24 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }
@@ -667,11 +695,24 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }
@@ -724,11 +765,24 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       startedAt
       __typename
     }
+    user {
+      id
+      username
+      email
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userPostsId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
     __typename
   }
