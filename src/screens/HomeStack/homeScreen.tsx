@@ -18,13 +18,15 @@ import {
 import { useFocusEffect, useRoute } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { dark, light, gray, error, lgray, dgray } from '../../components/colorModes';
-import { faEdit, faSync, faTimes, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import {faHeart, faComment } from '@fortawesome/free-regular-svg-icons'
+import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular, faComment } from '@fortawesome/free-regular-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import * as queries from '../../graphql/queries';
+import * as mutations from '../../graphql/mutations';
 import awsconfig from '../../aws-exports';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { User } from '../../models';
 import CommentsBottomSheet from '../../components/CommentsBottomSheet';
@@ -32,7 +34,8 @@ import CommentsBottomSheet from '../../components/CommentsBottomSheet';
 Amplify.configure(awsconfig);
 
 const commentIcon = faComment as IconProp;
-const likeIcon = faHeart as IconProp;
+const unLikedIcon = faHeartRegular as IconProp;
+const likedIcon = faHeartSolid as IconProp;
 
 const HomeScreen: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -47,6 +50,24 @@ const HomeScreen: React.FC = () => {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const commentMenuHeight = useRef(new Animated.Value(0)).current;
 
+  const [likedPosts, setLikedPosts] = useState<{ postId: string, likeId: string }[]>([]);
+  const [userInfo, setUserId] = React.useState<any>(null);
+
+
+  React.useEffect(() => {
+    currentAuthenticatedUser();
+  }, []);
+
+  async function currentAuthenticatedUser() {
+    try {
+      const { userId  } = await getCurrentUser();
+      console.log(`The User Id: ${userId}`);
+  
+      setUserId({ userId });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
 
   const fetchPosts = useCallback(async () => {
@@ -123,6 +144,66 @@ const HomeScreen: React.FC = () => {
     }).start();
   }, [showCommentMenu]);
 
+  const handleLikePress = async (itemId: string) => {
+    try {
+      const { userId } = await getCurrentUser();
+      const client = generateClient();
+  
+      if (!userInfo) {
+        console.error("User not logged in!");
+        return;
+      }
+  
+      // 1. Fetch the Post to be updated 
+      const postToUpdate = posts.find((post) => post.id === itemId);
+  
+      if (!postToUpdate) {
+        console.error("Post not found!");
+        return;
+      }
+  
+      // 2. Determine if the post is already liked by the user
+      const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
+  
+      // 3. Prepare the updated 'likedBy' array 
+      let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
+        ? postToUpdate.likedBy 
+        : []; // Start with an empty array if null or not an array
+  
+      if (!isLiked) {
+        // Add the user's ID if they are not already liking the post
+        updatedLikedBy = [...updatedLikedBy, userId]; 
+      } else {
+        // Remove the user's ID if they are unliking the post
+        updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
+      }
+  
+      // 4. Calculate the updated 'likesCount'
+      const updatedLikesCount = updatedLikedBy.length;
+  
+      // 5. Update the Post in your database 
+      const updatedPost = await client.graphql({
+        query: mutations.updatePost, 
+        variables: {
+          input: {
+            id: itemId,
+            likedBy: updatedLikedBy,
+            likesCount: updatedLikesCount,
+            _version: postToUpdate._version, // Important for optimistic locking 
+          },
+        },
+      });
+  
+      // 6. Update your local state (if not using a cache)
+      setPosts(prevPosts => prevPosts.map(post => 
+        post.id === itemId ? updatedPost.data.updatePost : post 
+      ));
+  
+    } catch (error) {
+      console.error("Error updating post:", error);
+      // Handle the error appropriately (e.g., display an error message)
+    }
+  };
 
   const renderPostItem = ({ item }: { item: any }) => {
     const isSoundCloud = item.scTrackId;
@@ -148,9 +229,19 @@ const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
                   <View style={styles.commentLikeSection}>
-                    <TouchableOpacity style={styles.likeIcon}>
-                      <FontAwesomeIcon icon={likeIcon} size={20} color="#fff" />
+                    <TouchableOpacity 
+                      style={styles.likeIcon}
+                      onPress={() => handleLikePress(item.id)} 
+                    >
+                      <FontAwesomeIcon
+                        icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                        size={20}
+                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'} 
+                      />
                     </TouchableOpacity>
+                    <Text style={styles.likesCountText}>
+                      {item.likesCount || 0} 
+                    </Text>
                     <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
@@ -176,9 +267,19 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
                   <View style={styles.commentLikeSection}>
-                    <TouchableOpacity style={styles.likeIcon}>
-                      <FontAwesomeIcon icon={likeIcon} size={20} color="#fff" />
+                    <TouchableOpacity 
+                      style={styles.likeIcon}
+                      onPress={() => handleLikePress(item.id)} 
+                    >
+                      <FontAwesomeIcon
+                        icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                        size={20}
+                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'} 
+                      />
                     </TouchableOpacity>
+                      <Text style={styles.likesCountText}>
+                        {item.likesCount || 0} 
+                      </Text>
                     <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
@@ -202,9 +303,19 @@ const HomeScreen: React.FC = () => {
                 </Text>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
                   <View style={styles.commentLikeSection}>
-                    <TouchableOpacity style={styles.likeIcon}>
-                      <FontAwesomeIcon icon={likeIcon} size={20} color="#fff" />
+                    <TouchableOpacity 
+                      style={styles.likeIcon}
+                      onPress={() => handleLikePress(item.id)} 
+                    >
+                      <FontAwesomeIcon
+                        icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                        size={20}
+                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'} 
+                      />
                     </TouchableOpacity>
+                    <Text style={styles.likesCountText}>
+                      {item.likesCount || 0} 
+                    </Text>
                     <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
@@ -468,7 +579,11 @@ const styles = StyleSheet.create({
   likeIcon: {
     marginLeft: 2,
   },
-
+  likesCountText: {
+    color: '#fff', // Set your desired color
+    fontSize: 16,  // Set your desired font size
+    marginLeft: 8,  // Add spacing between icon and count
+  },
   commentMenuContainer: {
     position: 'absolute',
     bottom: 0,

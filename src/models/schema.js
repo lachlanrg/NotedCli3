@@ -371,22 +371,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
-                "likes": {
-                    "name": "likes",
-                    "isArray": true,
-                    "type": {
-                        "model": "Like"
-                    },
-                    "isRequired": false,
-                    "attributes": [],
-                    "isArrayNullable": true,
-                    "association": {
-                        "connectionType": "HAS_MANY",
-                        "associatedWith": [
-                            "postLikesId"
-                        ]
-                    }
-                },
                 "comments": {
                     "name": "comments",
                     "isArray": true,
@@ -422,6 +406,21 @@ export const schema = {
                     "name": "userPostsId",
                     "isArray": false,
                     "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "likedBy": {
+                    "name": "likedBy",
+                    "isArray": true,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
                     "isRequired": true,
                     "attributes": []
                 },
@@ -771,21 +770,6 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "post": {
-                    "name": "post",
-                    "isArray": false,
-                    "type": {
-                        "model": "Post"
-                    },
-                    "isRequired": false,
-                    "attributes": [],
-                    "association": {
-                        "connectionType": "BELONGS_TO",
-                        "targetNames": [
-                            "postLikesId"
-                        ]
-                    }
-                },
                 "user": {
                     "name": "user",
                     "isArray": false,
@@ -800,6 +784,20 @@ export const schema = {
                             "userLikesId"
                         ]
                     }
+                },
+                "postId": {
+                    "name": "postId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "userLikesId": {
+                    "name": "userLikesId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
                 },
                 "createdAt": {
                     "name": "createdAt",
@@ -816,20 +814,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "userLikesId": {
-                    "name": "userLikesId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "postLikesId": {
-                    "name": "postLikesId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 },
                 "commentLikesId": {
                     "name": "commentLikesId",
@@ -877,5 +861,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "9fe3fb707a3b457c1e14657f05032347"
+    "version": "b1c1d127ca62c723093db095fc98493d"
 };

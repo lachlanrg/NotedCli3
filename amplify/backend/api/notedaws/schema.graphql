@@ -26,10 +26,12 @@ type FriendRequest @model @auth(rules: [{allow: public}]) {
 type Post @model @auth(rules: [{allow: public}]) {
   id: ID!
   body: String
-  likes: [Like] @hasMany
   comments: [Comment] @hasMany
   user: User @belongsTo
   userPostsId: String!
+
+  likedBy: [ID!]    # Array of user IDs who liked this post
+  likesCount: Int!  # Total number of likes (initialize to 0 in your database)
 
   spotifyAlbumId: ID
   spotifyAlbumName: String
@@ -70,7 +72,8 @@ type Comment @model @auth(rules: [{allow: public}]) {
 
 type Like @model @auth(rules: [{allow: public}]) {
   id: ID!
-  post: Post @belongsTo
   user: User @belongsTo
+  postId: String!
+  userLikesId: String!
 }
  

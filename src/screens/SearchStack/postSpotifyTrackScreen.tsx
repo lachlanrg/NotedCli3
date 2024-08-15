@@ -53,6 +53,7 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         spotifyTrackImageUrl: track.album.images[0]?.url,
         spotifyTrackPreviewUrl: track.preview_url,
         spotifyTrackExternalUrl: track.external_urls.spotify,
+        likesCount: 0,
       };
 
       await client.graphql({

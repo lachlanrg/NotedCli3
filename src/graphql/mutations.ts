@@ -417,11 +417,6 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
   createPost(input: $input, condition: $condition) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -439,6 +434,8 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -482,11 +479,6 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
   updatePost(input: $input, condition: $condition) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -504,6 +496,8 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -547,11 +541,6 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
   deletePost(input: $input, condition: $condition) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -569,6 +558,8 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -615,6 +606,8 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -688,6 +681,8 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -761,6 +756,8 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -830,41 +827,6 @@ export const createLike = /* GraphQL */ `mutation CreateLike(
 ) {
   createLike(input: $input, condition: $condition) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -876,13 +838,13 @@ export const createLike = /* GraphQL */ `mutation CreateLike(
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }
@@ -897,41 +859,6 @@ export const updateLike = /* GraphQL */ `mutation UpdateLike(
 ) {
   updateLike(input: $input, condition: $condition) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -943,13 +870,13 @@ export const updateLike = /* GraphQL */ `mutation UpdateLike(
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }
@@ -964,41 +891,6 @@ export const deleteLike = /* GraphQL */ `mutation DeleteLike(
 ) {
   deleteLike(input: $input, condition: $condition) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -1010,13 +902,13 @@ export const deleteLike = /* GraphQL */ `mutation DeleteLike(
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }
