@@ -399,11 +399,6 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
   onCreatePost(filter: $filter) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -421,6 +416,8 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -461,11 +458,6 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
   onUpdatePost(filter: $filter) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -483,6 +475,8 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -523,11 +517,6 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
   onDeletePost(filter: $filter) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -545,6 +534,8 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -588,6 +579,8 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -658,6 +651,8 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -728,6 +723,8 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -794,41 +791,6 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
 export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: ModelSubscriptionLikeFilterInput) {
   onCreateLike(filter: $filter) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -840,13 +802,13 @@ export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: Mo
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }
@@ -858,41 +820,6 @@ export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: Mo
 export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: ModelSubscriptionLikeFilterInput) {
   onUpdateLike(filter: $filter) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -904,13 +831,13 @@ export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: Mo
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }
@@ -922,41 +849,6 @@ export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: Mo
 export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: ModelSubscriptionLikeFilterInput) {
   onDeleteLike(filter: $filter) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -968,13 +860,13 @@ export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: Mo
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }

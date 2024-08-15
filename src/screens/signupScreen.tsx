@@ -32,6 +32,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [password, setPassword] = React.useState('');
   const [confirmationCode, setConfirmationCode] = React.useState('');
   const [isConfirmationStep, setIsConfirmationStep] = React.useState(false);
+  const [activeInput, setActiveInput] = React.useState<string | null>(null);
 
   const handleSignUp = async () => {
     try {
@@ -119,13 +120,18 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         <>
           <Text style={styles.title}>Confirm Sign Up</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input, 
+              activeInput === 'confirmationCode' && styles.activeInput 
+            ]} 
             placeholder="Confirmation Code"
             value={confirmationCode}
             onChangeText={setConfirmationCode}
             keyboardType="numeric"
             autoCapitalize="none"
             placeholderTextColor={placeholder}
+            onFocus={() => setActiveInput('confirmationCode')}
+            onBlur={() => setActiveInput(null)}
           />
           <Button title="Confirm Sign Up" onPress={handleConfirmation}/>
           <Button title="Back to Login" onPress={() => navigation.navigate('Login')}/>
@@ -135,36 +141,52 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         <>
           <Text style={styles.title}>Sign Up</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input, 
+              activeInput === 'username' && styles.activeInput 
+            ]} 
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
             placeholderTextColor={placeholder}
+            onFocus={() => setActiveInput('username')} // Set active on focus
+            onBlur={() => setActiveInput(null)}       // Clear active on blur
           />
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input, 
+              activeInput === 'email' && styles.activeInput 
+            ]} 
             placeholder="Email"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
             placeholderTextColor={placeholder}
+            onFocus={() => setActiveInput('email')} 
+            onBlur={() => setActiveInput(null)}
           />
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input, 
+              activeInput === 'password' && styles.activeInput 
+            ]} 
             placeholder="Password"
             secureTextEntry={true}
             value={password}
             onChangeText={setPassword}
             autoCapitalize="none"
             placeholderTextColor={placeholder}
+            onFocus={() => setActiveInput('password')} 
+            onBlur={() => setActiveInput(null)}    
           />
           <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => handleSignUp()}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-
-          <Button title="Back to Login" onPress={() => navigation.navigate('Login')}/>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.backToLoginButton} onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.backToLoginText}>Back to Login</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
@@ -217,6 +239,17 @@ const styles = StyleSheet.create({
     color: light,
     fontSize: 16,
     fontWeight: '600',
+  },
+  backToLoginButton: {
+    marginTop: 20,
+  },
+  backToLoginText: {
+    color: '#007BFF',
+    fontSize: 18,
+  },
+  activeInput: {
+    borderColor: 'white',
+    borderWidth: 0.8,         
   },
 });
 

@@ -15,6 +15,8 @@ type LoginScreenProps = {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [activeInput, setActiveInput] = React.useState<string | null>(null);
+
 
   async function handleSignIn() {
     try {
@@ -48,30 +50,46 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Login - awsauth branch</Text>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input, 
+          activeInput === 'username' && styles.activeInput 
+        ]} 
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
         placeholderTextColor={placeholder}
+        onFocus={() => setActiveInput('username')}
+        onBlur={() => setActiveInput(null)}
       />
       <TextInput
-        style={styles.input}
+       style={[
+        styles.input, 
+        activeInput === 'password' && styles.activeInput 
+      ]} 
         placeholder="Password"
         secureTextEntry={true}
         value={password}
         onChangeText={setPassword}
         autoCapitalize="none"
         placeholderTextColor={placeholder}
+        onFocus={() => setActiveInput('password')}
+        onBlur={() => setActiveInput(null)}
       />
       <View style={styles.buttonContainer}>
         <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => handleSignIn()}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity activeOpacity={0.7} style={styles.button} onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
+      <View style={styles.signUpRow}>
+        <Text style={styles.signupText}>
+          Don't have an account?{" "} 
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signupLink}>Sign Up</Text>
+          </TouchableOpacity>
+        </Text>
+        </View>
+
         <Button title="Logout" onPress={(handleSignOut)} />
 
       </View>
@@ -131,6 +149,25 @@ const styles = StyleSheet.create({
     color: light,
     fontSize: 16,
     fontWeight: '600',
+  },
+  activeInput: {
+    borderColor: 'white',
+    borderWidth: 0.8,         
+  },
+  signUpRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  signupText: {
+    color: light,
+    fontSize: 16,
+  },
+  signupLink: {
+    color: '#007BFF', 
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
 

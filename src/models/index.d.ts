@@ -123,10 +123,11 @@ type EagerPost = {
   };
   readonly id: string;
   readonly body?: string | null;
-  readonly likes?: (Like | null)[] | null;
   readonly comments?: (Comment | null)[] | null;
   readonly user?: User | null;
   readonly userPostsId: string;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
   readonly spotifyAlbumId?: string | null;
   readonly spotifyAlbumName?: string | null;
   readonly spotifyAlbumType?: string | null;
@@ -162,10 +163,11 @@ type LazyPost = {
   };
   readonly id: string;
   readonly body?: string | null;
-  readonly likes: AsyncCollection<Like>;
   readonly comments: AsyncCollection<Comment>;
   readonly user: AsyncItem<User | undefined>;
   readonly userPostsId: string;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
   readonly spotifyAlbumId?: string | null;
   readonly spotifyAlbumName?: string | null;
   readonly spotifyAlbumType?: string | null;
@@ -246,12 +248,11 @@ type EagerLike = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly post?: Post | null;
   readonly user?: User | null;
+  readonly postId: string;
+  readonly userLikesId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly userLikesId?: string | null;
-  readonly postLikesId?: string | null;
   readonly commentLikesId?: string | null;
 }
 
@@ -261,12 +262,11 @@ type LazyLike = {
     readOnlyFields: 'createdAt' | 'updatedAt';
   };
   readonly id: string;
-  readonly post: AsyncItem<Post | undefined>;
   readonly user: AsyncItem<User | undefined>;
+  readonly postId: string;
+  readonly userLikesId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly userLikesId?: string | null;
-  readonly postLikesId?: string | null;
   readonly commentLikesId?: string | null;
 }
 

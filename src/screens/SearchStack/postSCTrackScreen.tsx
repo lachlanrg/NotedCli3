@@ -54,6 +54,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         scTrackArtworkUrl: sctrack.artwork_url,
         scTrackPermalinkUrl: sctrack.permalink_url,
         scTrackWaveformUrl: sctrack.waveform_url,
+        likesCount: 0,
       };
 
       await client.graphql({

@@ -302,11 +302,6 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
   getPost(id: $id) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -324,6 +319,8 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       __typename
     }
     userPostsId
+    likedBy
+    likesCount
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -367,6 +364,8 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -420,6 +419,8 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -464,6 +465,8 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       id
       body
       userPostsId
+      likedBy
+      likesCount
       spotifyAlbumId
       spotifyAlbumName
       spotifyAlbumType
@@ -592,41 +595,6 @@ export const syncComments = /* GraphQL */ `query SyncComments(
 export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
   getLike(id: $id) {
     id
-    post {
-      id
-      body
-      userPostsId
-      spotifyAlbumId
-      spotifyAlbumName
-      spotifyAlbumType
-      spotifyAlbumImageUrl
-      spotifyAlbumReleaseDate
-      spotifyAlbumArtists
-      spotifyAlbumTotalTracks
-      spotifyAlbumExternalUrl
-      spotifyTrackId
-      spotifyTrackName
-      spotifyTrackAlbumName
-      spotifyTrackImageUrl
-      spotifyTrackArtists
-      spotifyTrackPreviewUrl
-      spotifyTrackExternalUrl
-      scTrackId
-      scTrackTitle
-      scTrackArtworkUrl
-      scTrackUserId
-      scTrackUsername
-      scTrackLikes
-      scTrackGenre
-      scTrackPermalinkUrl
-      scTrackWaveformUrl
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
     user {
       id
       username
@@ -638,13 +606,13 @@ export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
       _lastChangedAt
       __typename
     }
+    postId
+    userLikesId
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
     commentLikesId
     __typename
   }
@@ -658,13 +626,13 @@ export const listLikes = /* GraphQL */ `query ListLikes(
   listLikes(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
+      postId
+      userLikesId
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userLikesId
-      postLikesId
       commentLikesId
       __typename
     }
@@ -688,13 +656,13 @@ export const syncLikes = /* GraphQL */ `query SyncLikes(
   ) {
     items {
       id
+      postId
+      userLikesId
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userLikesId
-      postLikesId
       commentLikesId
       __typename
     }
