@@ -639,12 +639,10 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -714,12 +712,10 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -789,12 +785,10 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -845,7 +839,6 @@ export const createLike = /* GraphQL */ `mutation CreateLike(
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }
@@ -877,7 +870,6 @@ export const updateLike = /* GraphQL */ `mutation UpdateLike(
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }
@@ -909,7 +901,6 @@ export const deleteLike = /* GraphQL */ `mutation DeleteLike(
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }

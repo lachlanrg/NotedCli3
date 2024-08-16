@@ -612,12 +612,10 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -684,12 +682,10 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -756,12 +752,10 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -809,7 +803,6 @@ export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: Mo
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }
@@ -838,7 +831,6 @@ export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: Mo
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }
@@ -867,7 +859,6 @@ export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: Mo
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }

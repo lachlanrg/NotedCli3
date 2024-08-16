@@ -29,7 +29,8 @@ import awsconfig from '../../aws-exports';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { User } from '../../models';
-import CommentsBottomSheet from '../../components/CommentsBottomSheet';
+import CustomBottomSheet from '../../components/bottomSheetModal';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 
 Amplify.configure(awsconfig);
 
@@ -52,6 +53,8 @@ const HomeScreen: React.FC = () => {
 
   const [likedPosts, setLikedPosts] = useState<{ postId: string, likeId: string }[]>([]);
   const [userInfo, setUserId] = React.useState<any>(null);
+
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
 
 
   React.useEffect(() => {
@@ -148,7 +151,7 @@ const HomeScreen: React.FC = () => {
     try {
       const { userId } = await getCurrentUser();
       const client = generateClient();
-  
+      
       if (!userInfo) {
         console.error("User not logged in!");
         return;
@@ -240,9 +243,9 @@ const HomeScreen: React.FC = () => {
                       />
                     </TouchableOpacity>
                     <Text style={styles.likesCountText}>
-                      {item.likesCount || 0} 
+                      {item.likesCount || ''} 
                     </Text>
-                    <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
+                    <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
                   </View>
@@ -278,9 +281,9 @@ const HomeScreen: React.FC = () => {
                       />
                     </TouchableOpacity>
                       <Text style={styles.likesCountText}>
-                        {item.likesCount || 0} 
+                        {item.likesCount || ''} 
                       </Text>
-                    <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
+                      <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
                   </View>
@@ -314,9 +317,9 @@ const HomeScreen: React.FC = () => {
                       />
                     </TouchableOpacity>
                     <Text style={styles.likesCountText}>
-                      {item.likesCount || 0} 
+                      {item.likesCount || ''} 
                     </Text>
-                    <TouchableOpacity style={styles.commentIcon} onPress={() => toggleCommentMenu(item.id)}>
+                    <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
                   </View>
@@ -330,6 +333,14 @@ const HomeScreen: React.FC = () => {
   const handleTopPress = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
+
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const { dismiss } = useBottomSheetModal();
+
+  const handlePresentModalPress = (post: any) => { 
+    setSelectedPost(post);
+    bottomSheetRef.current?.present();
+  }
 
   return (
     <View style={styles.container}>
@@ -388,6 +399,8 @@ const HomeScreen: React.FC = () => {
             </View>
           )}
         </Animated.View>
+
+        <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost}/>
 
       {selectedTrack && (
         <View style={styles.trackMenu}>

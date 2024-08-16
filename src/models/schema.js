@@ -659,6 +659,13 @@ export const schema = {
                         ]
                     }
                 },
+                "postId": {
+                    "name": "postId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "content": {
                     "name": "content",
                     "isArray": false,
@@ -666,21 +673,20 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "likes": {
-                    "name": "likes",
+                "likedBy": {
+                    "name": "likedBy",
                     "isArray": true,
-                    "type": {
-                        "model": "Like"
-                    },
-                    "isRequired": false,
+                    "type": "ID",
+                    "isRequired": true,
                     "attributes": [],
-                    "isArrayNullable": true,
-                    "association": {
-                        "connectionType": "HAS_MANY",
-                        "associatedWith": [
-                            "commentLikesId"
-                        ]
-                    }
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
                 },
                 "user": {
                     "name": "user",
@@ -814,13 +820,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "commentLikesId": {
-                    "name": "commentLikesId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 }
             },
             "syncable": true,
@@ -829,15 +828,6 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
-                },
-                {
-                    "type": "key",
-                    "properties": {
-                        "name": "gsi-Comment.likes",
-                        "fields": [
-                            "commentLikesId"
-                        ]
-                    }
                 },
                 {
                     "type": "auth",
@@ -861,5 +851,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "b1c1d127ca62c723093db095fc98493d"
+    "version": "82367d974d9b8bc9cd41e30a85ae451c"
 };

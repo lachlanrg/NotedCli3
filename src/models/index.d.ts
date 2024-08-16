@@ -209,8 +209,10 @@ type EagerComment = {
   };
   readonly id: string;
   readonly post?: Post | null;
+  readonly postId: string;
   readonly content: string;
-  readonly likes?: (Like | null)[] | null;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
   readonly user?: User | null;
   readonly userPostsId: string;
   readonly createdAt?: string | null;
@@ -226,8 +228,10 @@ type LazyComment = {
   };
   readonly id: string;
   readonly post: AsyncItem<Post | undefined>;
+  readonly postId: string;
   readonly content: string;
-  readonly likes: AsyncCollection<Like>;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
   readonly user: AsyncItem<User | undefined>;
   readonly userPostsId: string;
   readonly createdAt?: string | null;
@@ -253,7 +257,6 @@ type EagerLike = {
   readonly userLikesId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly commentLikesId?: string | null;
 }
 
 type LazyLike = {
@@ -267,7 +270,6 @@ type LazyLike = {
   readonly userLikesId: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly commentLikesId?: string | null;
 }
 
 export declare type Like = LazyLoading extends LazyLoadingDisabled ? EagerLike : LazyLike
