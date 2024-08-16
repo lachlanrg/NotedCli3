@@ -287,14 +287,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {userInfo && (
+        {/* {userInfo && (
           <View style={styles.userInfoContainer}>
             <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
             <Text style={styles.userInfo}>User ID: {userInfo.userId}</Text>
             <Text style={styles.userInfo}>Sign In Details: {JSON.stringify(userInfo.signInDetails)}</Text>
             {email && <Text style={styles.userInfo}>Email: {email}</Text>}
           </View>
-        )}
+        )} */}
         <UserPostList userId={userInfo?.userId} />
       </ScrollView>
   

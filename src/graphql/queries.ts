@@ -498,12 +498,10 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       _lastChangedAt
       __typename
     }
+    postId
     content
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
+    likedBy
+    likesCount
     user {
       id
       username
@@ -538,7 +536,10 @@ export const listComments = /* GraphQL */ `query ListComments(
   listComments(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
+      postId
       content
+      likedBy
+      likesCount
       userPostsId
       createdAt
       updatedAt
@@ -572,7 +573,10 @@ export const syncComments = /* GraphQL */ `query SyncComments(
   ) {
     items {
       id
+      postId
       content
+      likedBy
+      likesCount
       userPostsId
       createdAt
       updatedAt
@@ -613,7 +617,6 @@ export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
     _version
     _deleted
     _lastChangedAt
-    commentLikesId
     __typename
   }
 }
@@ -633,7 +636,6 @@ export const listLikes = /* GraphQL */ `query ListLikes(
       _version
       _deleted
       _lastChangedAt
-      commentLikesId
       __typename
     }
     nextToken
@@ -663,7 +665,6 @@ export const syncLikes = /* GraphQL */ `query SyncLikes(
       _version
       _deleted
       _lastChangedAt
-      commentLikesId
       __typename
     }
     nextToken

@@ -103,7 +103,6 @@ export type Like = {
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
-  commentLikesId?: string | null,
 };
 
 export type ModelPostConnection = {
@@ -164,8 +163,10 @@ export type Comment = {
   __typename: "Comment",
   id: string,
   post?: Post | null,
+  postId: string,
   content: string,
-  likes?: ModelLikeConnection | null,
+  likedBy?: Array< string > | null,
+  likesCount: number,
   user?: User | null,
   userPostsId: string,
   createdAt: string,
@@ -429,7 +430,10 @@ export type DeletePostInput = {
 
 export type CreateCommentInput = {
   id?: string | null,
+  postId: string,
   content: string,
+  likedBy?: Array< string > | null,
+  likesCount: number,
   userPostsId: string,
   _version?: number | null,
   userCommentsId?: string | null,
@@ -437,7 +441,10 @@ export type CreateCommentInput = {
 };
 
 export type ModelCommentConditionInput = {
+  postId?: ModelStringInput | null,
   content?: ModelStringInput | null,
+  likedBy?: ModelIDInput | null,
+  likesCount?: ModelIntInput | null,
   userPostsId?: ModelStringInput | null,
   and?: Array< ModelCommentConditionInput | null > | null,
   or?: Array< ModelCommentConditionInput | null > | null,
@@ -451,7 +458,10 @@ export type ModelCommentConditionInput = {
 
 export type UpdateCommentInput = {
   id: string,
+  postId?: string | null,
   content?: string | null,
+  likedBy?: Array< string > | null,
+  likesCount?: number | null,
   userPostsId?: string | null,
   _version?: number | null,
   userCommentsId?: string | null,
@@ -468,7 +478,6 @@ export type CreateLikeInput = {
   postId: string,
   userLikesId: string,
   _version?: number | null,
-  commentLikesId?: string | null,
 };
 
 export type ModelLikeConditionInput = {
@@ -480,7 +489,6 @@ export type ModelLikeConditionInput = {
   _deleted?: ModelBooleanInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
-  commentLikesId?: ModelIDInput | null,
 };
 
 export type UpdateLikeInput = {
@@ -488,7 +496,6 @@ export type UpdateLikeInput = {
   postId?: string | null,
   userLikesId?: string | null,
   _version?: number | null,
-  commentLikesId?: string | null,
 };
 
 export type DeleteLikeInput = {
@@ -579,7 +586,10 @@ export type ModelPostFilterInput = {
 
 export type ModelCommentFilterInput = {
   id?: ModelIDInput | null,
+  postId?: ModelStringInput | null,
   content?: ModelStringInput | null,
+  likedBy?: ModelIDInput | null,
+  likesCount?: ModelIntInput | null,
   userPostsId?: ModelStringInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
@@ -601,7 +611,6 @@ export type ModelLikeFilterInput = {
   or?: Array< ModelLikeFilterInput | null > | null,
   not?: ModelLikeFilterInput | null,
   _deleted?: ModelBooleanInput | null,
-  commentLikesId?: ModelIDInput | null,
 };
 
 export type ModelSubscriptionUserFilterInput = {
@@ -722,14 +731,16 @@ export type ModelSubscriptionIntInput = {
 
 export type ModelSubscriptionCommentFilterInput = {
   id?: ModelSubscriptionIDInput | null,
+  postId?: ModelSubscriptionStringInput | null,
   content?: ModelSubscriptionStringInput | null,
+  likedBy?: ModelSubscriptionIDInput | null,
+  likesCount?: ModelSubscriptionIntInput | null,
   userPostsId?: ModelSubscriptionStringInput | null,
   createdAt?: ModelSubscriptionStringInput | null,
   updatedAt?: ModelSubscriptionStringInput | null,
   and?: Array< ModelSubscriptionCommentFilterInput | null > | null,
   or?: Array< ModelSubscriptionCommentFilterInput | null > | null,
   _deleted?: ModelBooleanInput | null,
-  commentLikesId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionLikeFilterInput = {
@@ -1365,12 +1376,10 @@ export type CreateCommentMutation = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -1439,12 +1448,10 @@ export type UpdateCommentMutation = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -1513,12 +1520,10 @@ export type DeleteCommentMutation = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -1568,7 +1573,6 @@ export type CreateLikeMutation = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };
 
@@ -1599,7 +1603,6 @@ export type UpdateLikeMutation = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };
 
@@ -1630,7 +1633,6 @@ export type DeleteLikeMutation = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };
 
@@ -2123,12 +2125,10 @@ export type GetCommentQuery = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -2163,7 +2163,10 @@ export type ListCommentsQuery = {
     items:  Array< {
       __typename: "Comment",
       id: string,
+      postId: string,
       content: string,
+      likedBy?: Array< string > | null,
+      likesCount: number,
       userPostsId: string,
       createdAt: string,
       updatedAt: string,
@@ -2191,7 +2194,10 @@ export type SyncCommentsQuery = {
     items:  Array< {
       __typename: "Comment",
       id: string,
+      postId: string,
       content: string,
+      likedBy?: Array< string > | null,
+      likesCount: number,
       userPostsId: string,
       createdAt: string,
       updatedAt: string,
@@ -2232,7 +2238,6 @@ export type GetLikeQuery = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };
 
@@ -2255,7 +2260,6 @@ export type ListLikesQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
-      commentLikesId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -2282,7 +2286,6 @@ export type SyncLikesQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
-      commentLikesId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -2898,12 +2901,10 @@ export type OnCreateCommentSubscription = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -2971,12 +2972,10 @@ export type OnUpdateCommentSubscription = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -3044,12 +3043,10 @@ export type OnDeleteCommentSubscription = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
+    postId: string,
     content: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
+    likedBy?: Array< string > | null,
+    likesCount: number,
     user?:  {
       __typename: "User",
       id: string,
@@ -3098,7 +3095,6 @@ export type OnCreateLikeSubscription = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };
 
@@ -3128,7 +3124,6 @@ export type OnUpdateLikeSubscription = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };
 
@@ -3158,6 +3153,5 @@ export type OnDeleteLikeSubscription = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
-    commentLikesId?: string | null,
   } | null,
 };

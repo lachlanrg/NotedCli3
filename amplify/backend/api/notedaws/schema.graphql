@@ -64,8 +64,10 @@ type Post @model @auth(rules: [{allow: public}]) {
 type Comment @model @auth(rules: [{allow: public}]) {
   id: ID!
   post: Post @belongsTo
+  postId: String!
   content: String!
-  likes: [Like] @hasMany
+  likedBy: [ID!]
+  likesCount: Int!
   user: User @belongsTo
   userPostsId: String!
 }
