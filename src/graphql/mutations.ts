@@ -655,6 +655,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version
@@ -728,6 +729,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version
@@ -801,6 +803,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version
