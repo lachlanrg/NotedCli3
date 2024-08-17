@@ -15,7 +15,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from 'react-native';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import { useNavigation, RouteProp,  useFocusEffect, useRoute } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { dark, light, gray, error, lgray, dgray } from '../../components/colorModes';
 import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
@@ -29,8 +29,11 @@ import awsconfig from '../../aws-exports';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { User } from '../../models';
-import CustomBottomSheet from '../../components/bottomSheetModal';
+import CustomBottomSheet from '../../components/BottomSheets/CommentsBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { fetchUsernameById } from '../../components/getUserUsername';
+import { HomeStackParamList } from '../../components/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 Amplify.configure(awsconfig);
 
@@ -39,6 +42,7 @@ const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
 
 const HomeScreen: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
@@ -47,14 +51,38 @@ const HomeScreen: React.FC = () => {
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
   const flatListRef = useRef<FlatList>(null);
   
-  const [showCommentMenu, setShowCommentMenu] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const commentMenuHeight = useRef(new Animated.Value(0)).current;
 
   const [likedPosts, setLikedPosts] = useState<{ postId: string, likeId: string }[]>([]);
   const [userInfo, setUserId] = React.useState<any>(null);
+  const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
 
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
+  const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
+
+  const [following, setFollowing] = useState<string[]>([]);
+  
+
+  
+  const fetchPostUsername = useCallback(async (postId: string) => {
+    try {
+      const username = await fetchUsernameById(postId);
+      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
+    } catch (error) {
+      console.error('Error fetching username for postId', postId, error);
+      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
+    }
+  }, []);
+  useEffect(() => {
+    const fetchUsernamesForPosts = async () => {
+      const postIds = posts.map(post => post.userPostsId); 
+      for (const postId of postIds) {
+        await fetchPostUsername(postId);
+      }
+    };
+    fetchUsernamesForPosts();
+  }, [posts, fetchPostUsername]); 
 
 
   React.useEffect(() => {
@@ -76,19 +104,49 @@ const HomeScreen: React.FC = () => {
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await client.graphql({ query: queries.listPosts });
-      const sortedPosts = response.data.listPosts.items.sort((a, b) => {
+      // 1. Fetch posts from followed users:
+      const followingPostPromises = following.map(async (userId) => {
+        const response = await client.graphql({
+          query: queries.listPosts,
+          variables: {
+            filter: { 
+              userPostsId: { eq: userId } 
+            }
+          },
+        });
+        return response.data.listPosts.items; 
+      });
+  
+      // 2. Fetch posts from the current user:
+      const currentUserPostPromise = client.graphql({
+        query: queries.listPosts,
+        variables: {
+          filter: {
+            userPostsId: { eq: userInfo?.userId } 
+          }
+        },
+      }).then(response => response.data.listPosts.items);
+  
+      // 3. Wait for all requests:
+      const allPosts = await Promise.all([
+        ...followingPostPromises, 
+        currentUserPostPromise
+      ]);
+  
+      // 4. Combine, flatten, and sort:
+      const flattenedPosts = allPosts.flat(); 
+      const sortedPosts = flattenedPosts.sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
       setPosts(sortedPosts);
+  
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
     }
-  }, []);
-
+  }, [following, userInfo?.userId]);
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
@@ -133,19 +191,6 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const toggleCommentMenu = (postId: string | null) => {
-    setSelectedPostId(postId);
-    setShowCommentMenu((prevState) => !prevState);
-  };
-
-  useEffect(() => {
-    Animated.timing(commentMenuHeight, {
-      toValue: showCommentMenu ? 300 : 0, // Adjust height as needed
-      duration: 300,
-
-      useNativeDriver: false, // You might need to use 'false' for Android
-    }).start();
-  }, [showCommentMenu]);
 
   const handleLikePress = async (itemId: string) => {
     try {
@@ -156,57 +201,100 @@ const HomeScreen: React.FC = () => {
         console.error("User not logged in!");
         return;
       }
-  
-      // 1. Fetch the Post to be updated 
-      const postToUpdate = posts.find((post) => post.id === itemId);
-  
+        const postToUpdate = posts.find((post) => post.id === itemId);
       if (!postToUpdate) {
         console.error("Post not found!");
         return;
       }
+        const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
   
-      // 2. Determine if the post is already liked by the user
-      const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
-  
-      // 3. Prepare the updated 'likedBy' array 
-      let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
+        let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
         ? postToUpdate.likedBy 
         : []; // Start with an empty array if null or not an array
   
       if (!isLiked) {
-        // Add the user's ID if they are not already liking the post
         updatedLikedBy = [...updatedLikedBy, userId]; 
       } else {
-        // Remove the user's ID if they are unliking the post
         updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
       }
-  
-      // 4. Calculate the updated 'likesCount'
-      const updatedLikesCount = updatedLikedBy.length;
-  
-      // 5. Update the Post in your database 
-      const updatedPost = await client.graphql({
-        query: mutations.updatePost, 
-        variables: {
-          input: {
-            id: itemId,
-            likedBy: updatedLikedBy,
-            likesCount: updatedLikesCount,
-            _version: postToUpdate._version, // Important for optimistic locking 
+        const updatedLikesCount = updatedLikedBy.length;
+        const updatedPost = await client.graphql({
+          query: mutations.updatePost, 
+          variables: {
+            input: {
+              id: itemId,
+              likedBy: updatedLikedBy,
+              likesCount: updatedLikesCount,
+              _version: postToUpdate._version, // Important for optimistic locking 
+            },
           },
-        },
-      });
-  
-      // 6. Update your local state (if not using a cache)
+        });
       setPosts(prevPosts => prevPosts.map(post => 
         post.id === itemId ? updatedPost.data.updatePost : post 
       ));
-  
     } catch (error) {
       console.error("Error updating post:", error);
-      // Handle the error appropriately (e.g., display an error message)
     }
   };
+
+  const fetchFollowing = useCallback(async () => {
+    if (userInfo?.userId) {
+      try {
+        const response = await client.graphql({
+          query: queries.listFriendRequests,
+          variables: {
+            filter: {
+              userSentFriendRequestsId: { eq: userInfo.userId }, // Current user is the sender
+              status: { eq: 'Following' }  // Make sure the request is approved/following
+            },
+          },
+        });
+  
+        const friendRequests = response.data.listFriendRequests.items;
+        const followingIds = friendRequests.map((request: any) => request.userReceivedFriendRequestsId);
+  
+        setFollowing(followingIds);
+        console.log("Following IDs:", followingIds); // Check if you are getting the correct IDs
+      } catch (error) {
+        console.error('Error fetching following:', error);
+      }
+    }
+  }, [userInfo?.userId]);
+
+  useEffect(() => {
+    fetchFollowing(); // Call fetchFollowing when the component mounts
+  }, [userInfo?.userId]);  // Run when userInfo?.userId changes
+
+  useEffect(() => { 
+    if (following.length > 0) { 
+      fetchPosts();
+    }
+  }, [following]); 
+
+
+  const fetchCommentCounts = useCallback(async () => {
+    try {
+      const counts = await Promise.all(
+        posts.map(async (post) => {
+          const response = await client.graphql({
+            query: queries.listComments,
+            variables: {
+              filter: { postId: { eq: post.id } },
+            },
+          });
+          return [post.id, response.data.listComments.items.length];
+        })
+      );
+      setCommentCounts(Object.fromEntries(counts));
+    } catch (error) {
+      console.error('Error fetching comment counts:', error);
+    }
+  }, [posts]);
+
+  useEffect(() => {
+    fetchCommentCounts();
+  }, [fetchCommentCounts]);
+
 
   const renderPostItem = ({ item }: { item: any }) => {
     const isSoundCloud = item.scTrackId;
@@ -216,7 +304,16 @@ const HomeScreen: React.FC = () => {
     return (
       <View style={styles.postContainer}>
         <View style={styles.post}>
-          <Text style={styles.user}>{item.userPostsId}</Text>
+        <TouchableOpacity 
+            onPress={() => navigation.navigate('HomeUserProfile', { userId: item.userPostsId })}
+        >
+          <Text style={styles.user}>
+              {postUsernames[item.userPostsId] 
+               ? postUsernames[item.userPostsId] 
+               : ''
+               } 
+          </Text>
+          </TouchableOpacity>
           <Text style={styles.bodytext}>{item.body}</Text>
 
           {isSoundCloud && (
@@ -248,6 +345,9 @@ const HomeScreen: React.FC = () => {
                     <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
+                    <Text style={styles.commentCountText}>
+                        {commentCounts[item.id] || null}
+                    </Text>
                   </View>
               </View>
           )}
@@ -284,8 +384,11 @@ const HomeScreen: React.FC = () => {
                         {item.likesCount || ''} 
                       </Text>
                       <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
-                      <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
-                    </TouchableOpacity>
+                        <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                      </TouchableOpacity>
+                      <Text style={styles.commentCountText}>
+                        {commentCounts[item.id] || null}
+                      </Text>
                   </View>
               </View>
           )}
@@ -322,6 +425,9 @@ const HomeScreen: React.FC = () => {
                     <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
+                    <Text style={styles.commentCountText}>
+                        {commentCounts[item.id] || null}
+                      </Text>
                   </View>
               </View>
           )}
@@ -593,6 +699,11 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   likesCountText: {
+    color: '#fff', // Set your desired color
+    fontSize: 16,  // Set your desired font size
+    marginLeft: 8,  // Add spacing between icon and count
+  },
+  commentCountText: {
     color: '#fff', // Set your desired color
     fontSize: 16,  // Set your desired font size
     marginLeft: 8,  // Add spacing between icon and count

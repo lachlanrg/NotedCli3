@@ -10,10 +10,10 @@ import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { ListFriendRequestsQuery, FriendRequest } from '../../API'; // Import types from your API.ts file
-import { getUser } from '../../graphql/queries'; // Import the getUser query
+import { ListFriendRequestsQuery, FriendRequest } from '../../API';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { dark, light, gray, lgray, placeholder, dgray } from '../../components/colorModes';
+import { fetchUsernameById } from '../../components/getUserUsername'; 
 
 Amplify.configure(awsconfig);
 
@@ -24,6 +24,7 @@ type NotificationsScreenProps = {
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [currentAuthUserInfo, setCurrentAuthUserInfo] = useState<any>(null);
   const [friendRequests, setFriendRequests] = useState<Array<FriendRequest>>([]); // Type the state
+  const [requestUsernames, setRequestUsernames] = useState<{ [userId: string]: string | null }>({});
 
   const client = generateClient();
 
@@ -82,13 +83,33 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     }
   };
 
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      const newRequestUsernames: { [userId: string]: string | null } = {};
+
+      for (const request of friendRequests) {
+        if (request.userSentFriendRequestsId) {
+          const username = await fetchUsernameById(request.userSentFriendRequestsId);
+          newRequestUsernames[request.userSentFriendRequestsId] = username;
+        }
+      }
+
+      setRequestUsernames(newRequestUsernames); 
+    };
+
+    fetchUsernames();
+  }, [friendRequests]); 
+
   const renderItem = ({ item }: { item: FriendRequest }) => {
-    // Conditional rendering for the entire item container
+    const username = item.userSentFriendRequestsId 
+    ? requestUsernames[item.userSentFriendRequestsId] || 'Loading...' 
+    : 'Loading...';
+
     if (item.status !== 'Cancelled') {
       return (
         <View style={styles.friendRequestItem}>
-          {/* <Text style={styles.friendRequestUsername}>{item.userSentFriendRequestsId} </Text> */}
-          {item.status === 'Pending' ? (
+          <Text style={styles.friendRequestUsername}>{username}</Text> 
+           {item.status === 'Pending' ? (
             <Text style={styles.friendRequestStatus}>Sent a friend request</Text>
           ) : (
             <Text style={styles.friendRequestStatus}>Is now following you</Text>
@@ -157,6 +178,7 @@ const styles = StyleSheet.create({
   friendRequestUsername: {
     fontWeight: 'bold',
     fontSize: 16,
+    color: light,
   },
   friendRequestStatus: {
     fontSize: 16,

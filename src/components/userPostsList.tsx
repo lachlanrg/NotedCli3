@@ -12,6 +12,7 @@ import { generateClient } from 'aws-amplify/api';
 import { listPosts } from '../graphql/queries';
 import awsmobile from '../aws-exports';
 import { formatRelativeTime } from './formatComponents';
+import { fetchUsernameById } from './getUserUsername';
 
 // Assuming dark, light styles are imported from your colorModes file
 import { dark, light } from './colorModes'; 
@@ -26,6 +27,27 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
+
+  const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
+
+  const fetchPostUsername = useCallback(async (postId: string) => {
+    try {
+      const username = await fetchUsernameById(postId);
+      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
+    } catch (error) {
+      console.error('Error fetching username for postId', postId, error);
+      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
+    }
+  }, []);
+  useEffect(() => {
+    const fetchUsernamesForPosts = async () => {
+      const postIds = posts.map(post => post.userPostsId); 
+      for (const postId of postIds) {
+        await fetchPostUsername(postId);
+      }
+    };
+    fetchUsernamesForPosts();
+  }, [posts, fetchPostUsername]); 
 
 
   const fetchUserPosts = useCallback(async () => {
@@ -66,7 +88,12 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
           <View style={styles.post}>
           {item.scTrackId && (
           <View>
-            <Text style={styles.user}>{item.userPostsId}</Text>
+            <Text style={styles.user}>
+              {postUsernames[item.userPostsId] 
+               ? postUsernames[item.userPostsId] 
+               : ''
+               } 
+            </Text>
             <Text style={styles.bodytext}>{item.body}</Text>
             <Text style={styles.date}>SoundCloud Track: {item.scTrackTitle}</Text>
             <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
@@ -75,7 +102,12 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
 
         {item.spotifyAlbumId && (
           <View>
-            <Text style={styles.user}>{item.userPostsId}</Text>
+            <Text style={styles.user}>
+              {postUsernames[item.userPostsId] 
+               ? postUsernames[item.userPostsId] 
+               : ''
+               } 
+            </Text>            
             <Text style={styles.bodytext}>{item.body}</Text>
             <Text style={styles.bodytext}>Album: {item.spotifyAlbumName}</Text>
             <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
@@ -87,7 +119,12 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
 
         {item.spotifyTrackId && (
           <View>
-            <Text style={styles.user}>{item.userPostsId}</Text>
+            <Text style={styles.user}>
+              {postUsernames[item.userPostsId] 
+               ? postUsernames[item.userPostsId] 
+               : ''
+               } 
+            </Text>
             <Text style={styles.bodytext}>{item.body}</Text>
             <Text style={styles.date}>Track: {item.spotifyTrackName}</Text>
             <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>

@@ -514,6 +514,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version
@@ -541,6 +542,7 @@ export const listComments = /* GraphQL */ `query ListComments(
       likedBy
       likesCount
       userPostsId
+      username
       createdAt
       updatedAt
       _version
@@ -578,6 +580,7 @@ export const syncComments = /* GraphQL */ `query SyncComments(
       likedBy
       likesCount
       userPostsId
+      username
       createdAt
       updatedAt
       _version

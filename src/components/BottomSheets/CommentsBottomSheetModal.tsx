@@ -1,15 +1,16 @@
-import React, { useMemo, forwardRef, useCallback, useState } from "react";
+import React, { useMemo, forwardRef, useCallback, useState, useEffect } from "react";
 import { View, Text, StyleSheet, Button, FlatList, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { dark, gray, light } from "./colorModes";
+import { dark, gray, light } from "../colorModes";
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
-import * as queries from '../graphql/queries';
-import * as mutations from '../graphql/mutations';
+import * as queries from '../../graphql/queries';
+import * as mutations from '../../graphql/mutations';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons"
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import ContentLoader, { Rect, Circle } from "react-content-loader/native"; // Import
 
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -20,6 +21,7 @@ type Comment = {
   id: string;
   content: string;
   userPostsId: string;
+  username: string; // Added username field
 };
 
 type Props = {
@@ -30,36 +32,36 @@ type Props = {
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
-  const snapPoints = useMemo(() => ['60%', '90%'], []);
-  const [newComment, setNewComment] = useState(''); 
-  const [userInfo, setUserId] = React.useState<any>(null);
+  const snapPoints = useMemo(() => ['80%'], []);
+  const [newComment, setNewComment] = useState('');
+  const [userInfo, setUserInfo] = React.useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  
 
-  React.useEffect(() => {
+  useEffect(() => {
     currentAuthenticatedUser();
     const fetchInitialComments = async () => {
       const fetchedComments = await fetchComments();
       setComments(fetchedComments);
     };
-  
+
     if (selectedPost) { // Only fetch if a post is selected
-      fetchInitialComments(); 
-    } 
+      fetchInitialComments();
+    }
   }, [selectedPost]); // Fetch again if selectedPost changes
 
   async function currentAuthenticatedUser() {
     try {
-      const { userId  } = await getCurrentUser();
-      console.log(`The User Id: ${userId}`);
-  
-      setUserId({ userId });
+      const user = await getCurrentUser();
+      const { userId, username } = user;
+      console.log(`The User Id: ${userId}, Username: ${username}`);
+
+      setUserInfo({ userId, username });
     } catch (err) {
       console.log(err);
     }
   }
 
-  const renderBackDrop = useCallback (
+  const renderBackDrop = useCallback(
     (props: any) => <BottomSheetBackdrop appearsOnIndex={1} disappearsOnIndex={-1} {...props} />,
     []
   );
@@ -69,31 +71,33 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
   };
 
   const createComment = async () => {
-    if (!newComment || !selectedPost) return;
+    if (!newComment || !selectedPost || !userInfo) return;
     try {
-      const { userId } = await getCurrentUser();
+      const { userId, username } = userInfo;
       const client = generateClient();
 
       const input = {
         postId: selectedPost.id,
         content: newComment,
-        userPostsId: userId, 
+        userPostsId: userId,
+        username: username, // Include the username in the comment
         likesCount: 0,
       };
       console.log("Trying to create comment with info:")
       console.log("Post ID:", selectedPost.id)
       console.log("Comment:", newComment)
       console.log("userPosts ID:", userId)
+      console.log("Username:", username)
 
-      // Use API.graphql directly for consistency with your post creation 
+      // Use API.graphql directly for consistency with your post creation
       await client.graphql({
         query: mutations.createComment,
         variables: { input },
       });
       console.log('New Comment created successfully!:', newComment);
-      // Update the local state with the new comment  
+      // Update the local state with the new comment
       setNewComment(''); // Clear the input field
-      const fetchedComments = await fetchComments(); 
+      const fetchedComments = await fetchComments();
       setComments(fetchedComments);
     } catch (error) {
       console.error('Error adding comment:', error);
@@ -103,62 +107,65 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
 
   const fetchComments = async () => {
     if (!selectedPost) return []; // Don't fetch if no post is selected
-  
+
     try {
       const client = generateClient();
       const filter = { // Filter comments by the selected post ID
         postId: {
-          eq: selectedPost.id 
+          eq: selectedPost.id
         }
       };
-  
+
       const response = await client.graphql({
-        query: queries.listComments, 
-        variables: { filter: filter }, 
+        query: queries.listComments,
+        variables: { filter: filter },
       });
-  
+
       if (response.data && response.data.listComments) {
-      // Sort by createdAt in descending order (most recent first)
-      const sortedComments = [...response.data.listComments.items].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      ); 
-      return sortedComments;
-    } else {
-      console.warn('Unexpected response format from listComments query:', response);
+        // Sort by createdAt in descending order (most recent first)
+        const sortedComments = [...response.data.listComments.items].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        return sortedComments;
+      } else {
+        console.warn('Unexpected response format from listComments query:', response);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
       return [];
     }
-  } catch (error) {
-    console.error('Error fetching comments:', error);
-    return [];
-  }
-};
+  };
 
-  const renderComment = ({ item }: { item: Comment }) => (
-    <View style={styles.commentItem}>
-      {/* <Text style={styles.commentUser}>{item.userPostsId}: </Text> */}
-      <Text>{item.content}</Text>
-      <FontAwesomeIcon icon={unLikedIcon} style={styles.heartIcon} />
-    </View>
-  );
-
+  const renderComment = ({ item }: { item: Comment }) => {
+    return (
+      <View style={styles.commentItem}>
+        <View style={styles.commentContent}>
+          <Text style={styles.commentUser}>{item.username}: </Text>
+          <Text>{item.content}</Text>
+        </View>
+        <FontAwesomeIcon icon={unLikedIcon} style={styles.heartIcon} />
+      </View>
+    );
+  };
 
   return (
     <BottomSheetModal
       ref={ref}
-      index={0} 
+      index={0}
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
       keyboardBehavior="extend"
       // handleIndicatorStyle={{ backgroundColor: 'white '}}
-      >
+    >
       <View style={styles.contentContainer}>
         {/* <Text style={styles.containerHeadline}>Comments</Text> */}
 
-        <View style={styles.inputContainer}> 
+        <View style={styles.inputContainer}>
           <BottomSheetTextInput
-            style={styles.input} 
-            onChangeText={handleCommentChange} 
+            style={styles.input}
+            onChangeText={handleCommentChange}
             placeholder="Add a comment ..."
           />
           <TouchableOpacity onPress={createComment} style={styles.postButton}>
@@ -166,9 +173,9 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           </TouchableOpacity>
         </View>
 
-        {selectedPost && ( 
+        {selectedPost && (
           <FlatList
-            data={comments} 
+            data={comments}
             renderItem={renderComment}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.commentList}
@@ -196,7 +203,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1, // Input takes up available space
-    marginRight: 8, 
+    marginRight: 8,
     fontSize: 14,
     lineHeight: 20,
     borderRadius: 10,
@@ -217,27 +224,25 @@ const styles = StyleSheet.create({
   },
   commentList: {
     flexGrow: 1, // Allow the comment list to grow to take up available space
-    width: '100%', 
+    width: '100%',
     justifyContent: "flex-start",
   },
   commentItem: {
-    flexDirection: 'row',
-    alignItems: 'center', // Align items to the same baseline
-    justifyContent: 'space-between', // Position content and icon
-    marginBottom: 8,
-    padding: 8,
-    marginRight: 20,
-    marginLeft: 10,
+    flexDirection: 'row', // Arrange username and heart horizontally
+    alignItems: 'center', // Align items vertically
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  commentContent: {
+    flex: 1, // Allow comment content to take up remaining space
   },
   commentUser: {
     fontWeight: 'bold',
   },
   heartIcon: {
-    fontSize: 16, // Adjust icon size as needed
-    color: 'gray',  // Default icon color
-    justifyContent: "flex-end",
+    marginLeft: 'auto', // Push heart icon to the right
   },
 });
 
-export default CustomBottomSheet
-
+export default CustomBottomSheet;

@@ -628,6 +628,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version
@@ -698,6 +699,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version
@@ -768,6 +770,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       __typename
     }
     userPostsId
+    username
     createdAt
     updatedAt
     _version

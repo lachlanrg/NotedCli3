@@ -10,6 +10,7 @@ import { RankedTopTrending } from './exploreAPIs/topTrendingItems';
 
 export type HomeStackParamList = {
   Home: undefined;
+  HomeUserProfile: { userId: string }; 
   CreatePostTab: undefined
 };
 
@@ -30,6 +31,7 @@ export type ProfileStackParamList = {
   UserSearch: undefined;
   UserSearchProfile: { userId: string };
   Notifications: undefined;
+  ResetPassword: undefined;
 };
 
 export type ExploreStackParamList ={

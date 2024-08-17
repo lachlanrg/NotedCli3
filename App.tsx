@@ -28,6 +28,8 @@ import PostSpotifyAlbumScreen from './src/screens/SearchStack/postSpotifyAlbumSc
 import PostSCTrackScreen from './src/screens/SearchStack/postSCTrackScreen';
 import ExploreScreen from './src/screens/ExploreStack/exploreScreen';
 import ItemDetailsExploreScreen from './src/screens/ExploreStack/itemDetailsExploreScreen';
+import ResetPasswordScreen from './src/screens/ProfileStack/ResetPasswordScreen';
+import HomeUserProfileScreen from './src/screens/HomeStack/homeUserProfileScreen';
 
 
 //Initialise Amplify Config
@@ -64,7 +66,8 @@ const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      {/* Add more screens related to Home here */}
+      <HomeStack.Screen name="HomeUserProfile" component={HomeUserProfileScreen} options={{ headerShown: false }} />
+
     </HomeStack.Navigator>
   );
 };
@@ -78,7 +81,6 @@ const SearchStackNavigator = () => {
       <SearchStack.Screen name="PostSpotifyAlbum" component={PostSpotifyAlbumScreen} options={{ headerShown: false }} />
       <SearchStack.Screen name="PostSCTrack" component={PostSCTrackScreen} options={{ headerShown: false }} />
 
-      {/* Add more screens related to Search here */}
     </SearchStack.Navigator>
   );
 };
@@ -87,7 +89,6 @@ const CreatePostStackNavigator = () => {
   return (
     <CreatePostStack.Navigator>
       <CreatePostStack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: false }} />
-      {/* Add more screens related to Create Post here */}
     </CreatePostStack.Navigator>
   );
 };
@@ -99,9 +100,7 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="UserSearch" component={UserSearchScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="UserSearchProfile" component={UserSearchProfileScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
-
-
-      {/* Add more screens related to Profile here */}
+      <ProfileStack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerShown: false }} />
     </ProfileStack.Navigator>
   );
 };
@@ -142,6 +141,7 @@ const MainTabNavigator = () => {
         tabBarInactiveTintColor: lgray,  
         tabBarLabel: () => null, // Remove the label from below the icons
         tabBarStyle: { backgroundColor: gray, borderTopWidth: 0 },
+        safeAreaInsets: { top: 0 },
       })}
     >
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ headerShown: false }} />

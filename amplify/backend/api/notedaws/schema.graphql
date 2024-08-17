@@ -70,6 +70,7 @@ type Comment @model @auth(rules: [{allow: public}]) {
   likesCount: Int!
   user: User @belongsTo
   userPostsId: String!
+  username: String!
 }
 
 type Like @model @auth(rules: [{allow: public}]) {

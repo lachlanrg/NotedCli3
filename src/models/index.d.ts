@@ -215,6 +215,7 @@ type EagerComment = {
   readonly likesCount: number;
   readonly user?: User | null;
   readonly userPostsId: string;
+  readonly username: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
@@ -234,6 +235,7 @@ type LazyComment = {
   readonly likesCount: number;
   readonly user: AsyncItem<User | undefined>;
   readonly userPostsId: string;
+  readonly username: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;

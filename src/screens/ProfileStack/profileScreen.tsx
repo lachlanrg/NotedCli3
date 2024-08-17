@@ -19,6 +19,9 @@ import { handleScrollRefresh, showRefreshIcon, refreshing, setRefreshing } from 
 import SettingsDropdown from '../../components/settingsDropdown';
 import UserPostList from '../../components/userPostsList';
 
+import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
@@ -35,18 +38,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const menuWidth = Dimensions.get('window').width / 2.3;
   const menuPosition = useRef(new Animated.Value(-menuWidth)).current;
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [resetUsername, setResetUsername] = useState('');
-  const [confirmationCode, setConfirmationCode] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
-  const [showConfirmationError, setShowConfirmationError] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState('start'); // 'start', 'codeSent', 'done'
   const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
 
 
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const { dismiss } = useBottomSheetModal();
+
+  const handlePresentModalPress = () => { 
+    bottomSheetRef.current?.present();
+  };
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
@@ -156,75 +156,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     console.log("Navigating to UserSearch Screen")
     };
 
-  const handleSettingsMenu = () => {
-    console.log("Opened settings")
-    toggleMenu();
-  };
-
   const handleNotificationPress = () => {
     console.log("Notification button pressed");
     navigation.navigate('Notifications');
     // Navigate to the notifications screen or handle notifications logic
   };
 
-  const handleResetPassword = async (username: string) => {
-    try {
-      const output: ResetPasswordOutput = await resetPassword({ username });
-      handleResetPasswordNextSteps(output);
-      setIsConfirmingReset(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleResetPasswordNextSteps = (output: ResetPasswordOutput) => {
-    const { nextStep } = output;
-    switch (nextStep.resetPasswordStep) {
-      case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
-        console.log(`Confirmation code was sent to ${nextStep.codeDeliveryDetails.deliveryMedium}`);
-        setCurrentPhase('codeSent');
-        break;
-      case 'DONE':
-        console.log('Successfully reset password.');
-        setCurrentPhase('done');
-        break;
-    }
-  };
-
-  const handleConfirmResetPassword = async ({ username, confirmationCode, newPassword }: ConfirmResetPasswordInput) => {
-    try {
-      await confirmResetPassword({ username, confirmationCode, newPassword });
-      console.log('Password reset successful.');
-      setCurrentPhase('done');
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleConfirmReset = () => {
-    if (newPassword !== confirmNewPassword) {
-      setShowConfirmationError(true);
-      return; 
-    }
-
-    setShowConfirmationError(false); // Reset error if passwords match
-    handleConfirmResetPassword({ username: resetUsername, confirmationCode, newPassword });
-  };
-
-  const closeModal = () => {
-    setIsModalVisible(false);
-    setResetUsername('');
-    setConfirmationCode('');
-    setNewPassword('');
-    setIsConfirmingReset(false);
-    setCurrentPhase('start');
-  };
-
-  const handleResetCloseMenu = () => {
-    setResetUsername(userInfo.username); // Set the initial username
-    setIsModalVisible(true);
-    toggleMenu();
-  }
 
 
   return (
@@ -241,7 +178,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
             <FontAwesomeIcon icon={faBell} size={25} color={light} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.createPostButton} onPress={(handleSettingsMenu)}>
+          <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentModalPress)}>
             <FontAwesomeIcon icon={faCog} size={25} color={light} />
           </TouchableOpacity>
           {/* <SettingsDropdown /> */}
@@ -297,95 +234,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         )} */}
         <UserPostList userId={userInfo?.userId} />
       </ScrollView>
-  
-  <Animated.View
-      {...panResponder.panHandlers}
-      style={[styles.settingsMenu, { right: menuPosition, width: menuWidth }]}
-    >
-      <TouchableOpacity style={styles.closeButton} onPress={toggleMenu}>
-        <FontAwesomeIcon icon={faTimes} size={24} color={light} />
-      </TouchableOpacity>
-      <View style={styles.settingsContainer}> 
-        <TouchableOpacity onPress={() => {}}>
-          <Text style={styles.settingsText}>Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleResetCloseMenu}>
-          <Text style={styles.settingsText}>Reset Password</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.logoutButtonContainer}> 
-        <Button 
-          title="Logout" 
-          onPress={handleSignOut}
-          color={error} 
-        /> 
-      </View>
-    </Animated.View>
 
-      <Modal
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={closeModal}
-      >
-        <View style={styles.modalBackgroundContainer}>
-          <View style={styles.modalContainer}>
-            <View style={[styles.modalContent, currentPhase === 'start' 
-              ? styles.startPhaseHeight 
-              : styles.codeSentPhaseHeight, 
-              currentPhase === 'done' ? styles.donePhaseHeight : null]}
-            >
-              {currentPhase === 'start' && (
-                <View>
-                  <Text style={styles.userInfo}>
-                  Reset Password for <Text style={{ fontWeight: 'bold', color: light }}>{resetUsername}</Text>
-                </Text>
-                  <Button title="Send Reset Code" onPress={() => handleResetPassword(resetUsername)} />
-                  <Button title="Close" onPress={closeModal} color={error} />
-                </View>
-              )}
-              {currentPhase === 'codeSent' && (
-                <View>
-                  <Text style={styles.modalText}>Enter Confirmation Code and New Password</Text>
-                  <TextInput
-                    placeholder="Confirmation Code"
-                    value={confirmationCode}
-                    onChangeText={setConfirmationCode}
-                    style={styles.input}
-                    placeholderTextColor={placeholder}
-                  />
-                  <TextInput
-                    placeholder="New Password"
-                    value={newPassword}
-                    onChangeText={setNewPassword}
-                    secureTextEntry
-                    style={styles.input}
-                    placeholderTextColor={placeholder}
-                  />
-                  <TextInput
-                    placeholder="Confirm New Password"
-                    value={confirmNewPassword}
-                    onChangeText={setConfirmNewPassword}
-                    secureTextEntry
-                    style={styles.input}
-                    placeholderTextColor={placeholder}
-                  />
-                  {showConfirmationError && (
-                    <Text style={styles.errorText}>Passwords do not match</Text>
-                  )}
-                  <Button title="Confirm Reset" onPress={handleConfirmReset} />
-                  <Button title="Close" onPress={closeModal} color={error} />
-                </View>
-              )}
-              {currentPhase === 'done' && (
-                <View>
-                  <Text style={styles.doneModalText}>Password reset successful!</Text>
-                  <Button title="Close" onPress={closeModal} />
-                </View>
-              )}
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <SettingsBottomSheet ref={bottomSheetRef} />
+
       </View>
     );
   };
