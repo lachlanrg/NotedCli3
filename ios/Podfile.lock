@@ -1098,7 +1098,7 @@ PODS:
     - RNSound/Core (= 0.11.2)
   - RNSound/Core (0.11.2):
     - React-Core
-  - RNSVG (15.0.0):
+  - RNSVG (15.5.0):
     - React-Core
   - SocketRocket (0.6.1)
   - SwiftAudioEx (1.1.0)
@@ -1360,7 +1360,7 @@ SPEC CHECKSUMS:
   RNReanimated: ba95f6d26ca4b8a8f7f2b15f62a3513750762f6b
   RNScreens: 17e2f657f1b09a71ec3c821368a04acbb7ebcb46
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
-  RNSVG: 3f65a03e0c61a8495dee92bf82545ed9041cbf3b
+  RNSVG: b986585e367f4a49d8aa43065066cc9c290b3d9b
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   SwiftAudioEx: f6aa653770f3a0d3851edaf8d834a30aee4a7646
   Yoga: 9e6a04eacbd94f97d94577017e9f23b3ab41cf6c

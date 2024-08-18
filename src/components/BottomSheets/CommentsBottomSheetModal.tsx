@@ -21,7 +21,10 @@ type Comment = {
   id: string;
   content: string;
   userPostsId: string;
-  username: string; // Added username field
+  username: string;
+  likedBy: string[]; // Add the likedBy property with the correct type
+  likesCount: number; // Make sure this is a number type
+  _version: number; // Add the _version property
 };
 
 type Props = {
@@ -36,6 +39,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
   const [newComment, setNewComment] = useState('');
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+
 
   useEffect(() => {
     currentAuthenticatedUser();
@@ -80,7 +84,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         postId: selectedPost.id,
         content: newComment,
         userPostsId: userId,
-        username: username, // Include the username in the comment
+        username: username,
         likesCount: 0,
       };
       console.log("Trying to create comment with info:")
@@ -107,7 +111,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
 
   const fetchComments = async () => {
     if (!selectedPost) return []; // Don't fetch if no post is selected
-
     try {
       const client = generateClient();
       const filter = { // Filter comments by the selected post ID
@@ -115,18 +118,32 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           eq: selectedPost.id
         }
       };
-
+  
       const response = await client.graphql({
         query: queries.listComments,
         variables: { filter: filter },
       });
-
+  
+      console.log('Response from listComments query:', response);
+  
       if (response.data && response.data.listComments) {
         // Sort by createdAt in descending order (most recent first)
         const sortedComments = [...response.data.listComments.items].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-        return sortedComments;
+  
+        // Ensure the comments match the expected structure
+        const validatedComments = sortedComments.map(comment => ({
+          id: comment.id,
+          content: comment.content,
+          userPostsId: comment.userPostsId,
+          username: comment.username,
+          likedBy: comment.likedBy || [], // Ensure likedBy is an array
+          likesCount: comment.likesCount || 0, // Ensure likesCount is a number
+          _version: comment._version,
+        }));
+  
+        return validatedComments;
       } else {
         console.warn('Unexpected response format from listComments query:', response);
         return [];
@@ -136,15 +153,131 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       return [];
     }
   };
+  
+  
+
+  const toggleLike = async (commentId: string) => {
+    try {
+      const client = generateClient();
+      const commentToUpdate = comments.find((comment) => comment.id === commentId);
+  
+      if (!commentToUpdate) {
+        console.warn("Comment not found:", commentId);
+        return;
+      }
+  
+      const isLiked = commentToUpdate.likedBy ? commentToUpdate.likedBy.includes(userInfo.userId) : false;
+      let updatedLikedBy = Array.isArray(commentToUpdate.likedBy)
+        ? commentToUpdate.likedBy
+        : []; // Start with an empty array if null or not an array
+  
+      if (!isLiked) {
+        updatedLikedBy = [...updatedLikedBy, userInfo.userId];
+      } else {
+        updatedLikedBy = updatedLikedBy.filter(id => id !== userInfo.userId);
+      }
+  
+      const updatedLikesCount = updatedLikedBy.length;
+  
+      const updatedComment = await client.graphql({
+        query: mutations.updateComment,
+        variables: {
+          input: {
+            id: commentId,
+            likedBy: updatedLikedBy,
+            likesCount: updatedLikesCount,
+            _version: commentToUpdate._version, // Important for optimistic locking
+          },
+        },
+      });
+  
+      console.log("Response from updateComment mutation:", updatedComment);
+  
+      if (updatedComment.data && updatedComment.data.updateComment) {
+        console.log("Comment updated successfully in the backend.");
+  
+        // Update the local state optimistically
+
+        setComments(prevComments => prevComments.map(comment => 
+          comment.id === commentId ? {
+            ...updatedComment.data.updateComment,
+            likedBy: updatedComment.data.updateComment.likedBy || []
+          } : comment 
+        ));
+      } else {
+        console.warn("No data returned from updateComment mutation:", updatedComment);
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
+  };
+
+
+  // const handleLikePress = async (commentId: string) => {
+  //   try {
+  //     const { userId } = await getCurrentUser();
+  //     const client = generateClient();
+      
+  //     if (!userInfo) {
+  //       console.error("User not logged in!");
+  //       return;
+  //     }
+  //       const commentToUpdate = comments.find((comment) => comment.id === commentId);
+  //     if (!commentToUpdate) {
+  //       console.error("Post not found!");
+  //       return;
+  //     }
+  //       const isLiked = (commentToUpdate.likedBy || []).includes(userInfo?.userId || "");
+  
+  //       let updatedLikedBy = Array.isArray(commentToUpdate.likedBy)
+  //       ? commentToUpdate.likedBy 
+  //       : []; // Start with an empty array if null or not an array
+  
+  //     if (!isLiked) {
+  //       updatedLikedBy = [...updatedLikedBy, userId]; 
+  //     } else {
+  //       updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
+  //     }
+  //       const updatedLikesCount = updatedLikedBy.length;
+  //       const updatedPost = await client.graphql({
+  //         query: mutations.updatePost, 
+  //         variables: {
+  //           input: {
+  //             id: commentId,
+  //             likedBy: updatedLikedBy,
+  //             likesCount: updatedLikesCount,
+  //             _version: commentToUpdate._version, // Important for optimistic locking 
+  //           },
+  //         },
+  //       });
+  //     setComments(prevComments => prevComments.map(comment => 
+  //          comment.id === commentId ? {
+  //           ...updatedComment.data.updateComment,
+  //          likedBy: updatedComment.data.updateComment.likedBy || []
+  //        } : comment 
+  //      ));
+  //   } catch (error) {
+  //     console.error("Error updating post:", error);
+  //   }
+  // };
+
 
   const renderComment = ({ item }: { item: Comment }) => {
+    const isLiked = item.likedBy ? item.likedBy.includes(userInfo?.userId) : false;
+
     return (
       <View style={styles.commentItem}>
         <View style={styles.commentContent}>
           <Text style={styles.commentUser}>{item.username}: </Text>
           <Text>{item.content}</Text>
         </View>
-        <FontAwesomeIcon icon={unLikedIcon} style={styles.heartIcon} />
+        <TouchableOpacity onPress={() => toggleLike(item.id)}>
+          <FontAwesomeIcon
+            icon={isLiked ? likedIcon : unLikedIcon}
+            style={styles.heartIcon}
+            color={isLiked ? 'red' : 'black'}
+          />
+      </TouchableOpacity>
       </View>
     );
   };
