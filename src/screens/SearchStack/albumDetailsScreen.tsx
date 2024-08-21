@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ScrollView } from 'react-native';
 import { SearchScreenStackParamList } from '../../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'; // Import specific icon 
@@ -90,6 +90,8 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
 
 
   return (
+    <SafeAreaView style={styles.safeAreaContainer}> 
+
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -112,6 +114,7 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
         contentContainerStyle={styles.scrollViewContainer}
       />
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -201,6 +204,10 @@ const styles = StyleSheet.create({
     color: 'lightblue',
     fontWeight: 'bold',
     justifyContent: 'flex-end',
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

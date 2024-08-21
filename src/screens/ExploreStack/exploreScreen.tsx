@@ -8,9 +8,10 @@ import {
   Image,
   Animated,
   Dimensions,
+  SafeAreaView
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-
+import { dark, light, gray } from '../../components/colorModes';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import * as queries from '../../graphql/queries';
@@ -124,142 +125,142 @@ const ExploreScreen: React.FC = () => {
       }, []);
 
   return (
-    <View style={styles.container}>
-        <View style={styles.tabContainer}>
+    <SafeAreaView style={styles.safeAreaContainer}> 
+      <View style={styles.container}>
+          <View style={styles.tabContainer}>
 
-            <TouchableOpacity style={styles.tabButton} onPress={() => handleTabPress('Trending')}>
-                <View style={styles.tabTextWrapper}> 
-                <Text style={[styles.tabText, activeTab === 'Trending' && styles.activeTabText]}>Trending</Text>
-                </View>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.tabButton} onPress={() => handleTabPress('Trending')}>
+                  <View style={styles.tabTextWrapper}> 
+                  <Text style={[styles.tabText, activeTab === 'Trending' && styles.activeTabText]}>Trending</Text>
+                  </View>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.tabButton} onPress={() => handleTabPress('Spotify')}>
-                <View style={styles.tabTextWrapper}>
-                <Text style={[styles.tabText, activeTab === 'Spotify' && styles.activeTabText]}>Spotify</Text>
-                </View>
-            </TouchableOpacity>
+              <TouchableOpacity style={styles.tabButton} onPress={() => handleTabPress('Spotify')}>
+                  <View style={styles.tabTextWrapper}>
+                  <Text style={[styles.tabText, activeTab === 'Spotify' && styles.activeTabText]}>Spotify</Text>
+                  </View>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.tabButton} onPress={() => handleTabPress('SoundCloud')}>
-                <View style={styles.tabTextWrapper}>
-                <Text style={[styles.tabText, activeTab === 'SoundCloud' && styles.activeTabText]}>SoundCloud</Text>
-                </View>
-            </TouchableOpacity>
-            </View>
+              <TouchableOpacity style={styles.tabButton} onPress={() => handleTabPress('SoundCloud')}>
+                  <View style={styles.tabTextWrapper}>
+                  <Text style={[styles.tabText, activeTab === 'SoundCloud' && styles.activeTabText]}>SoundCloud</Text>
+                  </View>
+              </TouchableOpacity>
+              </View>
 
-        {/* Animated Underline */}
-        <View style={styles.underlineContainer}>
-            <Animated.View
+          {/* Animated Underline */}
+          <View style={styles.underlineContainer}>
+              <Animated.View
                 style={[
                 styles.underline,
-                {
-                    transform: [{ translateX: underlineX }],
-                },
+                { transform: [{ translateX: underlineX }] },
                 ]}
-            />
-         </View>
+              />
+          </View>
 
-      <ScrollView ref={scrollViewRef} contentContainerStyle={styles.contentContainer} > 
-        {activeTab === 'Spotify' && (
-          <>
-            <Text style={styles.sectionTitle}>Top Spotify Tracks:</Text>
-            {topSpotifyTracks.map((track, index) => (
-              <TouchableOpacity key={track.trackId}> 
-                <View style={[styles.trackRow, index === 0 && styles.topTrackRow]}>
-                {index === 0 && track.spotifyTrackImageUrl && (
-                  <Image source={{ uri: track.spotifyTrackImageUrl }} style={styles.topTrackImage} />
-                )}
-                <View style={styles.trackInfoContainer}>
-                  {index !== 0 && <Text style={styles.trackRank}>{index + 1}</Text>} 
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
-                      {track.spotifyTrackName}
-                    </Text>
-                    <Text style={styles.trackArtists} numberOfLines={1} ellipsizeMode="tail">
-                      {track.spotifyTrackArtists}
-                    </Text>
-                  </View>
-                  <Text style={styles.trackCount}>({track.count} posts)</Text>
-                </View>
-              </View>
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
-
-        {activeTab === 'SoundCloud' && (
+        <ScrollView ref={scrollViewRef} contentContainerStyle={styles.contentContainer} > 
+          {activeTab === 'Spotify' && (
             <>
-                <Text style={styles.sectionTitle}>Top SoundCloud Tracks:</Text>
+              <Text style={styles.sectionTitle}>Top Spotify Tracks:</Text>
+              {topSpotifyTracks.map((track, index) => (
+                <TouchableOpacity key={track.trackId}> 
+                  <View style={[styles.trackRow, index === 0 && styles.topTrackRow]}>
+                  {index === 0 && track.spotifyTrackImageUrl && (
+                    <Image source={{ uri: track.spotifyTrackImageUrl }} style={styles.topTrackImage} />
+                  )}
+                  <View style={styles.trackInfoContainer}>
+                    {index !== 0 && <Text style={styles.trackRank}>{index + 1}</Text>} 
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
+                        {track.spotifyTrackName}
+                      </Text>
+                      <Text style={styles.trackArtists} numberOfLines={1} ellipsizeMode="tail">
+                        {track.spotifyTrackArtists}
+                      </Text>
+                    </View>
+                    <Text style={styles.trackCount}>({track.count} posts)</Text>
+                  </View>
+                </View>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+
+          {activeTab === 'SoundCloud' && (
+            <>
+              <Text style={styles.sectionTitle}>Top SoundCloud Tracks:</Text>
                 {topSoundCloudTracks.map((track, index) => (
-                <View
-                    style={[
-                    styles.trackRow,
-                    index === 0 && styles.topTrackRow
-                    ]}
-                    key={track.trackId}
-                >
-                    {index === 0 && ( 
+                  <View
+                      style={[
+                      styles.trackRow,
+                      index === 0 && styles.topTrackRow
+                      ]}
+                      key={track.trackId}
+                  >
+                      {index === 0 && ( 
                         <Image source={ track.scTrackArtworkUrl 
-                                        ? { uri: track.scTrackArtworkUrl } 
-                                        : require('../../assets/placeholder.png')
+                          ? { uri: track.scTrackArtworkUrl } 
+                          : require('../../assets/placeholder.png')
                         }
                         style={styles.topTrackImage}
                         />
-                    )}
-                    <View style={styles.trackInfoContainer}>
-                    {index !== 0 && <Text style={styles.trackRank}>{index + 1}</Text>}
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
-                            {track.scTrackTitle}
-                        </Text>
-                        <Text style={styles.trackArtists} numberOfLines={1} ellipsizeMode="tail">
-                            {track.scTrackUsername}
-                        </Text>
-                    </View>
-                    <Text style={styles.trackCount}>({track.count} posts)</Text>
-                    </View>
-                </View>
+                      )}
+                      <View style={styles.trackInfoContainer}>
+                      {index !== 0 && <Text style={styles.trackRank}>{index + 1}</Text>}
+                      <View style={{ flex: 1 }}>
+                          <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
+                              {track.scTrackTitle}
+                          </Text>
+                          <Text style={styles.trackArtists} numberOfLines={1} ellipsizeMode="tail">
+                              {track.scTrackUsername}
+                          </Text>
+                      </View>
+                      <Text style={styles.trackCount}>({track.count} posts)</Text>
+                      </View>
+                  </View>
                 ))}
             </>
-        )}
+          )}
 
-        {activeTab === 'Trending' && (
-            <>
-                <Text style={styles.sectionTitle}>Top Trending</Text>
-                {topTrendingItems.map((item, index) => (
-                <View style={[ styles.trackRow, index === 0 && styles.topTrackRow ]} key={item.trackId} >
-                    {index === 0 && (
-                        <Image
-                        source={
-                          item.spotifyTrackImageUrl || 
-                          item.spotifyAlbumImageUrl || 
-                          item.scTrackArtworkUrl 
-                            ? { 
-                              uri: item.spotifyTrackImageUrl || item.spotifyAlbumImageUrl || item.scTrackArtworkUrl,
-                            } 
-                            : require('../../assets/placeholder.png')
-                        }
-                        style={styles.topTrackImage}
-                      />
-                    )}
-                    <View style={styles.trackInfoContainer}>
-                    {index !== 0 && <Text style={styles.trackRank}>{index + 1}</Text>}
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
-                        {item.spotifyTrackName ||
-                            item.spotifyAlbumName ||
-                            item.scTrackTitle ||
-                            "Unknown Item"}
-                        </Text>
-                    </View>
-                    <Text style={styles.trackCount}>({item.count} posts)</Text>
-                    </View>
-                </View>
-                ))}
-            </>
-        )}
+          {activeTab === 'Trending' && (
+              <>
+                  <Text style={styles.sectionTitle}>Top Trending x</Text>
+                  {topTrendingItems.map((item, index) => (
+                  <View style={[ styles.trackRow, index === 0 && styles.topTrackRow ]} key={item.trackId} >
+                      {index === 0 && (
+                          <Image
+                          source={
+                            item.spotifyTrackImageUrl || 
+                            item.spotifyAlbumImageUrl || 
+                            item.scTrackArtworkUrl 
+                              ? { 
+                                uri: item.spotifyTrackImageUrl || item.spotifyAlbumImageUrl || item.scTrackArtworkUrl,
+                              } 
+                              : require('../../assets/placeholder.png')
+                          }
+                          style={styles.topTrackImage}
+                        />
+                      )}
+                      <View style={styles.trackInfoContainer}>
+                      {index !== 0 && <Text style={styles.trackRank}>{index + 1}</Text>}
+                      <View style={{ flex: 1 }}>
+                          <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
+                          {item.spotifyTrackName ||
+                              item.spotifyAlbumName ||
+                              item.scTrackTitle ||
+                              "Unknown Item"}
+                          </Text>
+                      </View>
+                      <Text style={styles.trackCount}>({item.count} posts)</Text>
+                      </View>
+                  </View>
+                  ))}
+              </>
+          )}
 
-      </ScrollView> 
-    </View>
+        </ScrollView> 
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -273,10 +274,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     // padding: 10,
-    paddingTop: 10,
+    // paddingTop: 10,
     // paddingLeft: 10,
     // paddingRight: 10,
-    marginTop: 10,
+    // marginTop: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
     width: '100%',
@@ -370,6 +371,10 @@ const styles = StyleSheet.create({
     flex: 1, 
     flexDirection: 'row', 
     alignItems: 'center',
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

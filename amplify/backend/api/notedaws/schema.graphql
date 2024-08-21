@@ -8,6 +8,7 @@ type User @model @auth(rules: [{allow: public}]) {
   sentFriendRequests: [FriendRequest] @hasMany
   receivedFriendRequests: [FriendRequest] @hasMany
   comments: [Comment] @hasMany
+  publicProfile: Boolean!
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {
@@ -29,6 +30,7 @@ type Post @model @auth(rules: [{allow: public}]) {
   comments: [Comment] @hasMany
   user: User @belongsTo
   userPostsId: String!
+  username: String!
 
   likedBy: [ID!]    # Array of user IDs who liked this post
   likesCount: Int!  # Total number of likes (initialize to 0 in your database)

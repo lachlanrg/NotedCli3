@@ -43,6 +43,7 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       startedAt
       __typename
     }
+    publicProfile
     createdAt
     updatedAt
     _version
@@ -90,6 +91,7 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       startedAt
       __typename
     }
+    publicProfile
     createdAt
     updatedAt
     _version
@@ -137,6 +139,7 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       startedAt
       __typename
     }
+    publicProfile
     createdAt
     updatedAt
     _version
@@ -158,6 +161,7 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -169,6 +173,7 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -198,6 +203,7 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -209,6 +215,7 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -238,6 +245,7 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -249,6 +257,7 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -278,6 +287,7 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -289,6 +299,7 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -320,6 +331,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -331,6 +343,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -362,6 +375,7 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -373,6 +387,7 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -408,6 +423,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -416,6 +432,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       __typename
     }
     userPostsId
+    username
     likedBy
     likesCount
     spotifyAlbumId
@@ -467,6 +484,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -475,6 +493,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       __typename
     }
     userPostsId
+    username
     likedBy
     likesCount
     spotifyAlbumId
@@ -526,6 +545,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -534,6 +554,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       __typename
     }
     userPostsId
+    username
     likedBy
     likesCount
     spotifyAlbumId
@@ -579,6 +600,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       id
       body
       userPostsId
+      username
       likedBy
       likesCount
       spotifyAlbumId
@@ -620,6 +642,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -650,6 +673,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       id
       body
       userPostsId
+      username
       likedBy
       likesCount
       spotifyAlbumId
@@ -691,6 +715,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -721,6 +746,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       id
       body
       userPostsId
+      username
       likedBy
       likesCount
       spotifyAlbumId
@@ -762,6 +788,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -792,6 +819,7 @@ export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: Mo
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -820,6 +848,7 @@ export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: Mo
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -848,6 +877,7 @@ export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: Mo
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView, TextInput } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ScrollView, TextInput } from 'react-native';
 import { SearchScreenStackParamList } from '../../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
 import { faX } from '@fortawesome/free-solid-svg-icons';
@@ -21,7 +21,7 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
   const { album } = route.params;
   const [postText, setPostText] = useState('');
   const [userId, setUserId] = useState(''); // Store userId
-  const [userInfo, setUserUsername] = React.useState<any>(null);
+  const [userUsername, setUserUsername] = React.useState<any>(null);
 
 
   React.useEffect(() => {
@@ -47,6 +47,7 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
       const PostDetails = {
         body: postText,
         userPostsId: userId,
+        username: userUsername,
         spotifyAlbumId: album.id,
         spotifyAlbumName: album.name, 
         spotifyAlbumReleaseDate: album.release_date,
@@ -78,6 +79,8 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
     };
 
     return (
+      <SafeAreaView style={styles.safeAreaContainer}> 
+
         <View style={styles.container}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -112,6 +115,7 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
         </View>
       </View> 
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -186,6 +190,10 @@ const styles = StyleSheet.create({
   },
   trackArtist: {
     color: lgray, 
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 
 });

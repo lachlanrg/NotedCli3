@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHome, faPlus, faSearch, faUser, faCompass } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, gray, error, placeholder, lgray } from './src/components/colorModes';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 // import { faCompass } from '@fortawesome/free-regular-svg-icons';
 
 
@@ -158,19 +159,21 @@ const App = () => {
   const colorScheme = useColorScheme();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-      <ThemeProvider>
-      <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack.Navigator>
-          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
-      </NavigationContainer>
-      </ThemeProvider>
-    </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <ThemeProvider>
+            <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <Stack.Navigator>
+                <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
+                <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ThemeProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 };
 

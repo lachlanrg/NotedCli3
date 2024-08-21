@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView, TextInput } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, ScrollView, TextInput } from 'react-native';
 import { SearchScreenStackParamList } from '../../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
 import { faX } from '@fortawesome/free-solid-svg-icons';
@@ -20,7 +20,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
   const { sctrack } = route.params;
   const [postText, setPostText] = useState('');
   const [userId, setUserId] = useState(''); // Store userId
-  const [userInfo, setUserUsername] = React.useState<any>(null);
+  const [userUsername, setUserUsername] = React.useState<any>(null);
 
 
   React.useEffect(() => {
@@ -48,6 +48,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
       const PostDetails = {
         body: postText,
         userPostsId: userId,
+        username: userUsername,
         scTrackTitle: sctrack.title, 
         scTrackId: sctrack.id,
         scTrackUserId: sctrack.user_id,
@@ -77,6 +78,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
     };
 
     return (
+      <SafeAreaView style={styles.safeAreaContainer}> 
         <View style={styles.container}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -109,6 +111,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         </View>
       </View> 
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: 15,
     backgroundColor: dark,
     justifyContent: 'space-between',
@@ -183,6 +186,10 @@ const styles = StyleSheet.create({
   },
   trackArtist: {
     color: lgray, 
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 
 });

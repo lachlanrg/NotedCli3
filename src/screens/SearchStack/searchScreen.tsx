@@ -15,6 +15,7 @@ import {
   Easing,
   TouchableWithoutFeedback, 
   PanResponder, // Import PanResponder
+  SafeAreaView,
 } from 'react-native';import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core'; // Import IconProp type
@@ -310,6 +311,8 @@ const closeSCBottomSheet = () => {
 
 
   return (
+    <SafeAreaView style={styles.safeAreaContainer}> 
+
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={closeBottomSheet}>
         <View style={{ flex: 1 }}> 
@@ -495,13 +498,14 @@ const closeSCBottomSheet = () => {
       </Animated.View>
 
     </View>
+    </SafeAreaView>
   );
 }  
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
+    // paddingTop: 10,
     paddingLeft: 12,
     paddingRight: 12,
     paddingBottom: 0,
@@ -511,7 +515,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    paddingTop: 40,
+    paddingTop: 20,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -697,6 +701,10 @@ const styles = StyleSheet.create({
   postButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 
