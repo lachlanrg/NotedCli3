@@ -33,7 +33,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [confirmationCode, setConfirmationCode] = React.useState('');
   const [isConfirmationStep, setIsConfirmationStep] = React.useState(false);
   const [activeInput, setActiveInput] = React.useState<string | null>(null);
-
+  
   const handleSignUp = async () => {
     try {
       console.log('Attempting sign up with username: ', username, 'email: ', email, 'and password:', password);
@@ -44,6 +44,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         options: {
           userAttributes: {
             email,
+            'custom:publicProfile': 'false'          
           },
           autoSignIn: true,
         },
@@ -90,6 +91,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         id: userId,
         username: username,
         email: email,
+        publicProfile: false,
       };
 
       await client.graphql({

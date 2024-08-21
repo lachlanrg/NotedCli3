@@ -1,6 +1,6 @@
 // userSearchScreen.tsx
 import React, { useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, FlatList } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, FlatList, SafeAreaView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faTimes, faUserPlus } from '@fortawesome/free-solid-svg-icons';
@@ -44,56 +44,58 @@ const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
-        </TouchableOpacity>
-        <View style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faUserPlus} size={18} color={light} style={styles.userPlusIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Find a friend..."
-            value={searchTerm}
-            onChangeText={handleInputChange}
-            autoCapitalize="none"       // Disable auto-capitalization
-            autoCorrect={false}         // Disable auto-correction
-            placeholderTextColor={placeholder}
-            onKeyPress={(event) => {
-              if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {
-                handleUserSearch();
-              }
-            }}
-            onSubmitEditing={handleUserSearch}
-          />
-          {searchTerm !== '' && (
-            <TouchableOpacity style={styles.clearButton} onPress={() => handleInputChange('')}>
-              <FontAwesomeIcon icon={faTimes} size={14} style={styles.clearButtonIcon} />
+    <SafeAreaView style={styles.safeAreaContainer}> 
+      <View style={styles.container}>
+        <View style={styles.searchContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
+          </TouchableOpacity>
+          <View style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faUserPlus} size={18} color={light} style={styles.userPlusIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Find a friend..."
+              value={searchTerm}
+              onChangeText={handleInputChange}
+              autoCapitalize="none"       // Disable auto-capitalization
+              autoCorrect={false}         // Disable auto-correction
+              placeholderTextColor={placeholder}
+              onKeyPress={(event) => {
+                if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === 'Return') {
+                  handleUserSearch();
+                }
+              }}
+              onSubmitEditing={handleUserSearch}
+            />
+            {searchTerm !== '' && (
+              <TouchableOpacity style={styles.clearButton} onPress={() => handleInputChange('')}>
+                <FontAwesomeIcon icon={faTimes} size={14} style={styles.clearButtonIcon} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        <FlatList
+          data={searchResults || []}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleUserPress(item)} style={styles.itemContainer}>
+              <Text style={styles.username}>{item.username}</Text>
             </TouchableOpacity>
           )}
-        </View>
+          ListEmptyComponent={() => (
+            <Text style={styles.noResultsText}>Search to find a friend</Text>
+          )}
+        />
       </View>
-
-      <FlatList
-        data={searchResults || []}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleUserPress(item)} style={styles.itemContainer}>
-            <Text style={styles.username}>{item.username}</Text>
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() => (
-          <Text style={styles.noResultsText}>Search to find a friend</Text>
-        )}
-      />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: 20,
     paddingLeft: 12,
     paddingRight: 12,
     paddingBottom: 0,
@@ -103,7 +105,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    paddingTop: 30,
   },
   backButton: {
     marginRight: 10,
@@ -158,6 +159,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: lgray,
     marginTop: 20,
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

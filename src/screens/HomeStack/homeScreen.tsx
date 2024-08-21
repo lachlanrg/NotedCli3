@@ -14,6 +14,7 @@ import {
   Linking,
   TextInput,
   KeyboardAvoidingView,
+  SafeAreaView,
 } from 'react-native';
 import { useNavigation, RouteProp,  useFocusEffect, useRoute } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -304,15 +305,10 @@ const HomeScreen: React.FC = () => {
     return (
       <View style={styles.postContainer}>
         <View style={styles.post}>
-        <TouchableOpacity 
-            onPress={() => navigation.navigate('HomeUserProfile', { userId: item.userPostsId })}
-        >
-          <Text style={styles.user}>
-              {postUsernames[item.userPostsId] 
-               ? postUsernames[item.userPostsId] 
-               : ''
-               } 
-          </Text>
+          <TouchableOpacity 
+              onPress={() => navigation.navigate('HomeUserProfile', { userId: item.userPostsId })}
+          >
+            <Text style={styles.user}>{item.username}</Text>
           </TouchableOpacity>
           <Text style={styles.bodytext}>{item.body}</Text>
 
@@ -449,6 +445,7 @@ const HomeScreen: React.FC = () => {
   }
 
   return (
+    <SafeAreaView style={styles.safeAreaContainer}> 
     <View style={styles.container}>
       <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
         <View style={styles.topButtonArea} />
@@ -462,7 +459,7 @@ const HomeScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <Animated.View
+      {/* <Animated.View
         style={[
           styles.refreshIconContainer,
           {
@@ -479,14 +476,14 @@ const HomeScreen: React.FC = () => {
         ]}
       >
         <ActivityIndicator size="small" color="#fff" />
-      </Animated.View>
+      </Animated.View> */}
 
       <FlatList
         ref={flatListRef}
         data={posts}
         renderItem={renderPostItem}
         keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        // ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -541,6 +538,8 @@ const HomeScreen: React.FC = () => {
         </View>
       )}
     </View>
+    </SafeAreaView>
+
   );
 };
 
@@ -548,7 +547,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
-    paddingTop: 20,
+    // paddingTop: 20,
   },
   topButton: {
     position: 'absolute',
@@ -559,7 +558,7 @@ const styles = StyleSheet.create({
     width: 100,
     zIndex: 1,
     borderColor: 'white',
-    borderWidth: 0.5,
+    // borderWidth: 0.5,
   },
   topButtonArea: {
     flex: 1,
@@ -567,7 +566,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    padding: 10,
+    paddingRight: 10,
   },
   button: {
     padding: 10,
@@ -722,6 +721,10 @@ const styles = StyleSheet.create({
   },
   bottomSheetContent: { 
     padding: 20,
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

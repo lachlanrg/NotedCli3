@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert, SafeAreaView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -63,24 +63,38 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           query: queries.getUser,
           variables: { id: userId },
         });
-        setUser(response.data.getUser);
-
-        const postsResponse = await client.graphql({
-          query: queries.listPosts,
-          variables: {
-            filter: {
-              userPostsId: { eq: userId },
-            },
-          },
-        });
-        setPosts(postsResponse.data.listPosts.items);
+  
+        // Check if getUser exists in the response:
+        if (response.data && response.data.getUser) { 
+          const fetchedUser = response.data.getUser;
+          setUser(fetchedUser); 
+  
+          // Now it's safe to use fetchedUser.publicProfile:
+          if (fetchedUser.publicProfile || friendRequestStatus === 'Following') {
+            const postsResponse = await client.graphql({
+              query: queries.listPosts,
+              variables: {
+                filter: {
+                  userPostsId: { eq: userId },
+                },
+              },
+            });
+            setPosts(postsResponse.data.listPosts.items);
+          } 
+        } else {
+          // Handle the case where getUser is not found (e.g., user doesn't exist)
+          console.error('User not found');
+          // You might want to display an error message to the user or navigate back
+        }
+  
       } catch (error) {
         console.error('Error fetching user or posts:', error);
+        // Handle other potential errors (network issues, etc.)
       }
     };
-
+  
     fetchUser();
-  }, [userId]);
+  }, [userId, friendRequestStatus]);
 
   // Check for existing friend request
   useEffect(() => {
@@ -135,52 +149,99 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
 
   const handleFollowRequest = async () => {
     try {
-      if (existingFriendRequest) {
-        // If an existing request is found, update it to "Pending"
+      if (user.publicProfile && existingFriendRequest) {
+        // Public profile and existing request: update to "Following"
         const response = await client.graphql({
           query: mutations.updateFriendRequest,
           variables: {
             input: {
               id: existingFriendRequest.id,
-              status: 'Pending',
+              status: 'Following', // Directly set to "Following"
               _version: existingFriendRequest._version,
             },
-            condition: {
-              status: { eq: 'Cancelled' }
-            }
-          }
+          },
         });
   
         if (response.data.updateFriendRequest) {
-          console.log('Friend Request sent successfully!', response.data.updateFriendRequest);
-          setFriendRequestStatus('Requested');
+          console.log('Automatically followed successfully!');
+          setFriendRequestStatus('Following');
           setExistingFriendRequest(response.data.updateFriendRequest);
         } else {
-          console.error('Failed to send friend request:', response.errors);
+          console.error('Failed to follow:', response.errors);
         }
-      } else {
-        // If no existing request, create a new one
-        const response = await client.graphql({
-          query: mutations.createFriendRequest,
-          variables: {
-            input: {
+      } else if (user.publicProfile && !existingFriendRequest) { 
+        // Public profile and no existing request: create a "Following" relationship
+        try {
+          const response = await client.graphql({
+            query: mutations.createFriendRequest,
+            variables: {
+              input: {
                 userSentFriendRequestsId: currentAuthUserInfo.userId,
                 userReceivedFriendRequestsId: user.id,
-              status: 'Pending',
-            }
-          }
-        });
+                status: 'Following',
+              },
+            },
+          });
   
-        if (response.data.createFriendRequest) {
-          console.log('Friend Request created successfully!', response.data.createFriendRequest);
-          setFriendRequestStatus('Requested');
-          setExistingFriendRequest(response.data.createFriendRequest);
-        } else {
-          console.error('Failed to create friend request:', response.errors);
+          if (response.data.createFriendRequest) {
+            console.log('Automatically followed successfully!');
+            setFriendRequestStatus('Following');
+            setExistingFriendRequest(response.data.createFriendRequest);
+          } else {
+            console.error('Failed to follow:', response.errors);
+          }
+        } catch (error) {
+          console.error('Error sending follow request:', error);
         }
-      }
+      } else if (!user.publicProfile) {
+        // Private profile: handle as a normal friend request
+        if (existingFriendRequest) {
+          // Existing request: update to "Pending"
+          const response = await client.graphql({
+            query: mutations.updateFriendRequest,
+            variables: {
+              input: {
+                id: existingFriendRequest.id,
+                status: 'Pending',
+                _version: existingFriendRequest._version,
+              },
+              condition: {
+                status: { eq: 'Cancelled' },
+              },
+            },
+          });
+  
+          if (response.data.updateFriendRequest) {
+            console.log('Friend Request sent successfully!', response.data.updateFriendRequest);
+            setFriendRequestStatus('Requested');
+            setExistingFriendRequest(response.data.updateFriendRequest);
+          } else {
+            console.error('Failed to send friend request:', response.errors);
+          }
+        } else {
+          // No existing request: create a new one
+          const response = await client.graphql({
+            query: mutations.createFriendRequest,
+            variables: {
+              input: {
+                userSentFriendRequestsId: currentAuthUserInfo.userId,
+                userReceivedFriendRequestsId: user.id,
+                status: 'Pending',
+              },
+            },
+          });
+  
+          if (response.data.createFriendRequest) {
+            console.log('Friend Request created successfully!', response.data.createFriendRequest);
+            setFriendRequestStatus('Requested');
+            setExistingFriendRequest(response.data.createFriendRequest);
+          } else {
+            console.error('Failed to create friend request:', response.errors);
+          }
+        }
+      } 
     } catch (error) {
-      console.error('Error sending friend request:', error);
+      console.error('Error handling follow request:', error);
     }
   };
 
@@ -268,6 +329,8 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
   };
 
   return (
+    <SafeAreaView style={styles.safeAreaContainer}> 
+
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -290,8 +353,8 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
         </View>
         </View>
          {/* Show posts only if following the user */}
-         {friendRequestStatus === 'Following' && (
-          <ScrollView>
+         {(friendRequestStatus === 'Following' || user.publicProfile) && ( 
+          <ScrollView> 
             {posts.map((post) => (
               <View key={post.id} style={styles.postContainer}>
                 <Text style={styles.postBody}>{post.body}</Text>
@@ -299,14 +362,20 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
               </View>
             ))}
           </ScrollView>
-        )}
-        {/* If not following, show a message */}
-        {friendRequestStatus !== 'Following' && (
+         )}
+
+        {/* Show "no posts" message if needed */}
+        {!(friendRequestStatus === 'Following' || user.publicProfile) && (
           <View style={styles.noPostsContainer}>
-            <Text style={styles.noPostsText}>Follow this user to see their posts.</Text>
+            <Text style={styles.noPostsText}>
+              {user.publicProfile
+                ? "This user hasn't posted yet."
+                : "Follow this user to see their posts."}
+            </Text>
           </View>
         )}
-      </ScrollView>
+        
+        </ScrollView>
 
       {/* Modal to confirm cancellation/unfollow */}
       <Modal 
@@ -344,6 +413,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
         </View>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -482,6 +552,10 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: light,
     fontWeight: 'bold',
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

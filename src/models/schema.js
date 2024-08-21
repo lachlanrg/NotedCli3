@@ -120,6 +120,13 @@ export const schema = {
                         ]
                     }
                 },
+                "publicProfile": {
+                    "name": "publicProfile",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -404,6 +411,13 @@ export const schema = {
                 },
                 "userPostsId": {
                     "name": "userPostsId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "username": {
+                    "name": "username",
                     "isArray": false,
                     "type": "String",
                     "isRequired": true,
@@ -858,5 +872,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "cf884ab09dddd1dcf657d57740d9f12d"
+    "version": "15db58b52f89b51cbefcb88ff8f998cd"
 };

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRef, useState, useCallback } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, Modal, ScrollView, ActivityIndicator, RefreshControl} from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, Modal, ScrollView, ActivityIndicator, RefreshControl, SafeAreaView} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
@@ -14,9 +14,8 @@ import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { resetPassword, confirmResetPassword, type ResetPasswordOutput, type ConfirmResetPasswordInput } from 'aws-amplify/auth';
 
 import { getFollowCounts } from '../../components/currentUserFollowerFollowingCount';
-import { handleScrollRefresh, showRefreshIcon, refreshing, setRefreshing } from '../../components/scrollRefresh';
+import { refreshing, setRefreshing } from '../../components/scrollRefresh';
 
-import SettingsDropdown from '../../components/settingsDropdown';
 import UserPostList from '../../components/userPostsList';
 
 import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
@@ -30,8 +29,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [email, setEmail] = React.useState<string | null>(null);
-  const [showSearchBox, setShowSearchBox] = React.useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = React.useState<string>('');
   const searchBoxHeight = React.useRef(new Animated.Value(0)).current;
   const [menuVisible, setMenuVisible] = React.useState<boolean>(false);
   const [overlayVisible, setOverlayVisible] = React.useState<boolean>(false);
@@ -97,25 +94,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     await fetchFollowCounts(); // Await the promise
   }, [fetchFollowCounts]); 
 
-  // React.useEffect(() => {
-  //   Animated.timing(searchBoxHeight, {
-  //     toValue: showSearchBox ? 50 : 0,
-  //     duration: 300,
-  //     easing: Easing.ease,
-  //     useNativeDriver: false,
-  //   }).start();
-  // }, [showSearchBox]);
 
   async function currentAuthenticatedUser() {
     try {
-      const { username, userId, signInDetails } = await getCurrentUser();
-      console.log('___________________________________')
-      console.log(`Current Authenticated User Info:`);
-      console.log(`The Username: ${username}`);
-      console.log(`The userId: ${userId}`);
-      console.log(`The signInDetails: ${signInDetails}`);
-      console.log('___________________________________')
-      setUserInfo({ username, userId, signInDetails });
+      const user = await getCurrentUser();
+      const { userId, username } = user;
+      console.log(`The User Id: ${userId}, Username: ${username}`);
+
+      setUserInfo({ userId, username });
     } catch (err) {
       console.log(err);
     }
@@ -147,10 +133,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
   }
 
-  const handleSearchToggle = () => {
-    setShowSearchBox(!showSearchBox);
-  };
-
   const handleNavigateToUserSearch = () =>{
     navigation.navigate('UserSearch');
     console.log("Navigating to UserSearch Screen")
@@ -165,79 +147,51 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
 
   return (
-    <View style={[styles.container]}>
-      {overlayVisible && (
-        <TouchableOpacity style={styles.overlay} onPress={toggleMenu} />
-      )}
-      <View style={styles.header}>
-        <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
-        <View style={styles.icons}>
-          <TouchableOpacity style={styles.createPostButton} onPress={() => navigation.navigate('CreatePostTab')}>
-            <FontAwesomeIcon icon={faEdit} size={25} color={light} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
-            <FontAwesomeIcon icon={faBell} size={25} color={light} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentModalPress)}>
-            <FontAwesomeIcon icon={faCog} size={25} color={light} />
-          </TouchableOpacity>
-          {/* <SettingsDropdown /> */}
-        </View>
-      </View>
-
-      <Animated.View 
-        style={[
-          styles.refreshIconContainer,
-          { 
-            opacity: showRefreshIcon, 
-            transform: [
-              {
-                translateY: showRefreshIcon.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-30, 0], 
-                }),
-              },
-            ],
-          }
-        ]}
-      >
-        <ActivityIndicator size="small" color={light} /> 
-      </Animated.View>
-
-      <ScrollView
-          style={styles.scrollViewContent}
-          onScroll={handleScrollRefresh}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          scrollEventThrottle={16}
-        >
-        <View style={styles.statsContainer}>
-          <View style={styles.stat}>
-           
-            <Text style={styles.statText}>Followers: {followCounts.followers}</Text>
-          </View>
-          <View style={styles.stat}>
-           
-            <Text style={styles.statText}>Following: {followCounts.following}</Text>
-          </View>
-          <TouchableOpacity onPress={handleNavigateToUserSearch}>
-            <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
-          </TouchableOpacity>
-        </View>
-
-        {userInfo && (
-          <View style={styles.userInfoContainer}>
-            <Text style={styles.userInfo}>Username: {userInfo.username}</Text>
-            <Text style={styles.userInfo}>User ID: {userInfo.userId}</Text>
-            <Text style={styles.userInfo}>Sign In Details: {JSON.stringify(userInfo.signInDetails)}</Text>
-            {email && <Text style={styles.userInfo}>Email: {email}</Text>}
-          </View>
+    <SafeAreaView style={styles.safeAreaContainer}> 
+      <View style={[styles.container]}>
+        {overlayVisible && (
+          <TouchableOpacity style={styles.overlay} onPress={toggleMenu} />
         )}
-        <UserPostList userId={userInfo?.userId} />
-      </ScrollView>
+          <View style={styles.header}>
+            <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
+            <View style={styles.icons}>
+              <TouchableOpacity style={styles.createPostButton} onPress={() => navigation.navigate('CreatePostTab')}>
+                <FontAwesomeIcon icon={faEdit} size={25} color={light} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
+                <FontAwesomeIcon icon={faBell} size={25} color={light} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentModalPress)}>
+                <FontAwesomeIcon icon={faCog} size={25} color={light} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      <SettingsBottomSheet ref={bottomSheetRef} />
+          <ScrollView
+              style={styles.scrollViewContent}
+              // onScroll={handleScrollRefresh}
+              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+              scrollEventThrottle={16}
+            >
+            <View style={styles.statsContainer}>
+              <View style={styles.stat}>
+              
+                <Text style={styles.statText}>Followers: {followCounts.followers}</Text>
+              </View>
+              <View style={styles.stat}>
+              
+                <Text style={styles.statText}>Following: {followCounts.following}</Text>
+              </View>
+              <TouchableOpacity onPress={handleNavigateToUserSearch}>
+                <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
+              </TouchableOpacity>
+            </View>
 
-      </View>
+            <UserPostList userId={userInfo?.userId} />
+          </ScrollView>
+          <SettingsBottomSheet ref={bottomSheetRef} />
+        </View>
+      </SafeAreaView>
     );
   };
 
@@ -251,7 +205,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 20,
+    // paddingTop: 20,
     paddingLeft: 20,
     paddingBottom: 20,
     paddingRight: 8,
@@ -449,6 +403,10 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     zIndex: 1,
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

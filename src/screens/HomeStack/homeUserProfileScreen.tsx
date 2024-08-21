@@ -1,6 +1,6 @@
 // HomeUserProfileScreen.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, SafeAreaView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -266,6 +266,7 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
   };
 
   return (
+    <SafeAreaView style={styles.safeAreaContainer}> 
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -342,6 +343,7 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
         </View>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -480,6 +482,10 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: light,
     fontWeight: 'bold',
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 

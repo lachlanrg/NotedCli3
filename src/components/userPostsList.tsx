@@ -1,5 +1,4 @@
 // userPostsList.tsx
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
@@ -14,7 +13,6 @@ import awsmobile from '../aws-exports';
 import { formatRelativeTime } from './formatComponents';
 import { fetchUsernameById } from './getUserUsername';
 
-// Assuming dark, light styles are imported from your colorModes file
 import { dark, light } from './colorModes'; 
 
 Amplify.configure(awsmobile);
@@ -77,9 +75,6 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
     fetchUserPosts();
   }, [fetchUserPosts]);
 
-  // if (isLoading) {
-  //   return <Text>Loading posts...</Text>; 
-  // }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

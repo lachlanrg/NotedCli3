@@ -43,6 +43,7 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       startedAt
       __typename
     }
+    publicProfile
     createdAt
     updatedAt
     _version
@@ -62,6 +63,7 @@ export const listUsers = /* GraphQL */ `query ListUsers(
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -91,6 +93,7 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -111,6 +114,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -122,6 +126,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -205,6 +210,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -216,6 +222,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -311,6 +318,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -319,6 +327,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       __typename
     }
     userPostsId
+    username
     likedBy
     likesCount
     spotifyAlbumId
@@ -364,6 +373,7 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       id
       body
       userPostsId
+      username
       likedBy
       likesCount
       spotifyAlbumId
@@ -419,6 +429,7 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       id
       body
       userPostsId
+      username
       likedBy
       likesCount
       spotifyAlbumId
@@ -465,6 +476,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       id
       body
       userPostsId
+      username
       likedBy
       likesCount
       spotifyAlbumId
@@ -506,6 +518,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version
@@ -606,6 +619,7 @@ export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
       id
       username
       email
+      publicProfile
       createdAt
       updatedAt
       _version

@@ -20,6 +20,7 @@ type EagerUser = {
   readonly sentFriendRequests?: (FriendRequest | null)[] | null;
   readonly receivedFriendRequests?: (FriendRequest | null)[] | null;
   readonly comments?: (Comment | null)[] | null;
+  readonly publicProfile: boolean;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -38,6 +39,7 @@ type LazyUser = {
   readonly sentFriendRequests: AsyncCollection<FriendRequest>;
   readonly receivedFriendRequests: AsyncCollection<FriendRequest>;
   readonly comments: AsyncCollection<Comment>;
+  readonly publicProfile: boolean;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -126,6 +128,7 @@ type EagerPost = {
   readonly comments?: (Comment | null)[] | null;
   readonly user?: User | null;
   readonly userPostsId: string;
+  readonly username: string;
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
   readonly spotifyAlbumId?: string | null;
@@ -166,6 +169,7 @@ type LazyPost = {
   readonly comments: AsyncCollection<Comment>;
   readonly user: AsyncItem<User | undefined>;
   readonly userPostsId: string;
+  readonly username: string;
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
   readonly spotifyAlbumId?: string | null;
