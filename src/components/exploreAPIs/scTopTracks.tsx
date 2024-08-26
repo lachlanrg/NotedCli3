@@ -22,7 +22,14 @@ export interface RankedSoundCloudTrack {
 
 export const fetchTopSoundCloudTracks = async (): Promise<RankedSoundCloudTrack[]> => {
   try {
-    const response = await client.graphql({ query: queries.listPosts });
+    const response = await client.graphql({ 
+      query: queries.listPosts,
+        variables: {
+          filter: {
+            _deleted: { ne: true } 
+          }
+        },
+    });
     const soundCloudTracks = response.data.listPosts.items.filter(
       (post: any) => post.scTrackId 
     );

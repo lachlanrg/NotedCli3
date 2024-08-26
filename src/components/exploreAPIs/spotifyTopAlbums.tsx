@@ -23,7 +23,14 @@ export interface RankedSpotifyAlbums {
 
   export const fetchTopSpotifyAlbums = async (): Promise<RankedSpotifyAlbums[]> => {
     try {
-        const response = await client.graphql({ query: queries.listPosts });
+        const response = await client.graphql({ 
+          query: queries.listPosts,
+            variables: {
+              filter: {
+                _deleted: { ne: true } 
+              }
+            },
+        });
             const spotifyAlbums = response.data.listPosts.items.filter(
               (post: any) => post.spotifyAlbumId
             );

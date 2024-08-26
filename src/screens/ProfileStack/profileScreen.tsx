@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useRef, useState, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef, useState} from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, Modal, ScrollView, ActivityIndicator, RefreshControl, SafeAreaView} from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
@@ -19,6 +18,7 @@ import { refreshing, setRefreshing } from '../../components/scrollRefresh';
 import UserPostList from '../../components/userPostsList';
 
 import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
+import ProfilePostBottomSheetModal from '../../components/BottomSheets/ProfilePostBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 
 type ProfileScreenProps = {
@@ -27,22 +27,29 @@ type ProfileScreenProps = {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
-  const [userInfo, setUserInfo] = React.useState<any>(null);
-  const [email, setEmail] = React.useState<string | null>(null);
-  const searchBoxHeight = React.useRef(new Animated.Value(0)).current;
-  const [menuVisible, setMenuVisible] = React.useState<boolean>(false);
-  const [overlayVisible, setOverlayVisible] = React.useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [menuVisible, setMenuVisible] = useState<boolean>(false);
+  const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 
   const menuWidth = Dimensions.get('window').width / 2.3;
   const menuPosition = useRef(new Animated.Value(-menuWidth)).current;
   const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
+  const [posts, setPosts] = useState<any[]>([]);
 
-
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const settingsBottomSheetRef = useRef<BottomSheetModal>(null);
   const { dismiss } = useBottomSheetModal();
 
-  const handlePresentModalPress = () => { 
-    bottomSheetRef.current?.present();
+  const handlePresentSettingsModalPress = () => { 
+    settingsBottomSheetRef.current?.present();
+  };
+
+  const postBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [selectedPost, setSelectedPost] = useState<any>(null); // Store the selected post
+
+  const handlePresentPostModalPress = (post: any) => {
+    setSelectedPost(post);
+    postBottomSheetRef.current?.present();
   };
 
   const toggleMenu = () => {
@@ -56,7 +63,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }).start();
   };
 
-  const panResponder = React.useRef(
+  const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: (evt, gestureState) => {
         // Check if touch starts from the left 50 pixels
@@ -70,13 +77,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       onPanResponderRelease: () => {},
     })
   ).current;
-
-
-  React.useEffect(() => {
-    currentAuthenticatedUser();
-    UserAttributes();
-    fetchFollowCounts();
-  }, []); 
 
   const fetchFollowCounts = useCallback(async () => {
     try {
@@ -95,13 +95,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   }, [fetchFollowCounts]); 
 
 
-  async function currentAuthenticatedUser() {
+  const currentAuthenticatedUser = async () => {
     try {
       const user = await getCurrentUser();
       const { userId, username } = user;
-      console.log(`The User Id: ${userId}, Username: ${username}`);
-
+      // console.log(`The User Id: ${userId}, Username: ${username}`);
       setUserInfo({ userId, username });
+
     } catch (err) {
       console.log(err);
     }
@@ -144,7 +144,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     // Navigate to the notifications screen or handle notifications logic
   };
 
+  const handlePostDeleted = () => {
+    // Refetch posts or update the post list in state
+    console.log("Post deleted from ProfileScreen");
+    // Assuming you have a function to fetch posts
+    // fetchUserPosts();
+  };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await currentAuthenticatedUser();
+      await fetchUserAttributes();
+      await fetchFollowCounts();
+    };
+    fetchData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
@@ -161,7 +175,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
                 <FontAwesomeIcon icon={faBell} size={25} color={light} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentModalPress)}>
+              <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentSettingsModalPress)}>
                 <FontAwesomeIcon icon={faCog} size={25} color={light} />
               </TouchableOpacity>
             </View>
@@ -187,9 +201,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            <UserPostList userId={userInfo?.userId} />
+            <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
-          <SettingsBottomSheet ref={bottomSheetRef} />
+          <SettingsBottomSheet ref={settingsBottomSheetRef} />
+          <ProfilePostBottomSheetModal ref={postBottomSheetRef} post={selectedPost} onPostDelete={handlePostDeleted}/>
+
         </View>
       </SafeAreaView>
     );

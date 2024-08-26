@@ -36,6 +36,9 @@ import { fetchUsernameById } from '../../components/getUserUsername';
 import { HomeStackParamList } from '../../components/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
+
+
 Amplify.configure(awsconfig);
 
 const commentIcon = faComment as IconProp;
@@ -63,27 +66,27 @@ const HomeScreen: React.FC = () => {
   const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
 
   const [following, setFollowing] = useState<string[]>([]);
-  
+  const postBottomSheetRef = useRef<BottomSheetModal>(null);
 
   
-  const fetchPostUsername = useCallback(async (postId: string) => {
-    try {
-      const username = await fetchUsernameById(postId);
-      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
-    } catch (error) {
-      console.error('Error fetching username for postId', postId, error);
-      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
-    }
-  }, []);
-  useEffect(() => {
-    const fetchUsernamesForPosts = async () => {
-      const postIds = posts.map(post => post.userPostsId); 
-      for (const postId of postIds) {
-        await fetchPostUsername(postId);
-      }
-    };
-    fetchUsernamesForPosts();
-  }, [posts, fetchPostUsername]); 
+  // const fetchPostUsername = useCallback(async (postId: string) => {
+  //   try {
+  //     const username = await fetchUsernameById(postId);
+  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
+  //   } catch (error) {
+  //     console.error('Error fetching username for postId', postId, error);
+  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
+  //   }
+  // }, []);
+  // useEffect(() => {
+  //   const fetchUsernamesForPosts = async () => {
+  //     const postIds = posts.map(post => post.userPostsId); 
+  //     for (const postId of postIds) {
+  //       await fetchPostUsername(postId);
+  //     }
+  //   };
+  //   fetchUsernamesForPosts();
+  // }, [posts, fetchPostUsername]); 
 
 
   React.useEffect(() => {
@@ -105,58 +108,65 @@ const HomeScreen: React.FC = () => {
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch posts from followed users:
-      const followingPostPromises = following.map(async (userId) => {
-        const response = await client.graphql({
-          query: queries.listPosts,
-          variables: {
-            filter: { 
-              userPostsId: { eq: userId } 
-            }
-          },
+        // 1. Fetch posts from followed users:
+        const followingPostPromises = following.map(async (userId) => {
+            const response = await client.graphql({
+                query: queries.listPosts,
+                variables: {
+                    filter: {
+                        userPostsId: { eq: userId }
+                        // Remove _deleted filter here
+                    },
+                },
+            });
+            return response.data.listPosts.items;
         });
-        return response.data.listPosts.items; 
-      });
-  
-      // 2. Fetch posts from the current user:
-      const currentUserPostPromise = client.graphql({
-        query: queries.listPosts,
-        variables: {
-          filter: {
-            userPostsId: { eq: userInfo?.userId } 
-          }
-        },
-      }).then(response => response.data.listPosts.items);
-  
-      // 3. Wait for all requests:
-      const allPosts = await Promise.all([
-        ...followingPostPromises, 
-        currentUserPostPromise
-      ]);
-  
-      // 4. Combine, flatten, and sort:
-      const flattenedPosts = allPosts.flat(); 
-      const sortedPosts = flattenedPosts.sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-      setPosts(sortedPosts);
-  
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    } finally {
-      setIsLoading(false);
-      setRefreshing(false);
-    }
+
+        // 2. Fetch posts from the current user:
+        const currentUserPostPromise = client.graphql({
+            query: queries.listPosts,
+            variables: {
+                filter: {
+                    userPostsId: { eq: userInfo?.userId }
+                    // Remove _deleted filter here
+                },
+            },
+        }).then(response => response.data.listPosts.items);
+
+        // 3. Wait for all requests:
+        const allPosts = await Promise.all([
+            ...followingPostPromises,
+            currentUserPostPromise
+        ]);
+
+        // 4. Combine, flatten, and sort:
+        const flattenedPosts = allPosts.flat();
+
+        // 5. Filter out deleted posts after fetching
+        const filteredPosts = flattenedPosts.filter(post => !post._deleted);
+
+        const sortedPosts = filteredPosts.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setPosts(sortedPosts);
+
+      } catch (error) {
+          console.error('Error fetching posts:', error);
+      } finally {
+          setIsLoading(false);
+          setRefreshing(false);
+      }
   }, [following, userInfo?.userId]);
+  
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
-
+  
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchPosts();
   }, [fetchPosts]);
-
+  
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     Animated.timing(showRefreshIcon, {
       toValue: event.nativeEvent.contentOffset.y <= -50 ? 1 : 0,
@@ -165,33 +175,10 @@ const HomeScreen: React.FC = () => {
     }).start();
   };
 
-  const handleTrackPress = (track: any) => {
-    setSelectedTrack(track);
+  const handleItemPress = (item: any) => {
+    setSelectedPost(item);
+    postBottomSheetRef.current?.present();
   };
-
-  const closeTrackMenu = () => {
-    setSelectedTrack(null);
-  };
-
-  const handleDetailsPress = () => {
-    console.log('Details pressed for:', selectedTrack);
-  };
-
-  const handleListenPress = () => {
-    if (selectedTrack) {
-      const url = selectedTrack.scTrackPermalinkUrl
-                  || selectedTrack.spotifyAlbumExternalUrl
-                  || selectedTrack.spotifyTrackExternalUrl;
-
-      if (url) {
-        Linking.openURL(url);
-        closeTrackMenu();
-      } else {
-        console.warn('No external URL found for selected track');
-      }
-    }
-  };
-
 
   const handleLikePress = async (itemId: string) => {
     try {
@@ -320,7 +307,7 @@ const HomeScreen: React.FC = () => {
                     style={styles.image}
                   />
                 </View>
-                <TouchableOpacity onPress={() => handleTrackPress(item)}>
+                <TouchableOpacity onPress={() => handleItemPress(item)}>
                   <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.scTrackTitle}</Text>
                 </TouchableOpacity>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
@@ -356,7 +343,7 @@ const HomeScreen: React.FC = () => {
                     style={styles.image}
                   />
                 </View>
-                <TouchableOpacity onPress={() => handleTrackPress(item)}>
+                <TouchableOpacity onPress={() => handleItemPress(item)}>
                   <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {item.spotifyAlbumName}</Text>
                 </TouchableOpacity>
                 <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
@@ -397,7 +384,7 @@ const HomeScreen: React.FC = () => {
                     style={styles.image}
                   />
                 </View>
-                <TouchableOpacity onPress={() => handleTrackPress(item)}>
+                <TouchableOpacity onPress={() => handleItemPress(item)}>
                   <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {item.spotifyTrackName}</Text>
                 </TouchableOpacity>
                 <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
@@ -459,25 +446,6 @@ const HomeScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* <Animated.View
-        style={[
-          styles.refreshIconContainer,
-          {
-            opacity: showRefreshIcon,
-            transform: [
-              {
-                translateY: showRefreshIcon.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-30, 0],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
-        <ActivityIndicator size="small" color="#fff" />
-      </Animated.View> */}
-
       <FlatList
         ref={flatListRef}
         data={posts}
@@ -487,6 +455,7 @@ const HomeScreen: React.FC = () => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
       />
 
       <Animated.View 
@@ -504,39 +473,8 @@ const HomeScreen: React.FC = () => {
         </Animated.View>
 
         <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost}/>
+        <HomePostBottomSheetModal ref={postBottomSheetRef} item={selectedPost} />
 
-      {selectedTrack && (
-        <View style={styles.trackMenu}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={closeTrackMenu}
-          >
-            <FontAwesomeIcon icon={faTimes} size={20} color={dark} />
-          </TouchableOpacity>
-
-          <Text style={styles.trackMenuText} numberOfLines={1} ellipsizeMode="tail">
-            {selectedTrack.scTrackTitle ||
-              selectedTrack.spotifyAlbumName ||
-              selectedTrack.spotifyTrackName}
-          </Text>
-
-          <View style={styles.menuButtonContainer}>
-          <TouchableOpacity style={styles.menuDetailsButton} onPress={handleDetailsPress}>
-              <Text style={styles.buttonText}>Details</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.menuListenButton, {
-                borderColor: selectedTrack.scTrackId ? 'orange' : 'green'
-              }]}
-              onPress={handleListenPress}
-            >
-              <Text style={styles.buttonText}>
-                {selectedTrack.scTrackId ? 'SoundCloud' : 'Spotify'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
     </View>
     </SafeAreaView>
 

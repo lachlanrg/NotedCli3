@@ -39,7 +39,14 @@ export const fetchTopTrendingItems = async (): Promise<RankedTopTrending[]> => {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7); // Calculate date one week ago
   
-      const response = await client.graphql({ query: queries.listPosts });
+      const response = await client.graphql({ 
+        query: queries.listPosts,
+        variables: {
+          filter: {
+            _deleted: { ne: true } 
+          }
+        },
+      });
       const allPosts = response.data.listPosts.items.filter(
         (post: any) => new Date(post.createdAt) >= oneWeekAgo // Filter posts from the past week
       );

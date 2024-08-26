@@ -82,17 +82,6 @@ const styles = StyleSheet.create({
   containerHeadline: {
     fontSize: 24,
   },
-  input: {
-    flex: 1, // Input takes up available space
-    marginRight: 8, 
-    fontSize: 14,
-    lineHeight: 20,
-    borderRadius: 10,
-    backgroundColor: light,
-    padding: 8,
-    borderColor: dark,
-    borderWidth: 1,
-  },
 });
 
 export default SettingsBottomSheet

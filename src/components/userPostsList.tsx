@@ -4,7 +4,8 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  ScrollView 
+  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
@@ -19,9 +20,10 @@ Amplify.configure(awsmobile);
 
 interface UserPostListProps {
   userId: string; 
+  onPostPress: (postId: string) => void; // Add onPostPress prop
 }
 
-const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
+const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
@@ -55,21 +57,23 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
         query: listPosts,
         variables: { 
           filter: {
-            userPostsId: { eq: userId } 
+            userPostsId: { eq: userId } ,
           }
         }
       });
       // Sort by createdAt in descending order
-      const sortedPosts = response.data.listPosts.items.sort((a, b) => {
+      const sortedPosts = response.data.listPosts.items
+      .filter(post => !post._deleted)
+      .sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
-      setPosts(sortedPosts); 
-    } catch (error) {
-      console.error('Error fetching user posts:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId]); 
+    setPosts(sortedPosts);
+  } catch (error) {
+    console.error('Error fetching user posts:', error);
+  } finally {
+    setIsLoading(false);
+  }
+}, [userId]);
 
   useEffect(() => {
     fetchUserPosts();
@@ -79,16 +83,12 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {posts.map((item) => (
+        <TouchableOpacity key={item.id} onPress={() => onPostPress(item)}>
         <View key={item.id} style={styles.postContainer}>
           <View style={styles.post}>
           {item.scTrackId && (
           <View>
-            <Text style={styles.user}>
-              {postUsernames[item.userPostsId] 
-               ? postUsernames[item.userPostsId] 
-               : ''
-               } 
-            </Text>
+            <Text style={styles.user}>{item.username}</Text>
             <Text style={styles.bodytext}>{item.body}</Text>
             <Text style={styles.date}>SoundCloud Track: {item.scTrackTitle}</Text>
             <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
@@ -129,6 +129,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId }) => {
         )}
         </View>
         </View>
+        </TouchableOpacity>
       )
       )
     }

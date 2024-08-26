@@ -295,6 +295,15 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       <View style={styles.contentContainer}>
         {/* <Text style={styles.containerHeadline}>Comments</Text> */}
 
+        {selectedPost && (
+          <FlatList
+            data={comments}
+            renderItem={renderComment}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.commentList}
+          />
+        )}
+
         <View style={styles.inputContainer}>
           <BottomSheetTextInput
             style={styles.input}
@@ -305,15 +314,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             <Text style={styles.postButtonText}>Post</Text>
           </TouchableOpacity>
         </View>
-
-        {selectedPost && (
-          <FlatList
-            data={comments}
-            renderItem={renderComment}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.commentList}
-          />
-        )}
       </View>
     </BottomSheetModal>
   );
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18, // Use horizontal padding
     paddingVertical: 8,
     marginTop: 8,
-    marginBottom: 16, // Add margin below input container
+    marginBottom: 50, // Add margin below input container
   },
   input: {
     flex: 1, // Input takes up available space
