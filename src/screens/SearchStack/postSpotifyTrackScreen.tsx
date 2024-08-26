@@ -24,31 +24,31 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
   const [userUsername, setUserUsername] = React.useState<any>(null);
 
 
-  React.useEffect(() => {
-    currentAuthenticatedUser();
-  }, []);
+  // React.useEffect(() => {
+  //   currentAuthenticatedUser();
+  // }, []);
 
-  async function currentAuthenticatedUser() {
-    try {
-      const { username  } = await getCurrentUser();
-      console.log(`The username: ${username}`);
-  
-      setUserUsername({ username });
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  // async function currentAuthenticatedUser() {
+  //   try {
+  //     const { username  } = await getCurrentUser();
+  //     console.log(`The username: ${username}`);
+  //     } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
 
   const handleTrackPost = async () => {
     try {
       const client = generateClient();
       const { userId } = await getCurrentUser();
+      const { username  } = await getCurrentUser();
+
     
       const PostDetails = {
         body: postText,
         userPostsId: userId,
-        username: userUsername,
+        username: username,
         spotifyTrackName: track.name, 
         spotifyTrackArtists: track.artists.map(artist => artist.name).join(', '), 
         spotifyTrackId: track.id,

@@ -373,6 +373,7 @@ const closeSCBottomSheet = () => {
           <FlatList
               data={soundcloudTracks}
               onScroll={closeSCBottomSheet}
+              showsVerticalScrollIndicator={false}
               renderItem={({ item }: {item: scTrack}) => (
               <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => toggleSCBottomSheet(item)} >
                 <Image source={{ uri: item.artwork_url }} style={styles.albumImage} />
@@ -399,62 +400,61 @@ const closeSCBottomSheet = () => {
           ) : (
             <> */}
         <ScrollView 
-          ref={scrollViewRef} onScrollBeginDrag={closeBottomSheet}
+          ref={scrollViewRef} onScrollBeginDrag={closeBottomSheet} showsVerticalScrollIndicator={false}
           >
-        {artists.slice(0, 2).map(artist => (
-          <TouchableOpacity key={artist.id} style={styles.itemContainer} onPress={() => logArtistInfo(artist)}>
-            <Image
-              source={{ uri: artist.images[0]?.url }}
-              style={styles.albumImage}
-            />
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{artist.name}</Text>
-              <View style={styles.itemLowerDetails}>
-                <Text style={styles.itemType}>{artist.type.charAt(0).toUpperCase() + artist.type.slice(1)}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        {albums.slice(0, 5).map(album => (
-          <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => handleNavigateToAlbumDetail(album)}>
-            <Image
-              source={{ uri: album.images[0]?.url }}
-              style={styles.albumImage}
-            />
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{album.name}</Text>
-              <View style={styles.itemLowerDetails}>
-                <Text style={styles.itemType}>{album.album_type.charAt(0).toUpperCase() + album.album_type.slice(1)}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {album.artists.map(artist => artist.name).join(', ')}
-                  </Text>
-                </View>
-                {/* <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text> */}
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-
-        {tracks.slice(0, 10).map(track => (
-          <TouchableOpacity key={track.id} style={styles.itemContainer} onPress={() => toggleBottomSheet(track)}>
-            <Image
-            source={{ uri: track.album.images[0]?.url }}
-            style={styles.albumImage}
-            />
-            <View style={styles.itemDetails}>
-              <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{track.name}</Text>
-              <View style={styles.itemLowerDetails}>
-              <Text style={styles.itemType}>{track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {track.artists.map(artist => artist.name).join(', ')}
-                  </Text>
+          {artists.slice(0, 2).map(artist => (
+            <TouchableOpacity key={artist.id} style={styles.itemContainer} onPress={() => logArtistInfo(artist)}>
+              <Image
+                source={{ uri: artist.images[0]?.url }}
+                style={styles.albumImage}
+              />
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{artist.name}</Text>
+                <View style={styles.itemLowerDetails}>
+                  <Text style={styles.itemType}>{artist.type.charAt(0).toUpperCase() + artist.type.slice(1)}</Text>
                 </View>
               </View>
-            </View>
-        </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          ))}
 
+          {albums.slice(0, 5).map(album => (
+            <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => handleNavigateToAlbumDetail(album)}>
+              <Image
+                source={{ uri: album.images[0]?.url }}
+                style={styles.albumImage}
+              />
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{album.name}</Text>
+                <View style={styles.itemLowerDetails}>
+                  <Text style={styles.itemType}>{album.album_type.charAt(0).toUpperCase() + album.album_type.slice(1)}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {album.artists.map(artist => artist.name).join(', ')}
+                    </Text>
+                  </View>
+                  {/* <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text> */}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          {tracks.slice(0, 10).map(track => (
+            <TouchableOpacity key={track.id} style={styles.itemContainer} onPress={() => toggleBottomSheet(track)}>
+              <Image
+              source={{ uri: track.album.images[0]?.url }}
+              style={styles.albumImage}
+              />
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{track.name}</Text>
+                <View style={styles.itemLowerDetails}>
+                <Text style={styles.itemType}>{track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {track.artists.map(artist => artist.name).join(', ')}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+          </TouchableOpacity>
+          ))}
       </ScrollView>
 
       </View>

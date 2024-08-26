@@ -23,7 +23,14 @@ export interface RankedTrack {
 
   export const fetchTopSpotifyTracks = async (): Promise<RankedTrack[]> => {
     try {
-        const response = await client.graphql({ query: queries.listPosts });
+        const response = await client.graphql({ 
+          query: queries.listPosts,
+            variables: {
+              filter: {
+                _deleted: { ne: true } 
+              }
+            },
+        });
             const spotifyTracks = response.data.listPosts.items.filter(
               (post: any) => post.spotifyTrackId
             );

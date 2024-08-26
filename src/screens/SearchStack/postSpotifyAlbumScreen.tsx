@@ -24,30 +24,32 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
   const [userUsername, setUserUsername] = React.useState<any>(null);
 
 
-  React.useEffect(() => {
-    currentAuthenticatedUser();
-  }, []);
+  // React.useEffect(() => {
+  //   currentAuthenticatedUser();
+  // }, []);
 
-  async function currentAuthenticatedUser() {
-    try {
-      const { username  } = await getCurrentUser();
-      console.log(`The username: ${username}`);
+  // async function currentAuthenticatedUser() {
+  //   try {
+  //     const { username  } = await getCurrentUser();
+  //     console.log(`The username: ${username}`);
   
-      setUserUsername({ username });
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  //     setUserUsername({ username });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
   const handleAlbumPost = async () => {
     try {
       const client = generateClient();
       const { userId } = await getCurrentUser();
+      const { username  } = await getCurrentUser();
+
     
       const PostDetails = {
         body: postText,
         userPostsId: userId,
-        username: userUsername,
+        username: username,
         spotifyAlbumId: album.id,
         spotifyAlbumName: album.name, 
         spotifyAlbumReleaseDate: album.release_date,

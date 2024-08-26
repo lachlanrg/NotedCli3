@@ -27,17 +27,18 @@ const CreatePostScreen = () => {
   }
 
   const handlePost = async () => {
-   
+  
     try {
       const client = generateClient();
       const { userId, username } = await getCurrentUser();
       const PostDetails = { 
         body: postContent,
         userPostsId: userId, 
+        username: username,
         spotifyTrackName: "track 2",
         spotifyTrackArtists: "Artists",
         spotifyTrackId: "143443423",
-
+        likesCount: 0,
         
         //Needs user id to associate @belongs to with user
         // username: username,

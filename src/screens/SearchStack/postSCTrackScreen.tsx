@@ -23,32 +23,34 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
   const [userUsername, setUserUsername] = React.useState<any>(null);
 
 
-  React.useEffect(() => {
-    currentAuthenticatedUser();
-  }, []);
+  // React.useEffect(() => {
+  //   currentAuthenticatedUser();
+  // }, []);
 
-  async function currentAuthenticatedUser() {
-    try {
-      const { username  } = await getCurrentUser();
-      console.log(`The username: ${username}`);
+  // async function currentAuthenticatedUser() {
+  //   try {
+  //     const { username  } = await getCurrentUser();
+  //     console.log(`The username: ${username}`);
   
-      setUserUsername({ username });
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  //     setUserUsername({ username });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
   const handleSCTrackPost = async () => {
     try {
       const client = generateClient();
       const { userId } = await getCurrentUser();
+      const { username  } = await getCurrentUser();
+
       
       // const openInApp = "soundcloud://tracks/" + id + "?utm_source=direct&utm_content=download_button_header&utm_medium=mobi&utm_campaign=no_campaign&mt=8&at=direct&pt=mobi&ct=no_campaign"
     
       const PostDetails = {
         body: postText,
         userPostsId: userId,
-        username: userUsername,
+        username: username,
         scTrackTitle: sctrack.title, 
         scTrackId: sctrack.id,
         scTrackUserId: sctrack.user_id,
