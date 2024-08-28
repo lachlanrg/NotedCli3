@@ -709,7 +709,29 @@ export const schema = {
                     "name": "postId",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "repost": {
+                    "name": "repost",
+                    "isArray": false,
+                    "type": {
+                        "model": "Repost"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "repostCommentsId"
+                        ]
+                    }
+                },
+                "repostId": {
+                    "name": "repostId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
                     "attributes": []
                 },
                 "content": {
@@ -788,6 +810,13 @@ export const schema = {
                 },
                 "postCommentsId": {
                     "name": "postCommentsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "repostCommentsId": {
+                    "name": "repostCommentsId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": false,
@@ -886,6 +915,22 @@ export const schema = {
                     "type": "String",
                     "isRequired": true,
                     "attributes": []
+                },
+                "comments": {
+                    "name": "comments",
+                    "isArray": true,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "repostCommentsId"
+                        ]
+                    }
                 },
                 "createdAt": {
                     "name": "createdAt",
@@ -1021,5 +1066,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "d06d84631c755b0d60aba624e136b6d6"
+    "version": "807e03bd7e557736be02485e2314ef71"
 };

@@ -102,6 +102,7 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
         multiline={true}
         value={postText}
         onChangeText={setPostText}
+        maxLength={600}
       />
 
       {/* Track Information */}

@@ -665,6 +665,21 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       __typename
     }
     postId
+    repost {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    repostId
     content
     likedBy
     likesCount
@@ -689,6 +704,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
     _lastChangedAt
     userCommentsId
     postCommentsId
+    repostCommentsId
     __typename
   }
 }
@@ -738,6 +754,21 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       __typename
     }
     postId
+    repost {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    repostId
     content
     likedBy
     likesCount
@@ -762,6 +793,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
     _lastChangedAt
     userCommentsId
     postCommentsId
+    repostCommentsId
     __typename
   }
 }
@@ -811,6 +843,21 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       __typename
     }
     postId
+    repost {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    repostId
     content
     likedBy
     likesCount
@@ -835,6 +882,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
     _lastChangedAt
     userCommentsId
     postCommentsId
+    repostCommentsId
     __typename
   }
 }
@@ -899,6 +947,11 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
     userRepostsId
     userOriginalPostId
     username
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -969,6 +1022,11 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
     userRepostsId
     userOriginalPostId
     username
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -1039,6 +1097,11 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
     userRepostsId
     userOriginalPostId
     username
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version

@@ -14,6 +14,7 @@ export type HomeStackParamList = {
   HomeUserProfile: { userId: string }; 
   CreatePostTab: undefined
   PostRepost: {post: Post};
+  RepostOriginalPost: {post: Post};
 };
 
 export type SearchScreenStackParamList = {

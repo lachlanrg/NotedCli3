@@ -69,7 +69,9 @@ type Post @model @auth(rules: [{allow: public}]) {
 type Comment @model @auth(rules: [{allow: public}]) {
   id: ID!
   post: Post @belongsTo
-  postId: String!
+  postId: String
+  repost: Repost @belongsTo
+  repostId: String
   content: String!
   likedBy: [ID!]
   likesCount: Int!
@@ -86,6 +88,7 @@ type Repost @model @auth(rules: [{allow: public}]) {
   userRepostsId: String!
   userOriginalPostId: String!
   username: String!
+  comments: [Comment] @hasMany
 }
 
 type Like @model @auth(rules: [{allow: public}]) {

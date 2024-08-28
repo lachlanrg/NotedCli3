@@ -217,7 +217,9 @@ type EagerComment = {
   };
   readonly id: string;
   readonly post?: Post | null;
-  readonly postId: string;
+  readonly postId?: string | null;
+  readonly repost?: Repost | null;
+  readonly repostId?: string | null;
   readonly content: string;
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
@@ -228,6 +230,7 @@ type EagerComment = {
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
   readonly postCommentsId?: string | null;
+  readonly repostCommentsId?: string | null;
 }
 
 type LazyComment = {
@@ -237,7 +240,9 @@ type LazyComment = {
   };
   readonly id: string;
   readonly post: AsyncItem<Post | undefined>;
-  readonly postId: string;
+  readonly postId?: string | null;
+  readonly repost: AsyncItem<Repost | undefined>;
+  readonly repostId?: string | null;
   readonly content: string;
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
@@ -248,6 +253,7 @@ type LazyComment = {
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
   readonly postCommentsId?: string | null;
+  readonly repostCommentsId?: string | null;
 }
 
 export declare type Comment = LazyLoading extends LazyLoadingDisabled ? EagerComment : LazyComment
@@ -268,6 +274,7 @@ type EagerRepost = {
   readonly userRepostsId: string;
   readonly userOriginalPostId: string;
   readonly username: string;
+  readonly comments?: (Comment | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly postRepostsId?: string | null;
@@ -285,6 +292,7 @@ type LazyRepost = {
   readonly userRepostsId: string;
   readonly userOriginalPostId: string;
   readonly username: string;
+  readonly comments: AsyncCollection<Comment>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly postRepostsId?: string | null;

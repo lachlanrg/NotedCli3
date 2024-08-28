@@ -276,7 +276,10 @@ const HomeScreen: React.FC = () => {
           const response = await client.graphql({
             query: queries.listComments,
             variables: {
-              filter: { postId: { eq: post.id } },
+              filter: {
+                postId: 'originalPost' in post ? undefined : { eq: post.id },
+                repostId: 'originalPost' in post ? { eq: post.id } : undefined,
+              },
             },
           });
           return [post.id, response.data.listComments.items.length];
@@ -384,10 +387,11 @@ const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
                 <Text style={styles.likesCountText}>
                 </Text>
-                <TouchableOpacity style={styles.commentIcon}>
+                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                   <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                 </TouchableOpacity>
                 <Text style={styles.commentCountText}>
+                      {commentCounts[item.id] || null}
                 </Text>
                 <TouchableOpacity style={styles.repostIcon}>
                   <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
