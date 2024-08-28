@@ -7,6 +7,8 @@
 
 ## To Run Application and All Components Together
 
+Firstly, checkout awsauth branch for most up-to-date version
+
 ```bash
 # using npx
 npx react-native@latest run-ios
