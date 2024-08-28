@@ -4,6 +4,7 @@ import { Album } from '../screens/SearchStack/searchScreen'
 import { User } from '../models';
 import { Track } from '../spotifyConfig/itemInterface';
 import { scTrack } from '../soundcloudConfig/itemInterface';
+import { Post } from '../API';
 import { RankedTrack } from './exploreAPIs/spotifyTopTracks';
 import { RankedSoundCloudTrack } from './exploreAPIs/scTopTracks';
 import { RankedTopTrending } from './exploreAPIs/topTrendingItems';
@@ -12,6 +13,7 @@ export type HomeStackParamList = {
   Home: undefined;
   HomeUserProfile: { userId: string }; 
   CreatePostTab: undefined
+  PostRepost: {post: Post};
 };
 
 export type SearchScreenStackParamList = {

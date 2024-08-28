@@ -44,6 +44,11 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -92,6 +97,11 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -140,6 +150,11 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -435,6 +450,11 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -496,6 +516,11 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -557,6 +582,11 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -811,6 +841,216 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
 ` as GeneratedSubscription<
   APITypes.OnDeleteCommentSubscriptionVariables,
   APITypes.OnDeleteCommentSubscription
+>;
+export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter: ModelSubscriptionRepostFilterInput) {
+  onCreateRepost(filter: $filter) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateRepostSubscriptionVariables,
+  APITypes.OnCreateRepostSubscription
+>;
+export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter: ModelSubscriptionRepostFilterInput) {
+  onUpdateRepost(filter: $filter) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateRepostSubscriptionVariables,
+  APITypes.OnUpdateRepostSubscription
+>;
+export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter: ModelSubscriptionRepostFilterInput) {
+  onDeleteRepost(filter: $filter) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteRepostSubscriptionVariables,
+  APITypes.OnDeleteRepostSubscription
 >;
 export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: ModelSubscriptionLikeFilterInput) {
   onCreateLike(filter: $filter) {
