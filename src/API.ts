@@ -169,7 +169,9 @@ export type Comment = {
   __typename: "Comment",
   id: string,
   post?: Post | null,
-  postId: string,
+  postId?: string | null,
+  repost?: Repost | null,
+  repostId?: string | null,
   content: string,
   likedBy?: Array< string > | null,
   likesCount: number,
@@ -183,13 +185,7 @@ export type Comment = {
   _lastChangedAt: number,
   userCommentsId?: string | null,
   postCommentsId?: string | null,
-};
-
-export type ModelRepostConnection = {
-  __typename: "ModelRepostConnection",
-  items:  Array<Repost | null >,
-  nextToken?: string | null,
-  startedAt?: number | null,
+  repostCommentsId?: string | null,
 };
 
 export type Repost = {
@@ -201,12 +197,20 @@ export type Repost = {
   userRepostsId: string,
   userOriginalPostId: string,
   username: string,
+  comments?: ModelCommentConnection | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
   postRepostsId?: string | null,
+};
+
+export type ModelRepostConnection = {
+  __typename: "ModelRepostConnection",
+  items:  Array<Repost | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
 };
 
 export type ModelFriendshipConnection = {
@@ -465,7 +469,8 @@ export type DeletePostInput = {
 
 export type CreateCommentInput = {
   id?: string | null,
-  postId: string,
+  postId?: string | null,
+  repostId?: string | null,
   content: string,
   likedBy?: Array< string > | null,
   likesCount: number,
@@ -474,10 +479,12 @@ export type CreateCommentInput = {
   _version?: number | null,
   userCommentsId?: string | null,
   postCommentsId?: string | null,
+  repostCommentsId?: string | null,
 };
 
 export type ModelCommentConditionInput = {
   postId?: ModelStringInput | null,
+  repostId?: ModelStringInput | null,
   content?: ModelStringInput | null,
   likedBy?: ModelIDInput | null,
   likesCount?: ModelIntInput | null,
@@ -491,11 +498,13 @@ export type ModelCommentConditionInput = {
   updatedAt?: ModelStringInput | null,
   userCommentsId?: ModelIDInput | null,
   postCommentsId?: ModelIDInput | null,
+  repostCommentsId?: ModelIDInput | null,
 };
 
 export type UpdateCommentInput = {
   id: string,
   postId?: string | null,
+  repostId?: string | null,
   content?: string | null,
   likedBy?: Array< string > | null,
   likesCount?: number | null,
@@ -504,6 +513,7 @@ export type UpdateCommentInput = {
   _version?: number | null,
   userCommentsId?: string | null,
   postCommentsId?: string | null,
+  repostCommentsId?: string | null,
 };
 
 export type DeleteCommentInput = {
@@ -666,6 +676,7 @@ export type ModelPostFilterInput = {
 export type ModelCommentFilterInput = {
   id?: ModelIDInput | null,
   postId?: ModelStringInput | null,
+  repostId?: ModelStringInput | null,
   content?: ModelStringInput | null,
   likedBy?: ModelIDInput | null,
   likesCount?: ModelIntInput | null,
@@ -679,6 +690,7 @@ export type ModelCommentFilterInput = {
   _deleted?: ModelBooleanInput | null,
   userCommentsId?: ModelIDInput | null,
   postCommentsId?: ModelIDInput | null,
+  repostCommentsId?: ModelIDInput | null,
 };
 
 export type ModelRepostFilterInput = {
@@ -836,6 +848,7 @@ export type ModelSubscriptionIntInput = {
 export type ModelSubscriptionCommentFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   postId?: ModelSubscriptionStringInput | null,
+  repostId?: ModelSubscriptionStringInput | null,
   content?: ModelSubscriptionStringInput | null,
   likedBy?: ModelSubscriptionIDInput | null,
   likesCount?: ModelSubscriptionIntInput | null,
@@ -859,6 +872,7 @@ export type ModelSubscriptionRepostFilterInput = {
   and?: Array< ModelSubscriptionRepostFilterInput | null > | null,
   or?: Array< ModelSubscriptionRepostFilterInput | null > | null,
   _deleted?: ModelBooleanInput | null,
+  repostCommentsId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionLikeFilterInput = {
@@ -1546,7 +1560,22 @@ export type CreateCommentMutation = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -1571,6 +1600,7 @@ export type CreateCommentMutation = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -1621,7 +1651,22 @@ export type UpdateCommentMutation = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -1646,6 +1691,7 @@ export type UpdateCommentMutation = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -1696,7 +1742,22 @@ export type DeleteCommentMutation = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -1721,6 +1782,7 @@ export type DeleteCommentMutation = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -1787,6 +1849,11 @@ export type CreateRepostMutation = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -1859,6 +1926,11 @@ export type UpdateRepostMutation = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -1931,6 +2003,11 @@ export type DeleteRepostMutation = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -2544,7 +2621,22 @@ export type GetCommentQuery = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -2569,6 +2661,7 @@ export type GetCommentQuery = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -2584,7 +2677,8 @@ export type ListCommentsQuery = {
     items:  Array< {
       __typename: "Comment",
       id: string,
-      postId: string,
+      postId?: string | null,
+      repostId?: string | null,
       content: string,
       likedBy?: Array< string > | null,
       likesCount: number,
@@ -2597,6 +2691,7 @@ export type ListCommentsQuery = {
       _lastChangedAt: number,
       userCommentsId?: string | null,
       postCommentsId?: string | null,
+      repostCommentsId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -2616,7 +2711,8 @@ export type SyncCommentsQuery = {
     items:  Array< {
       __typename: "Comment",
       id: string,
-      postId: string,
+      postId?: string | null,
+      repostId?: string | null,
       content: string,
       likedBy?: Array< string > | null,
       likesCount: number,
@@ -2629,6 +2725,7 @@ export type SyncCommentsQuery = {
       _lastChangedAt: number,
       userCommentsId?: string | null,
       postCommentsId?: string | null,
+      repostCommentsId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -2697,6 +2794,11 @@ export type GetRepostQuery = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3505,7 +3607,22 @@ export type OnCreateCommentSubscription = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -3530,6 +3647,7 @@ export type OnCreateCommentSubscription = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -3579,7 +3697,22 @@ export type OnUpdateCommentSubscription = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -3604,6 +3737,7 @@ export type OnUpdateCommentSubscription = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -3653,7 +3787,22 @@ export type OnDeleteCommentSubscription = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
     } | null,
-    postId: string,
+    postId?: string | null,
+    repost?:  {
+      __typename: "Repost",
+      id: string,
+      body?: string | null,
+      userRepostsId: string,
+      userOriginalPostId: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      postRepostsId?: string | null,
+    } | null,
+    repostId?: string | null,
     content: string,
     likedBy?: Array< string > | null,
     likesCount: number,
@@ -3678,6 +3827,7 @@ export type OnDeleteCommentSubscription = {
     _lastChangedAt: number,
     userCommentsId?: string | null,
     postCommentsId?: string | null,
+    repostCommentsId?: string | null,
   } | null,
 };
 
@@ -3743,6 +3893,11 @@ export type OnCreateRepostSubscription = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3814,6 +3969,11 @@ export type OnUpdateRepostSubscription = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3885,6 +4045,11 @@ export type OnDeleteRepostSubscription = {
     userRepostsId: string,
     userOriginalPostId: string,
     username: string,
+    comments?:  {
+      __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,

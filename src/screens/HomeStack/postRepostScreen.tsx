@@ -140,6 +140,7 @@ const PostRepostScreen: React.FC<PostRepostScreenRouteProp> = ({ route }) => {
         value={repostText}
         onChangeText={setRepostText}
         multiline
+        maxLength={600}
       />
 
       {/* Render the original post content */}

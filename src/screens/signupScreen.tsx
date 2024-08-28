@@ -152,8 +152,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             onChangeText={setUsername}
             autoCapitalize="none"
             placeholderTextColor={placeholder}
-            onFocus={() => setActiveInput('username')} // Set active on focus
-            onBlur={() => setActiveInput(null)}       // Clear active on blur
+            onFocus={() => setActiveInput('username')}
+            onBlur={() => setActiveInput(null)}
+            maxLength={20}
           />
           <TextInput
             style={[

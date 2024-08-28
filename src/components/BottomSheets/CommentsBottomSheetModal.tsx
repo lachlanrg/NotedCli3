@@ -27,11 +27,17 @@ type Comment = {
   _version: number; // Add the _version property
 };
 
+type Post = {
+  id: string;
+  comments: Comment[];
+};
+
+type Repost = {
+  id: string;
+  originalPost: Post;
+};
 type Props = {
-  selectedPost: {
-    id: string;
-    comments: Comment[];
-  } | null;
+  selectedPost: Post | Repost | null;
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
@@ -81,7 +87,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       const client = generateClient();
 
       const input = {
-        postId: selectedPost.id,
+        postId: 'originalPost' in selectedPost ? undefined : selectedPost.id,
+        repostId: 'originalPost' in selectedPost ? selectedPost.id : undefined,
         content: newComment,
         userPostsId: userId,
         username: username,
@@ -113,10 +120,9 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
     if (!selectedPost) return []; // Don't fetch if no post is selected
     try {
       const client = generateClient();
-      const filter = { // Filter comments by the selected post ID
-        postId: {
-          eq: selectedPost.id
-        }
+      const filter = { // Filter comments by the selected post ID or repost ID
+        postId: 'originalPost' in selectedPost ? undefined : { eq: selectedPost.id },
+        repostId: 'originalPost' in selectedPost ? { eq: selectedPost.id } : undefined,
       };
   
       const response = await client.graphql({
@@ -309,6 +315,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             style={styles.input}
             onChangeText={handleCommentChange}
             placeholder="Add a comment ..."
+            maxLength={600}
           />
           <TouchableOpacity onPress={createComment} style={styles.postButton}>
             <Text style={styles.postButtonText}>Post</Text>
@@ -329,13 +336,13 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 18, // Use horizontal padding
+    paddingHorizontal: 18,
     paddingVertical: 8,
     marginTop: 8,
-    marginBottom: 50, // Add margin below input container
+    marginBottom: 50,
   },
   input: {
-    flex: 1, // Input takes up available space
+    flex: 1,
     marginRight: 8,
     fontSize: 14,
     lineHeight: 20,
@@ -346,7 +353,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   postButton: {
-    backgroundColor: 'blue', // Example - customize as needed
+    backgroundColor: 'blue', 
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -356,25 +363,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   commentList: {
-    flexGrow: 1, // Allow the comment list to grow to take up available space
+    flexGrow: 1,
     width: '100%',
     justifyContent: "flex-start",
   },
   commentItem: {
-    flexDirection: 'row', // Arrange username and heart horizontally
-    alignItems: 'center', // Align items vertically
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
   commentContent: {
-    flex: 1, // Allow comment content to take up remaining space
+    flex: 1, 
   },
   commentUser: {
     fontWeight: 'bold',
   },
   heartIcon: {
-    marginLeft: 'auto', // Push heart icon to the right
+    marginLeft: 'auto', 
   },
 });
 
