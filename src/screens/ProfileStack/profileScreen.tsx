@@ -101,7 +101,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       const { userId, username } = user;
       // console.log(`The User Id: ${userId}, Username: ${username}`);
       setUserInfo({ userId, username });
-
     } catch (err) {
       console.log(err);
     }
@@ -120,18 +119,18 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
   }
 
-  async function handleSignOut() {
-    try {
-      const { username } = await getCurrentUser();
+  // async function handleSignOut() {
+  //   try {
+  //     const { username } = await getCurrentUser();
 
-      console.log('Attempting to sign out user: ', username);
-      await signOut();
-      navigation.navigate('Login');
-      console.log('User Signed Out');
-    } catch (error) {
-      console.log('error signing out: ', error);
-    }
-  }
+  //     console.log('Attempting to sign out user: ', username);
+  //     await signOut();
+  //     navigation.navigate('Login');
+  //     console.log('User Signed Out');
+  //   } catch (error) {
+  //     console.log('error signing out: ', error);
+  //   }
+  // }
 
   const handleNavigateToUserSearch = () =>{
     navigation.navigate('UserSearch');

@@ -31,6 +31,8 @@ import ExploreScreen from './src/screens/ExploreStack/exploreScreen';
 import ItemDetailsExploreScreen from './src/screens/ExploreStack/itemDetailsExploreScreen';
 import ResetPasswordScreen from './src/screens/ProfileStack/ResetPasswordScreen';
 import HomeUserProfileScreen from './src/screens/HomeStack/homeUserProfileScreen';
+import PostRepostScreen from './src/screens/HomeStack/postRepostScreen';
+import RepostOriginalPostScreen from './src/screens/HomeStack/repostOriginalPostScreen';
 
 
 //Initialise Amplify Config
@@ -68,6 +70,8 @@ const HomeStackNavigator = () => {
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="HomeUserProfile" component={HomeUserProfileScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name="PostRepost" component={PostRepostScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name="RepostOriginalPost" component={RepostOriginalPostScreen} options={{ headerShown: false }} />
 
     </HomeStack.Navigator>
   );

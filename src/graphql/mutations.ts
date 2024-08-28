@@ -47,6 +47,11 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -98,6 +103,11 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -149,6 +159,11 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -453,6 +468,11 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -517,6 +537,11 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -581,6 +606,11 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -844,6 +874,225 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
 ` as GeneratedMutation<
   APITypes.DeleteCommentMutationVariables,
   APITypes.DeleteCommentMutation
+>;
+export const createRepost = /* GraphQL */ `mutation CreateRepost(
+  $input: CreateRepostInput!
+  $condition: ModelRepostConditionInput
+) {
+  createRepost(input: $input, condition: $condition) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateRepostMutationVariables,
+  APITypes.CreateRepostMutation
+>;
+export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
+  $input: UpdateRepostInput!
+  $condition: ModelRepostConditionInput
+) {
+  updateRepost(input: $input, condition: $condition) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateRepostMutationVariables,
+  APITypes.UpdateRepostMutation
+>;
+export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
+  $input: DeleteRepostInput!
+  $condition: ModelRepostConditionInput
+) {
+  deleteRepost(input: $input, condition: $condition) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteRepostMutationVariables,
+  APITypes.DeleteRepostMutation
 >;
 export const createLike = /* GraphQL */ `mutation CreateLike(
   $input: CreateLikeInput!

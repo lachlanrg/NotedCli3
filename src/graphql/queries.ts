@@ -44,6 +44,11 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       __typename
     }
     publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -330,6 +335,11 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     username
     likedBy
     likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
     spotifyAlbumId
     spotifyAlbumName
     spotifyAlbumType
@@ -611,6 +621,137 @@ export const syncComments = /* GraphQL */ `query SyncComments(
 ` as GeneratedQuery<
   APITypes.SyncCommentsQueryVariables,
   APITypes.SyncCommentsQuery
+>;
+export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
+  getRepost(id: $id) {
+    id
+    body
+    originalPost {
+      id
+      body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userRepostsId
+    userOriginalPostId
+    username
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    postRepostsId
+    __typename
+  }
+}
+` as GeneratedQuery<APITypes.GetRepostQueryVariables, APITypes.GetRepostQuery>;
+export const listReposts = /* GraphQL */ `query ListReposts(
+  $filter: ModelRepostFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listReposts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListRepostsQueryVariables,
+  APITypes.ListRepostsQuery
+>;
+export const syncReposts = /* GraphQL */ `query SyncReposts(
+  $filter: ModelRepostFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncReposts(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncRepostsQueryVariables,
+  APITypes.SyncRepostsQuery
 >;
 export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
   getLike(id: $id) {

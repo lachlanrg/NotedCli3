@@ -1,3 +1,4 @@
+// HomeScreen.tsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
@@ -7,19 +8,15 @@ import {
   TouchableOpacity,
   RefreshControl,
   Animated,
-  ActivityIndicator,
   NativeSyntheticEvent,
   NativeScrollEvent,
   Image,
-  Linking,
-  TextInput,
-  KeyboardAvoidingView,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation, RouteProp,  useFocusEffect, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { dark, light, gray, error, lgray, dgray } from '../../components/colorModes';
-import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid, faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular, faComment } from '@fortawesome/free-regular-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Amplify } from 'aws-amplify';
@@ -35,15 +32,16 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { fetchUsernameById } from '../../components/getUserUsername';
 import { HomeStackParamList } from '../../components/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
 import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
-
+import { Repost } from '../../models';
+import { listRepostsWithOriginalPost } from '../../utils/customQueries';
 
 Amplify.configure(awsconfig);
 
 const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
+const repostIcon = faArrowsRotate as IconProp;
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
@@ -54,7 +52,7 @@ const HomeScreen: React.FC = () => {
   const showRefreshIcon = useRef(new Animated.Value(0)).current;
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
   const flatListRef = useRef<FlatList>(null);
-  
+
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const commentMenuHeight = useRef(new Animated.Value(0)).current;
 
@@ -63,31 +61,10 @@ const HomeScreen: React.FC = () => {
   const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
 
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
-  const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
+  const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({});
 
   const [following, setFollowing] = useState<string[]>([]);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
-
-  
-  // const fetchPostUsername = useCallback(async (postId: string) => {
-  //   try {
-  //     const username = await fetchUsernameById(postId);
-  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
-  //   } catch (error) {
-  //     console.error('Error fetching username for postId', postId, error);
-  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
-  //   }
-  // }, []);
-  // useEffect(() => {
-  //   const fetchUsernamesForPosts = async () => {
-  //     const postIds = posts.map(post => post.userPostsId); 
-  //     for (const postId of postIds) {
-  //       await fetchPostUsername(postId);
-  //     }
-  //   };
-  //   fetchUsernamesForPosts();
-  // }, [posts, fetchPostUsername]); 
-
 
   React.useEffect(() => {
     currentAuthenticatedUser();
@@ -95,78 +72,111 @@ const HomeScreen: React.FC = () => {
 
   async function currentAuthenticatedUser() {
     try {
-      const { userId  } = await getCurrentUser();
+      const { userId } = await getCurrentUser();
       console.log(`The User Id: ${userId}`);
-  
+
       setUserId({ userId });
     } catch (err) {
       console.log(err);
     }
   }
 
-
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     try {
-        // 1. Fetch posts from followed users:
-        const followingPostPromises = following.map(async (userId) => {
-            const response = await client.graphql({
-                query: queries.listPosts,
-                variables: {
-                    filter: {
-                        userPostsId: { eq: userId }
-                        // Remove _deleted filter here
-                    },
-                },
-            });
-            return response.data.listPosts.items;
-        });
-
-        // 2. Fetch posts from the current user:
-        const currentUserPostPromise = client.graphql({
-            query: queries.listPosts,
-            variables: {
-                filter: {
-                    userPostsId: { eq: userInfo?.userId }
-                    // Remove _deleted filter here
-                },
+      // 1. Fetch posts from followed users:
+      const followingPostPromises = following.map(async (userId) => {
+        const response = await client.graphql({
+          query: queries.listPosts,
+          variables: {
+            filter: {
+              userPostsId: { eq: userId }
+              // Remove _deleted filter here
             },
-        }).then(response => response.data.listPosts.items);
-
-        // 3. Wait for all requests:
-        const allPosts = await Promise.all([
-            ...followingPostPromises,
-            currentUserPostPromise
-        ]);
-
-        // 4. Combine, flatten, and sort:
-        const flattenedPosts = allPosts.flat();
-
-        // 5. Filter out deleted posts after fetching
-        const filteredPosts = flattenedPosts.filter(post => !post._deleted);
-
-        const sortedPosts = filteredPosts.sort((a, b) => {
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          },
         });
-        setPosts(sortedPosts);
+        return response.data.listPosts.items;
+      });
 
-      } catch (error) {
-          console.error('Error fetching posts:', error);
-      } finally {
-          setIsLoading(false);
-          setRefreshing(false);
-      }
+      // 2. Fetch posts from the current user:
+      const currentUserPostPromise = client.graphql({
+        query: queries.listPosts,
+        variables: {
+          filter: {
+            userPostsId: { eq: userInfo?.userId }
+            // Remove _deleted filter here
+          },
+        },
+      }).then(response => response.data.listPosts.items);
+
+      // 3. Fetch reposts from followed users
+      const followingRepostPromises = following.map(async (userId) => {
+        const response = await client.graphql({
+          query: listRepostsWithOriginalPost, // Use the custom query here
+          variables: {
+            filter: {
+              userRepostsId: { eq: userId }
+            },
+          },
+        });
+        return response.data.listReposts.items;
+      });
+
+      // 4. Fetch reposts from the current user:
+      const currentUserRepostPromise = client.graphql({
+        query: listRepostsWithOriginalPost, // Use the custom query here
+        variables: {
+          filter: {
+            userRepostsId: { eq: userInfo?.userId }
+          },
+        },
+      }).then(response => response.data.listReposts.items);
+
+      // 5. Wait for all post and repost requests:
+      const [
+        allPosts,
+        ...allReposts
+      ] = await Promise.all([
+        ...followingPostPromises,
+        currentUserPostPromise,
+        ...followingRepostPromises,
+        currentUserRepostPromise,
+      ]);
+
+      // 6. Combine, flatten, and sort:
+      const flattenedPosts = allPosts.flat();
+      const flattenedReposts = allReposts.flat();
+
+      // 7. Filter out deleted posts and reposts after fetching
+      const filteredPosts = flattenedPosts.filter(post => !post._deleted);
+      const filteredReposts = flattenedReposts.filter(repost => !repost._deleted);
+
+      // 8. Combine posts and reposts
+      const allContent = [...filteredPosts, ...filteredReposts];
+
+      // 9. Sort by createdAt
+      const sortedContent = allContent.sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+      setPosts(sortedContent);
+
+    } catch (error) {
+      console.error('Error fetching posts and reposts:', error);
+    } finally {
+      setIsLoading(false);
+      setRefreshing(false);
+    }
   }, [following, userInfo?.userId]);
-  
+
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
-  
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchPosts();
   }, [fetchPosts]);
-  
+
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     Animated.timing(showRefreshIcon, {
       toValue: event.nativeEvent.contentOffset.y <= -50 ? 1 : 0,
@@ -184,41 +194,41 @@ const HomeScreen: React.FC = () => {
     try {
       const { userId } = await getCurrentUser();
       const client = generateClient();
-      
+
       if (!userInfo) {
         console.error("User not logged in!");
         return;
       }
-        const postToUpdate = posts.find((post) => post.id === itemId);
+      const postToUpdate = posts.find((post) => post.id === itemId);
       if (!postToUpdate) {
         console.error("Post not found!");
         return;
       }
-        const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
-  
-        let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
-        ? postToUpdate.likedBy 
+      const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
+
+      let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
+        ? postToUpdate.likedBy
         : []; // Start with an empty array if null or not an array
-  
+
       if (!isLiked) {
-        updatedLikedBy = [...updatedLikedBy, userId]; 
+        updatedLikedBy = [...updatedLikedBy, userId];
       } else {
         updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
       }
-        const updatedLikesCount = updatedLikedBy.length;
-        const updatedPost = await client.graphql({
-          query: mutations.updatePost, 
-          variables: {
-            input: {
-              id: itemId,
-              likedBy: updatedLikedBy,
-              likesCount: updatedLikesCount,
-              _version: postToUpdate._version, // Important for optimistic locking 
-            },
+      const updatedLikesCount = updatedLikedBy.length;
+      const updatedPost = await client.graphql({
+        query: mutations.updatePost,
+        variables: {
+          input: {
+            id: itemId,
+            likedBy: updatedLikedBy,
+            likesCount: updatedLikesCount,
+            _version: postToUpdate._version, // Important for optimistic locking
           },
-        });
-      setPosts(prevPosts => prevPosts.map(post => 
-        post.id === itemId ? updatedPost.data.updatePost : post 
+        },
+      });
+      setPosts(prevPosts => prevPosts.map(post =>
+        post.id === itemId ? updatedPost.data.updatePost : post
       ));
     } catch (error) {
       console.error("Error updating post:", error);
@@ -237,10 +247,10 @@ const HomeScreen: React.FC = () => {
             },
           },
         });
-  
+
         const friendRequests = response.data.listFriendRequests.items;
         const followingIds = friendRequests.map((request: any) => request.userReceivedFriendRequestsId);
-  
+
         setFollowing(followingIds);
         console.log("Following IDs:", followingIds); // Check if you are getting the correct IDs
       } catch (error) {
@@ -253,12 +263,11 @@ const HomeScreen: React.FC = () => {
     fetchFollowing(); // Call fetchFollowing when the component mounts
   }, [userInfo?.userId]);  // Run when userInfo?.userId changes
 
-  useEffect(() => { 
-    if (following.length > 0) { 
+  useEffect(() => {
+    if (following.length > 0) {
       fetchPosts();
     }
-  }, [following]); 
-
+  }, [following]);
 
   const fetchCommentCounts = useCallback(async () => {
     try {
@@ -283,7 +292,6 @@ const HomeScreen: React.FC = () => {
     fetchCommentCounts();
   }, [fetchCommentCounts]);
 
-
   const renderPostItem = ({ item }: { item: any }) => {
     const isSoundCloud = item.scTrackId;
     const isSpotifyAlbum = item.spotifyAlbumId;
@@ -292,127 +300,226 @@ const HomeScreen: React.FC = () => {
     return (
       <View style={styles.postContainer}>
         <View style={styles.post}>
-          <TouchableOpacity 
-              onPress={() => navigation.navigate('HomeUserProfile', { userId: item.userPostsId })}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('HomeUserProfile', { userId: ('originalPost' in item) ? item.userRepostsId : item.userPostsId })}
           >
-            <Text style={styles.user}>{item.username}</Text>
+            <Text style={styles.repostUserUsername}>{('originalPost' in item) ? item.username : item.username}</Text>
           </TouchableOpacity>
-          <Text style={styles.bodytext}>{item.body}</Text>
 
-          {isSoundCloud && (
-              <View style={styles.soundCloudPost}>
-                <View style={styles.main}>
-                  <Image
-                    source={{ uri: item.scTrackArtworkUrl }}
-                    style={styles.image}
-                  />
-                </View>
-                <TouchableOpacity onPress={() => handleItemPress(item)}>
-                  <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.scTrackTitle}</Text>
+          { 'originalPost' in item ? (
+            <>
+              <Text style={styles.repostText}>{item.body}</Text>
+              <Text style={styles.repostDate}>{formatRelativeTime(item.createdAt)}</Text>
+
+              <View style={styles.repostedPostContainer}>
+                <TouchableOpacity onPress={() => navigation.navigate('RepostOriginalPost', { post: item.originalPost })} >
+                  {/* <TouchableOpacity
+                    onPress={() => navigation.navigate('HomeUserProfile', { userId: item.originalPost.userPostsId })}
+                  > */}
+                    <Text style={styles.originalPostUsername}>{item.originalPost.username}</Text>
+                  {/* </TouchableOpacity> */}
+
+                  {item.originalPost.scTrackId && (
+                    <View style={styles.soundCloudPost}>
+                      <View style={styles.main}>
+                        <Image
+                          source={{ uri: item.originalPost.scTrackArtworkUrl }}
+                          style={styles.image}
+                        />
+                      </View>
+                        <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.originalPost.scTrackTitle}</Text>
+                      <Text style={styles.date}>{formatRelativeTime(item.originalPost.createdAt)}</Text>
+                    </View>
+                  )}
+
+                  {item.originalPost.spotifyAlbumId && (
+                    <View style={styles.spotifyPost}>
+                      <View style={styles.main}>
+                        <Image
+                          source={{ uri: item.originalPost.spotifyAlbumImageUrl }}
+                          style={styles.image}
+                        />
+                      </View>
+                        <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {item.originalPost.spotifyAlbumName}</Text>
+                      <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                        {item.originalPost.spotifyAlbumArtists}
+                      </Text>
+                      <Text style={styles.date}>Total Tracks: {item.originalPost.spotifyAlbumTotalTracks}</Text>
+                      <Text style={styles.date}>Release Date: {item.originalPost.spotifyAlbumReleaseDate}</Text>
+                      <Text style={styles.date}>{formatRelativeTime(item.originalPost.createdAt)}</Text>
+                    </View>
+                  )}
+                  {item.originalPost.spotifyTrackId && (
+                    <View style={styles.spotifyPost}>
+                      <View style={styles.main}>
+                        <Image
+                          source={{ uri: item.originalPost.spotifyTrackImageUrl }}
+                          style={styles.image}
+                        />
+                      </View>
+                        <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {item.originalPost.spotifyTrackName}</Text>
+                      <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                        {item.originalPost.spotifyTrackArtists}
+                      </Text>
+                      <Text style={styles.date}>{formatRelativeTime(item.originalPost.createdAt)}</Text>
+                    </View>
+                  )}
+                  {!item.originalPost.scTrackId && !item.originalPost.spotifyAlbumId && !item.originalPost.spotifyTrackId && (
+                    <Text>{item.originalPost.body}</Text>
+                  )}
                 </TouchableOpacity>
-                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+              </View>
+
+              
+              <View style={styles.RepostCommentLikeSection}>
+                <TouchableOpacity
+                  style={styles.likeIcon}
+                  
+                >
+                  <FontAwesomeIcon
+                    icon={unLikedIcon}
+                    size={20}
+                    color={'#fff'}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.likesCountText}>
+                </Text>
+                <TouchableOpacity style={styles.commentIcon}>
+                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.commentCountText}>
+                </Text>
+                <TouchableOpacity style={styles.repostIcon}>
+                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.bodytext}>{item.body}</Text>
+              {isSoundCloud && (
+                <View style={styles.soundCloudPost}>
+                  <View style={styles.main}>
+                    <Image
+                      source={{ uri: item.scTrackArtworkUrl }}
+                      style={styles.image}
+                    />
+                  </View>
+                  <TouchableOpacity onPress={() => handleItemPress(item)}>
+                    <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.scTrackTitle}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
                   <View style={styles.commentLikeSection}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.likeIcon}
-                      onPress={() => handleLikePress(item.id)} 
+                      onPress={() => handleLikePress(item.id)}
                     >
                       <FontAwesomeIcon
                         icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
                         size={20}
-                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'} 
+                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
                       />
                     </TouchableOpacity>
                     <Text style={styles.likesCountText}>
-                      {item.likesCount || ''} 
+                      {item.likesCount || ''}
                     </Text>
                     <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.commentCountText}>
-                        {commentCounts[item.id] || null}
+                      {commentCounts[item.id] || null}
                     </Text>
-                  </View>
-              </View>
-          )}
-
-          {isSpotifyAlbum && (
-              <View style={styles.spotifyPost}>
-                <View style={styles.main}>
-                  <Image
-                    source={{ uri: item.spotifyAlbumImageUrl }}
-                    style={styles.image}
-                  />
-                </View>
-                <TouchableOpacity onPress={() => handleItemPress(item)}>
-                  <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {item.spotifyAlbumName}</Text>
-                </TouchableOpacity>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-                  {item.spotifyAlbumArtists}
-                </Text>
-                <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
-                <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
-                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-                  <View style={styles.commentLikeSection}>
-                    <TouchableOpacity 
-                      style={styles.likeIcon}
-                      onPress={() => handleLikePress(item.id)} 
-                    >
-                      <FontAwesomeIcon
-                        icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
-                        size={20}
-                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'} 
-                      />
+                    <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: item })}>
+                      <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
                     </TouchableOpacity>
-                      <Text style={styles.likesCountText}>
-                        {item.likesCount || ''} 
-                      </Text>
-                      <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
-                        <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
-                      </TouchableOpacity>
-                      <Text style={styles.commentCountText}>
-                        {commentCounts[item.id] || null}
-                      </Text>
                   </View>
-              </View>
-          )}
-
-          {isSpotifyTrack && (
-              <View style={styles.spotifyPost}>
-                <View style={styles.main}>
-                  <Image
-                    source={{ uri: item.spotifyTrackImageUrl }}
-                    style={styles.image}
-                  />
                 </View>
-                <TouchableOpacity onPress={() => handleItemPress(item)}>
-                  <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {item.spotifyTrackName}</Text>
-                </TouchableOpacity>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-                  {item.spotifyTrackArtists}
-                </Text>
-                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+              )}
+              {isSpotifyAlbum && (
+                <View style={styles.spotifyPost}>
+                  <View style={styles.main}>
+                    <Image
+                      source={{ uri: item.spotifyAlbumImageUrl }}
+                      style={styles.image}
+                    />
+                  </View>
+                  <TouchableOpacity onPress={() => handleItemPress(item)}>
+                    <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {item.spotifyAlbumName}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                    {item.spotifyAlbumArtists}
+                  </Text>
+                  <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
+                  <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
+                  <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
                   <View style={styles.commentLikeSection}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.likeIcon}
-                      onPress={() => handleLikePress(item.id)} 
+                      onPress={() => handleLikePress(item.id)}
                     >
                       <FontAwesomeIcon
                         icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
                         size={20}
-                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'} 
+                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
                       />
                     </TouchableOpacity>
                     <Text style={styles.likesCountText}>
-                      {item.likesCount || ''} 
+                      {item.likesCount || ''}
                     </Text>
                     <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
                       <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.commentCountText}>
-                        {commentCounts[item.id] || null}
-                      </Text>
+                      {commentCounts[item.id] || null}
+                    </Text>
+                    <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: item })}>
+                      <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
+                    </TouchableOpacity>
                   </View>
-              </View>
+                </View>
+              )}
+              {isSpotifyTrack && (
+                <View style={styles.spotifyPost}>
+                  <View style={styles.main}>
+                    <Image
+                      source={{ uri: item.spotifyTrackImageUrl }}
+                      style={styles.image}
+                    />
+                  </View>
+                  <TouchableOpacity onPress={() => handleItemPress(item)}>
+                    <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {item.spotifyTrackName}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                    {item.spotifyTrackArtists}
+                  </Text>
+                  <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+                  <View style={styles.commentLikeSection}>
+                    <TouchableOpacity
+                      style={styles.likeIcon}
+                      onPress={() => handleLikePress(item.id)}
+                    >
+                      <FontAwesomeIcon
+                        icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                        size={20}
+                        color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.likesCountText}>
+                      {item.likesCount || ''}
+                    </Text>
+                    <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>
+                      <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.commentCountText}>
+                      {commentCounts[item.id] || null}
+                    </Text>
+                    <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: item })}>
+                      <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </>
           )}
         </View>
       </View>
@@ -426,56 +533,42 @@ const HomeScreen: React.FC = () => {
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const { dismiss } = useBottomSheetModal();
 
-  const handlePresentModalPress = (post: any) => { 
+  const handlePresentModalPress = (post: any) => {
     setSelectedPost(post);
     bottomSheetRef.current?.present();
   }
 
   return (
-    <SafeAreaView style={styles.safeAreaContainer}> 
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
-        <View style={styles.topButtonArea} />
-      </TouchableOpacity>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
+        <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
+          <View style={styles.topButtonArea} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.refreshButton}>
-          <FontAwesomeIcon icon={faSync} size={20} color="#fff" />
-        </TouchableOpacity>
-      </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button}>
+            <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.refreshButton}>
+            <FontAwesomeIcon icon={faSync} size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
-      <FlatList
-        ref={flatListRef}
-        data={posts}
-        renderItem={renderPostItem}
-        keyExtractor={(item) => item.id}
-        // ItemSeparatorComponent={() => <View style={styles.separator} />}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-      />
+        <FlatList
+          ref={flatListRef}
+          data={posts}
+          renderItem={renderPostItem}
+          keyExtractor={(item) => item.id}
+          // ItemSeparatorComponent={() => <View style={styles.separator} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+        />
 
-      <Animated.View 
-          style={[
-            styles.commentMenuContainer,
-            { height: commentMenuHeight }
-          ]}
-        >
-          {selectedPostId && (
-            <View style={styles.commentMenu}>
-              <Text>Comments for Post ID: {selectedPostId}</Text>
-              {/* Here you will add the comment list and input later */}
-            </View>
-          )}
-        </Animated.View>
-
-        <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost}/>
+        <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} />
         <HomePostBottomSheetModal ref={postBottomSheetRef} item={selectedPost} />
 
-    </View>
+      </View>
     </SafeAreaView>
 
   );
@@ -528,7 +621,7 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
   },
-  user: {
+  repostUserUsername: {
     color: '#fff',
     fontWeight: 'bold',
     marginBottom: 5,
@@ -632,6 +725,9 @@ const styles = StyleSheet.create({
   commentIcon: {
     marginLeft: 20,
   },
+  repostIcon: {
+    marginLeft: 20,
+  },
   likeIcon: {
     marginLeft: 2,
   },
@@ -650,21 +746,48 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'white', 
+    backgroundColor: 'white',
     borderRadius: 18,
   },
   commentMenu: {
     flex: 1,
     padding: 10,
   },
-  bottomSheetContent: { 
+  bottomSheetContent: {
     padding: 20,
   },
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark, // or your background color
   },
+  // Styles for repost elements
+  repostText: {
+    color: '#ccc',
+    marginBottom: 5,
+    fontStyle: 'italic',
+  },
+  repostedPostContainer: {
+    borderWidth: 1,
+    borderColor: '#333',
+    padding: 10,
+    marginLeft: 5,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  originalPostUsername: {
+    color: '#fff',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  RepostCommentLikeSection: {
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  repostDate: {
+    color: '#888',
+    fontSize: 12,
+  },
 });
 
 export default HomeScreen;
-
