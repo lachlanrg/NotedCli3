@@ -527,6 +527,8 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -704,6 +706,8 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
@@ -726,6 +730,8 @@ export const listReposts = /* GraphQL */ `query ListReposts(
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -761,6 +767,8 @@ export const syncReposts = /* GraphQL */ `query SyncReposts(
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version

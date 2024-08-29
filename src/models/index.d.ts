@@ -275,6 +275,8 @@ type EagerRepost = {
   readonly userOriginalPostId: string;
   readonly username: string;
   readonly comments?: (Comment | null)[] | null;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly postRepostsId?: string | null;
@@ -293,6 +295,8 @@ type LazyRepost = {
   readonly userOriginalPostId: string;
   readonly username: string;
   readonly comments: AsyncCollection<Comment>;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly postRepostsId?: string | null;

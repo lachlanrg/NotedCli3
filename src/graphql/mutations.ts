@@ -698,6 +698,8 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -790,6 +792,8 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -882,6 +886,8 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -988,6 +994,8 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
@@ -1066,6 +1074,8 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
@@ -1144,6 +1154,8 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version

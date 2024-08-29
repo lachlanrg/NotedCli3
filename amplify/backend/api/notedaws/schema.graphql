@@ -89,6 +89,8 @@ type Repost @model @auth(rules: [{allow: public}]) {
   userOriginalPostId: String!
   username: String!
   comments: [Comment] @hasMany
+  likedBy: [ID!]
+  likesCount: Int!
 }
 
 type Like @model @auth(rules: [{allow: public}]) {
