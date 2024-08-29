@@ -932,6 +932,21 @@ export const schema = {
                         ]
                     }
                 },
+                "likedBy": {
+                    "name": "likedBy",
+                    "isArray": true,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1066,5 +1081,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "807e03bd7e557736be02485e2314ef71"
+    "version": "624efcf00a074cf0eedd9fc35d618603"
 };

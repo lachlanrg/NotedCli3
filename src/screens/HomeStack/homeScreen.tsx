@@ -38,6 +38,24 @@ import { listRepostsWithOriginalPost } from '../../utils/customQueries';
 
 Amplify.configure(awsconfig);
 
+type UpdatePostMutation = {
+  updatePost: {
+    id: string;
+    likedBy: string[];
+    likesCount: number;
+    _version: number;
+  };
+};
+
+type UpdateRepostMutation = {
+  updateRepost: {
+    id: string;
+    likedBy: string[];
+    likesCount: number;
+    _version: number;
+  };
+};
+
 const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -190,50 +208,78 @@ const HomeScreen: React.FC = () => {
     postBottomSheetRef.current?.present();
   };
 
-  const handleLikePress = async (itemId: string) => {
+  const handleLikePress = async (itemId: string, isRepost: boolean = false) => {
     try {
       const { userId } = await getCurrentUser();
       const client = generateClient();
-
+  
       if (!userInfo) {
         console.error("User not logged in!");
         return;
       }
-      const postToUpdate = posts.find((post) => post.id === itemId);
-      if (!postToUpdate) {
+  
+      const itemToUpdate = posts.find((post) => post.id === itemId);
+      if (!itemToUpdate) {
         console.error("Post not found!");
         return;
       }
-      const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
-
-      let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
-        ? postToUpdate.likedBy
+  
+      const isLiked = (itemToUpdate.likedBy || []).includes(userInfo?.userId || "");
+  
+      let updatedLikedBy = Array.isArray(itemToUpdate.likedBy)
+        ? itemToUpdate.likedBy
         : []; // Start with an empty array if null or not an array
-
+  
       if (!isLiked) {
         updatedLikedBy = [...updatedLikedBy, userId];
       } else {
         updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
       }
       const updatedLikesCount = updatedLikedBy.length;
-      const updatedPost = await client.graphql({
-        query: mutations.updatePost,
-        variables: {
-          input: {
-            id: itemId,
-            likedBy: updatedLikedBy,
-            likesCount: updatedLikesCount,
-            _version: postToUpdate._version, // Important for optimistic locking
+  
+      let updatedItem;
+      if (isRepost) {
+        updatedItem = await client.graphql({
+          query: mutations.updateRepost,
+          variables: {
+            input: {
+              id: itemId,
+              likedBy: updatedLikedBy,
+              likesCount: updatedLikesCount,
+              _version: itemToUpdate._version, // Important for optimistic locking
+            },
           },
-        },
-      });
-      setPosts(prevPosts => prevPosts.map(post =>
-        post.id === itemId ? updatedPost.data.updatePost : post
-      ));
+        });
+      } else {
+        updatedItem = await client.graphql({
+          query: mutations.updatePost,
+          variables: {
+            input: {
+              id: itemId,
+              likedBy: updatedLikedBy,
+              likesCount: updatedLikesCount,
+              _version: itemToUpdate._version, // Important for optimistic locking
+            },
+          },
+        });
+      }
+  
+      setPosts(prevPosts => prevPosts.map(post => {
+        if (post.id === itemId) {
+          if ('updatePost' in updatedItem.data) {
+            return updatedItem.data.updatePost;
+          } else if ('updateRepost' in updatedItem.data) {
+            return updatedItem.data.updateRepost;
+          }
+        }
+        return post;
+      }));
     } catch (error) {
       console.error("Error updating post:", error);
     }
   };
+  
+  
 
   const fetchFollowing = useCallback(async () => {
     if (userInfo?.userId) {
@@ -375,16 +421,19 @@ const HomeScreen: React.FC = () => {
 
               
               <View style={styles.RepostCommentLikeSection}>
-                <TouchableOpacity
-                  style={styles.likeIcon}
-                  
-                >
-                  <FontAwesomeIcon
-                    icon={unLikedIcon}
-                    size={20}
-                    color={'#fff'}
-                  />
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.likeIcon}
+                onPress={() => handleLikePress(item.id, true)}
+              >
+                <FontAwesomeIcon
+                  icon={(item.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                  size={20}
+                  color={(item.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
+                />
+              </TouchableOpacity>
+              <Text style={styles.likesCountText}>
+                {item.likesCount || ''}
+              </Text>
                 <Text style={styles.likesCountText}>
                 </Text>
                 <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(item)}>

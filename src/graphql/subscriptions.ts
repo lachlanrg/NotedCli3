@@ -671,6 +671,8 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -760,6 +762,8 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -849,6 +853,8 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       userRepostsId
       userOriginalPostId
       username
+      likedBy
+      likesCount
       createdAt
       updatedAt
       _version
@@ -952,6 +958,8 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
@@ -1027,6 +1035,8 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
@@ -1102,6 +1112,8 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       startedAt
       __typename
     }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
