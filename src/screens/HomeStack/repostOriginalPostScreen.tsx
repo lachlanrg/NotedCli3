@@ -1,5 +1,4 @@
-// repostOriginalPostScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { formatRelativeTime } from '../../components/formatComponents';
@@ -16,27 +15,29 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import { dark, gray, light } from '../../components/colorModes';
 import { generateClient } from 'aws-amplify/api';
 import { updatePost } from '../../graphql/mutations';
-
+import CustomBottomSheet from '../../components/BottomSheets/CommentsBottomSheetModal';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { listComments } from '../../graphql/queries'; // Ensure you have the correct import for listComments
 
 const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
 const repostIcon = faArrowsRotate as IconProp;
 
-
 type RepostOriginalPostScreenRouteProp = NativeStackScreenProps<HomeStackParamList, 'RepostOriginalPost'>;
-
 
 const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const { post } = route.params;
   const [userInfo, setUserId] = React.useState<any>(null);
   const [updatedPost, setUpdatedPost] = useState(post);
-
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
+  const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
 
   React.useEffect(() => {
     currentAuthenticatedUser();
-  }, []);
+    fetchCommentCounts();
+  }, [post]);
 
   async function currentAuthenticatedUser() {
     try {
@@ -49,12 +50,11 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
     }
   }
 
-
   const handleLikePress = async (postId: string) => {
     try {
       const { userId } = await getCurrentUser();
       const client = generateClient();
-  
+
       if (!userInfo) {
         console.error("User not logged in!");
         return;
@@ -65,11 +65,11 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
         return;
       }
       const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
-  
+
       let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
         ? postToUpdate.likedBy
         : []; // Start with an empty array if null or not an array
-  
+
       if (!isLiked) {
         updatedLikedBy = [...updatedLikedBy, userId];
       } else {
@@ -87,7 +87,7 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
           },
         },
       });
-  
+
       // Update the _version field in the updatedPost state
       setUpdatedPost({
         ...postToUpdate,
@@ -100,38 +100,62 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
     }
   };
 
-  const handlePresentModalPress = (post: Post) => {
-    // Handle present modal press logic here
-  };
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const { dismiss } = useBottomSheetModal();
 
-      
+  const handlePresentModalPress = (post: any) => {
+    setSelectedPost(post);
+    bottomSheetRef.current?.present();
+  }
+
   const getImageUrl = (url: string | null | undefined) => {
     return url ? { uri: url } : require('../../assets/placeholder.png');
   };
 
+  const fetchCommentCounts = useCallback(async () => {
+    try {
+      const client = generateClient();
+      const response = await client.graphql({
+        query: listComments,
+        variables: {
+          filter: {
+            postId: { eq: post.id },
+          },
+        },
+      });
+      setCommentCounts({ [post.id]: response.data.listComments.items.length });
+    } catch (error) {
+      console.error('Error fetching comment counts:', error);
+    }
+  }, [post]);
+
+  useEffect(() => {
+    fetchCommentCounts();
+  }, [fetchCommentCounts]);
+
   return (
-    <SafeAreaView style={styles.safeAreaContainer}> 
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
-            </TouchableOpacity>
-            <Text style={styles.headerText}>Post</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Post</Text>
         </View>
 
-      <View style={styles.repostedPostContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('HomeUserProfile', { userId: post.userPostsId })}>
-          <Text style={styles.repostedPostUser}>{post.username}</Text>
-        </TouchableOpacity>
-        <Text style={styles.bodytext}>{post.body}</Text>
+        <View style={styles.repostedPostContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('HomeUserProfile', { userId: post.userPostsId })}>
+            <Text style={styles.repostedPostUser}>{post.username}</Text>
+          </TouchableOpacity>
+          <Text style={styles.bodytext}>{post.body}</Text>
 
-        {post.scTrackId && (
-          <View style={styles.soundCloudPost}>
-            <Image source={getImageUrl(post.scTrackArtworkUrl)} style={styles.image} />
+          {post.scTrackId && (
+            <View style={styles.soundCloudPost}>
+              <Image source={getImageUrl(post.scTrackArtworkUrl)} style={styles.image} />
               <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{post.scTrackTitle}</Text>
-            <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
-            <View style={styles.commentLikeSection}>
-            <TouchableOpacity
+              <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
+              <View style={styles.commentLikeSection}>
+                <TouchableOpacity
                   style={styles.likeIcon}
                   onPress={() => handleLikePress(updatedPost.id)}
                 >
@@ -140,35 +164,35 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
                     size={20}
                     color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
                   />
-            </TouchableOpacity>
-              <Text style={styles.likesCountText}>
-                {updatedPost.likesCount || ''}
-              </Text>
-                <TouchableOpacity style={styles.commentIcon}>
-                    <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                 </TouchableOpacity>
-              <Text style={styles.commentCountText}>
-                {/* {commentCounts[post.id] || null} */}
-              </Text>
-              <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
-                <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
-              </TouchableOpacity>
+                <Text style={styles.likesCountText}>
+                  {updatedPost.likesCount || ''}
+                </Text>
+                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(post)}>
+                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                </TouchableOpacity>
+                <Text style={styles.commentCountText}>
+                  {commentCounts[post.id] || null}
+                </Text>
+                <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
+                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {post.spotifyAlbumId && (
-          <View style={styles.spotifyPost}>
-            <Image source={getImageUrl(post.spotifyAlbumImageUrl)} style={styles.image} />
+          {post.spotifyAlbumId && (
+            <View style={styles.spotifyPost}>
+              <Image source={getImageUrl(post.spotifyAlbumImageUrl)} style={styles.image} />
               <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {post.spotifyAlbumName}</Text>
-            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-              {post.spotifyAlbumArtists}
-            </Text>
-            <Text style={styles.date}>Total Tracks: {post.spotifyAlbumTotalTracks}</Text>
-            <Text style={styles.date}>Release Date: {post.spotifyAlbumReleaseDate}</Text>
-            <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
-            <View style={styles.commentLikeSection}>
-            <TouchableOpacity
+              <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                {post.spotifyAlbumArtists}
+              </Text>
+              <Text style={styles.date}>Total Tracks: {post.spotifyAlbumTotalTracks}</Text>
+              <Text style={styles.date}>Release Date: {post.spotifyAlbumReleaseDate}</Text>
+              <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
+              <View style={styles.commentLikeSection}>
+                <TouchableOpacity
                   style={styles.likeIcon}
                   onPress={() => handleLikePress(updatedPost.id)}
                 >
@@ -178,32 +202,32 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
                     color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
                   />
                 </TouchableOpacity>
-              <Text style={styles.likesCountText}>
-                {updatedPost.likesCount || ''}
-              </Text>
-                <TouchableOpacity style={styles.commentIcon}>
-                    <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                <Text style={styles.likesCountText}>
+                  {updatedPost.likesCount || ''}
+                </Text>
+                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(post)}>
+                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                 </TouchableOpacity>
-              <Text style={styles.commentCountText}>
-                {/* {commentCounts[post.id] || null} */}
-              </Text>
-              <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
-                <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
-              </TouchableOpacity>
+                <Text style={styles.commentCountText}>
+                  {commentCounts[post.id] || null}
+                </Text>
+                <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
+                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {post.spotifyTrackId && (
-          <View style={styles.spotifyPost}>
-            <Image source={getImageUrl(post.spotifyTrackImageUrl )} style={styles.image} />
+          {post.spotifyTrackId && (
+            <View style={styles.spotifyPost}>
+              <Image source={getImageUrl(post.spotifyTrackImageUrl)} style={styles.image} />
               <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {post.spotifyTrackName}</Text>
-            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-              {post.spotifyTrackArtists}
-            </Text>
-            <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
-            <View style={styles.commentLikeSection}>
-            <TouchableOpacity
+              <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                {post.spotifyTrackArtists}
+              </Text>
+              <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
+              <View style={styles.commentLikeSection}>
+                <TouchableOpacity
                   style={styles.likeIcon}
                   onPress={() => handleLikePress(updatedPost.id)}
                 >
@@ -213,24 +237,25 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
                     color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
                   />
                 </TouchableOpacity>
-
-              <Text style={styles.likesCountText}>
-                {updatedPost.likesCount || ''}
-              </Text>
-                <TouchableOpacity style={styles.commentIcon}>
-                    <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
+                <Text style={styles.likesCountText}>
+                  {updatedPost.likesCount || ''}
+                </Text>
+                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(post)}>
+                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
                 </TouchableOpacity>
-              <Text style={styles.commentCountText}>
-                {/* {commentCounts[post.id] || null} */}
-              </Text>
-              <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
-                <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
-              </TouchableOpacity>
+                <Text style={styles.commentCountText}>
+                  {commentCounts[post.id] || null}
+                </Text>
+                <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
+                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        )}
+          )}
+        </View>
       </View>
-    </View>
+
+      <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} />
     </SafeAreaView>
   );
 };
@@ -239,7 +264,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
-    // padding: 15,
   },
   header: {
     backgroundColor: dark,
@@ -252,16 +276,13 @@ const styles = StyleSheet.create({
     borderBottomColor: gray,
   },
   headerText: {
-        flex: 1,
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        paddingRight: 15,
-        color: light,
+    flex: 1,
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingRight: 15,
+    color: light,
   },
-//   main: {
-//     flex: 1,
-//   },
   repostText: {
     color: '#ccc',
     marginBottom: 5,
@@ -325,14 +346,14 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   likesCountText: {
-    color: '#fff', 
-    fontSize: 16,  
-    marginLeft: 8,  
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 8,
   },
   commentCountText: {
-    color: '#fff', 
-    fontSize: 16, 
-    marginLeft: 8, 
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 8,
   },
   safeAreaContainer: {
     flex: 1,

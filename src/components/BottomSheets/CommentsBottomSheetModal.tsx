@@ -1,5 +1,5 @@
 import React, { useMemo, forwardRef, useCallback, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Button, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { dark, gray, light } from "../colorModes";
 import { generateClient } from 'aws-amplify/api';
@@ -22,9 +22,9 @@ type Comment = {
   content: string;
   userPostsId: string;
   username: string;
-  likedBy: string[]; // Add the likedBy property with the correct type
-  likesCount: number; // Make sure this is a number type
-  _version: number; // Add the _version property
+  likedBy: string[]; 
+  likesCount: number; 
+  _version: number;
 };
 
 type Post = {
@@ -41,11 +41,11 @@ type Props = {
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
-  const snapPoints = useMemo(() => ['80%'], []);
+  const snapPoints = useMemo(() => ['82%'], []);
   const [newComment, setNewComment] = useState('');
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     currentAuthenticatedUser();
@@ -57,13 +57,27 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
     if (selectedPost) { // Only fetch if a post is selected
       fetchInitialComments();
     }
+
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => { setKeyboardVisible(true); }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => { setKeyboardVisible(false); }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, [selectedPost]); // Fetch again if selectedPost changes
 
   async function currentAuthenticatedUser() {
     try {
       const user = await getCurrentUser();
       const { userId, username } = user;
-      console.log(`The User Id: ${userId}, Username: ${username}`);
+      // console.log(`The User Id: ${userId}, Username: ${username}`);
 
       setUserInfo({ userId, username });
     } catch (err) {
@@ -100,55 +114,50 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       console.log("userPosts ID:", userId)
       console.log("Username:", username)
 
-      // Use API.graphql directly for consistency with your post creation
       await client.graphql({
         query: mutations.createComment,
         variables: { input },
       });
       console.log('New Comment created successfully!:', newComment);
-      // Update the local state with the new comment
-      setNewComment(''); // Clear the input field
+      setNewComment(''); 
       const fetchedComments = await fetchComments();
       setComments(fetchedComments);
     } catch (error) {
       console.error('Error adding comment:', error);
-      // Handle the error appropriately, e.g., show an error message to the user
     }
   };
 
   const fetchComments = async () => {
-    if (!selectedPost) return []; // Don't fetch if no post is selected
+    if (!selectedPost) return []; 
     try {
       const client = generateClient();
-      const filter = { // Filter comments by the selected post ID or repost ID
+      const filter = { 
         postId: 'originalPost' in selectedPost ? undefined : { eq: selectedPost.id },
         repostId: 'originalPost' in selectedPost ? { eq: selectedPost.id } : undefined,
       };
-  
+
       const response = await client.graphql({
         query: queries.listComments,
         variables: { filter: filter },
       });
-  
+
       console.log('Response from listComments query:', response);
-  
+
       if (response.data && response.data.listComments) {
-        // Sort by createdAt in descending order (most recent first)
         const sortedComments = [...response.data.listComments.items].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-  
-        // Ensure the comments match the expected structure
+
         const validatedComments = sortedComments.map(comment => ({
           id: comment.id,
           content: comment.content,
           userPostsId: comment.userPostsId,
           username: comment.username,
-          likedBy: comment.likedBy || [], // Ensure likedBy is an array
-          likesCount: comment.likesCount || 0, // Ensure likesCount is a number
+          likedBy: comment.likedBy || [], 
+          likesCount: comment.likesCount || 0, 
           _version: comment._version,
         }));
-  
+
         return validatedComments;
       } else {
         console.warn('Unexpected response format from listComments query:', response);
@@ -159,32 +168,30 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       return [];
     }
   };
-  
-  
 
   const toggleLike = async (commentId: string) => {
     try {
       const client = generateClient();
       const commentToUpdate = comments.find((comment) => comment.id === commentId);
-  
+
       if (!commentToUpdate) {
         console.warn("Comment not found:", commentId);
         return;
       }
-  
+
       const isLiked = commentToUpdate.likedBy ? commentToUpdate.likedBy.includes(userInfo.userId) : false;
       let updatedLikedBy = Array.isArray(commentToUpdate.likedBy)
         ? commentToUpdate.likedBy
-        : []; // Start with an empty array if null or not an array
-  
+        : [];
+
       if (!isLiked) {
         updatedLikedBy = [...updatedLikedBy, userInfo.userId];
       } else {
         updatedLikedBy = updatedLikedBy.filter(id => id !== userInfo.userId);
       }
-  
+
       const updatedLikesCount = updatedLikedBy.length;
-  
+
       const updatedComment = await client.graphql({
         query: mutations.updateComment,
         variables: {
@@ -192,23 +199,21 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             id: commentId,
             likedBy: updatedLikedBy,
             likesCount: updatedLikesCount,
-            _version: commentToUpdate._version, // Important for optimistic locking
+            _version: commentToUpdate._version, 
           },
         },
       });
-  
+
       console.log("Response from updateComment mutation:", updatedComment);
-  
+
       if (updatedComment.data && updatedComment.data.updateComment) {
         console.log("Comment updated successfully in the backend.");
-  
-        // Update the local state optimistically
 
-        setComments(prevComments => prevComments.map(comment => 
+        setComments(prevComments => prevComments.map(comment =>
           comment.id === commentId ? {
             ...updatedComment.data.updateComment,
             likedBy: updatedComment.data.updateComment.likedBy || []
-          } : comment 
+          } : comment
         ));
       } else {
         console.warn("No data returned from updateComment mutation:", updatedComment);
@@ -218,75 +223,34 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
     }
   };
 
-
-  // const handleLikePress = async (commentId: string) => {
-  //   try {
-  //     const { userId } = await getCurrentUser();
-  //     const client = generateClient();
-      
-  //     if (!userInfo) {
-  //       console.error("User not logged in!");
-  //       return;
-  //     }
-  //       const commentToUpdate = comments.find((comment) => comment.id === commentId);
-  //     if (!commentToUpdate) {
-  //       console.error("Post not found!");
-  //       return;
-  //     }
-  //       const isLiked = (commentToUpdate.likedBy || []).includes(userInfo?.userId || "");
-  
-  //       let updatedLikedBy = Array.isArray(commentToUpdate.likedBy)
-  //       ? commentToUpdate.likedBy 
-  //       : []; // Start with an empty array if null or not an array
-  
-  //     if (!isLiked) {
-  //       updatedLikedBy = [...updatedLikedBy, userId]; 
-  //     } else {
-  //       updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
-  //     }
-  //       const updatedLikesCount = updatedLikedBy.length;
-  //       const updatedPost = await client.graphql({
-  //         query: mutations.updatePost, 
-  //         variables: {
-  //           input: {
-  //             id: commentId,
-  //             likedBy: updatedLikedBy,
-  //             likesCount: updatedLikesCount,
-  //             _version: commentToUpdate._version, // Important for optimistic locking 
-  //           },
-  //         },
-  //       });
-  //     setComments(prevComments => prevComments.map(comment => 
-  //          comment.id === commentId ? {
-  //           ...updatedComment.data.updateComment,
-  //          likedBy: updatedComment.data.updateComment.likedBy || []
-  //        } : comment 
-  //      ));
-  //   } catch (error) {
-  //     console.error("Error updating post:", error);
-  //   }
-  // };
-
-
   const renderComment = ({ item }: { item: Comment }) => {
     const isLiked = item.likedBy ? item.likedBy.includes(userInfo?.userId) : false;
 
     return (
       <View style={styles.commentItem}>
         <View style={styles.commentContent}>
-          <Text style={styles.commentUser}>{item.username}: </Text>
+          <Text style={styles.commentUser}>{item.username}</Text>
           <Text>{item.content}</Text>
         </View>
-        <TouchableOpacity onPress={() => toggleLike(item.id)}>
-          <FontAwesomeIcon
-            icon={isLiked ? likedIcon : unLikedIcon}
-            style={styles.heartIcon}
-            color={isLiked ? 'red' : 'black'}
-          />
-      </TouchableOpacity>
+        <View style={styles.likeContainer}>
+          <TouchableOpacity onPress={() => toggleLike(item.id)}>
+            <FontAwesomeIcon
+              icon={isLiked ? likedIcon : unLikedIcon}
+              style={styles.heartIcon}
+              color={isLiked ? 'red' : 'black'}
+            />
+          </TouchableOpacity>
+          <Text style={styles.likesCount}>{item.likesCount > 0 ? item.likesCount : '\u00A0'}</Text>
+        </View>
       </View>
     );
   };
+
+  const renderEmptyList = () => (
+    <View style={styles.emptyListContainer}>
+      <Text style={styles.emptyListText}>No comments yet</Text>
+    </View>
+  );
 
   return (
     <BottomSheetModal
@@ -307,10 +271,11 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             renderItem={renderComment}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.commentList}
+            ListEmptyComponent={renderEmptyList}
           />
         )}
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { paddingBottom: keyboardVisible ? 20 : 40 }]}>
           <BottomSheetTextInput
             style={styles.input}
             onChangeText={handleCommentChange}
@@ -339,21 +304,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 8,
     marginTop: 8,
-    marginBottom: 50,
   },
   input: {
     flex: 1,
     marginRight: 8,
-    fontSize: 14,
+    fontSize: 16,
     lineHeight: 20,
     borderRadius: 10,
     backgroundColor: light,
     padding: 8,
     borderColor: dark,
     borderWidth: 1,
+    // height: 50,
   },
   postButton: {
-    backgroundColor: 'blue', 
+    backgroundColor: 'blue',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -375,13 +340,36 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   commentContent: {
-    flex: 1, 
+    flex: 1,
+    paddingRight: 26,
   },
   commentUser: {
     fontWeight: 'bold',
+    paddingBottom: 2,
+  },
+  likeContainer: {
+    alignItems: 'center',
+    paddingRight: 10,
+    paddingTop: 5,
   },
   heartIcon: {
-    marginLeft: 'auto', 
+    marginLeft: 'auto',
+  },
+  likesCount: {
+    marginTop: 4,
+    fontSize: 12,
+  },
+  emptyListContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 300,
+  },
+  emptyListText: {
+    color: gray,
+    fontSize: 16,
+    // fontStyle: "italic"
   },
 });
 
