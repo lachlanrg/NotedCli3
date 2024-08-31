@@ -16,11 +16,6 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -72,11 +67,6 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -128,11 +118,6 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -1168,100 +1153,4 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
 ` as GeneratedMutation<
   APITypes.DeleteRepostMutationVariables,
   APITypes.DeleteRepostMutation
->;
-export const createLike = /* GraphQL */ `mutation CreateLike(
-  $input: CreateLikeInput!
-  $condition: ModelLikeConditionInput
-) {
-  createLike(input: $input, condition: $condition) {
-    id
-    user {
-      id
-      username
-      email
-      publicProfile
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-    postId
-    userLikesId
-    createdAt
-    updatedAt
-    _version
-    _deleted
-    _lastChangedAt
-    __typename
-  }
-}
-` as GeneratedMutation<
-  APITypes.CreateLikeMutationVariables,
-  APITypes.CreateLikeMutation
->;
-export const updateLike = /* GraphQL */ `mutation UpdateLike(
-  $input: UpdateLikeInput!
-  $condition: ModelLikeConditionInput
-) {
-  updateLike(input: $input, condition: $condition) {
-    id
-    user {
-      id
-      username
-      email
-      publicProfile
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-    postId
-    userLikesId
-    createdAt
-    updatedAt
-    _version
-    _deleted
-    _lastChangedAt
-    __typename
-  }
-}
-` as GeneratedMutation<
-  APITypes.UpdateLikeMutationVariables,
-  APITypes.UpdateLikeMutation
->;
-export const deleteLike = /* GraphQL */ `mutation DeleteLike(
-  $input: DeleteLikeInput!
-  $condition: ModelLikeConditionInput
-) {
-  deleteLike(input: $input, condition: $condition) {
-    id
-    user {
-      id
-      username
-      email
-      publicProfile
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-    postId
-    userLikesId
-    createdAt
-    updatedAt
-    _version
-    _deleted
-    _lastChangedAt
-    __typename
-  }
-}
-` as GeneratedMutation<
-  APITypes.DeleteLikeMutationVariables,
-  APITypes.DeleteLikeMutation
 >;

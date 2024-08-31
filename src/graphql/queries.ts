@@ -13,11 +13,6 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -786,81 +781,3 @@ export const syncReposts = /* GraphQL */ `query SyncReposts(
   APITypes.SyncRepostsQueryVariables,
   APITypes.SyncRepostsQuery
 >;
-export const getLike = /* GraphQL */ `query GetLike($id: ID!) {
-  getLike(id: $id) {
-    id
-    user {
-      id
-      username
-      email
-      publicProfile
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-    postId
-    userLikesId
-    createdAt
-    updatedAt
-    _version
-    _deleted
-    _lastChangedAt
-    __typename
-  }
-}
-` as GeneratedQuery<APITypes.GetLikeQueryVariables, APITypes.GetLikeQuery>;
-export const listLikes = /* GraphQL */ `query ListLikes(
-  $filter: ModelLikeFilterInput
-  $limit: Int
-  $nextToken: String
-) {
-  listLikes(filter: $filter, limit: $limit, nextToken: $nextToken) {
-    items {
-      id
-      postId
-      userLikesId
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-    nextToken
-    startedAt
-    __typename
-  }
-}
-` as GeneratedQuery<APITypes.ListLikesQueryVariables, APITypes.ListLikesQuery>;
-export const syncLikes = /* GraphQL */ `query SyncLikes(
-  $filter: ModelLikeFilterInput
-  $limit: Int
-  $nextToken: String
-  $lastSync: AWSTimestamp
-) {
-  syncLikes(
-    filter: $filter
-    limit: $limit
-    nextToken: $nextToken
-    lastSync: $lastSync
-  ) {
-    items {
-      id
-      postId
-      userLikesId
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      __typename
-    }
-    nextToken
-    startedAt
-    __typename
-  }
-}
-` as GeneratedQuery<APITypes.SyncLikesQueryVariables, APITypes.SyncLikesQuery>;

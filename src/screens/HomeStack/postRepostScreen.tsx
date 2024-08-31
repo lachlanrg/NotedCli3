@@ -43,6 +43,7 @@ const PostRepostScreen: React.FC<PostRepostScreenRouteProp> = ({ route }) => {
         userOriginalPostId: post.userPostsId,
         username: username,
         postRepostsId: post.id,
+        likesCount: 0,
         };
 
         await client.graphql({

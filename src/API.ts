@@ -6,7 +6,7 @@ export type CreateUserInput = {
   id?: string | null,
   username: string,
   email: string,
-  publicProfile: boolean,
+  publicProfile?: boolean | null,
   _version?: number | null,
 };
 
@@ -74,34 +74,13 @@ export type User = {
   id: string,
   username: string,
   email: string,
-  likes?: ModelLikeConnection | null,
   posts?: ModelPostConnection | null,
   friends?: ModelFriendshipConnection | null,
   sentFriendRequests?: ModelFriendRequestConnection | null,
   receivedFriendRequests?: ModelFriendRequestConnection | null,
   comments?: ModelCommentConnection | null,
-  publicProfile: boolean,
+  publicProfile?: boolean | null,
   reposts?: ModelRepostConnection | null,
-  createdAt: string,
-  updatedAt: string,
-  _version: number,
-  _deleted?: boolean | null,
-  _lastChangedAt: number,
-};
-
-export type ModelLikeConnection = {
-  __typename: "ModelLikeConnection",
-  items:  Array<Like | null >,
-  nextToken?: string | null,
-  startedAt?: number | null,
-};
-
-export type Like = {
-  __typename: "Like",
-  id: string,
-  user?: User | null,
-  postId: string,
-  userLikesId: string,
   createdAt: string,
   updatedAt: string,
   _version: number,
@@ -568,36 +547,6 @@ export type DeleteRepostInput = {
   _version?: number | null,
 };
 
-export type CreateLikeInput = {
-  id?: string | null,
-  postId: string,
-  userLikesId: string,
-  _version?: number | null,
-};
-
-export type ModelLikeConditionInput = {
-  postId?: ModelStringInput | null,
-  userLikesId?: ModelStringInput | null,
-  and?: Array< ModelLikeConditionInput | null > | null,
-  or?: Array< ModelLikeConditionInput | null > | null,
-  not?: ModelLikeConditionInput | null,
-  _deleted?: ModelBooleanInput | null,
-  createdAt?: ModelStringInput | null,
-  updatedAt?: ModelStringInput | null,
-};
-
-export type UpdateLikeInput = {
-  id: string,
-  postId?: string | null,
-  userLikesId?: string | null,
-  _version?: number | null,
-};
-
-export type DeleteLikeInput = {
-  id: string,
-  _version?: number | null,
-};
-
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -718,18 +667,6 @@ export type ModelRepostFilterInput = {
   postRepostsId?: ModelIDInput | null,
 };
 
-export type ModelLikeFilterInput = {
-  id?: ModelIDInput | null,
-  postId?: ModelStringInput | null,
-  userLikesId?: ModelStringInput | null,
-  createdAt?: ModelStringInput | null,
-  updatedAt?: ModelStringInput | null,
-  and?: Array< ModelLikeFilterInput | null > | null,
-  or?: Array< ModelLikeFilterInput | null > | null,
-  not?: ModelLikeFilterInput | null,
-  _deleted?: ModelBooleanInput | null,
-};
-
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
@@ -740,7 +677,6 @@ export type ModelSubscriptionUserFilterInput = {
   and?: Array< ModelSubscriptionUserFilterInput | null > | null,
   or?: Array< ModelSubscriptionUserFilterInput | null > | null,
   _deleted?: ModelBooleanInput | null,
-  userLikesId?: ModelSubscriptionIDInput | null,
   userPostsId?: ModelSubscriptionIDInput | null,
   userFriendsId?: ModelSubscriptionIDInput | null,
   userSentFriendRequestsId?: ModelSubscriptionIDInput | null,
@@ -887,17 +823,6 @@ export type ModelSubscriptionRepostFilterInput = {
   repostCommentsId?: ModelSubscriptionIDInput | null,
 };
 
-export type ModelSubscriptionLikeFilterInput = {
-  id?: ModelSubscriptionIDInput | null,
-  postId?: ModelSubscriptionStringInput | null,
-  userLikesId?: ModelSubscriptionStringInput | null,
-  createdAt?: ModelSubscriptionStringInput | null,
-  updatedAt?: ModelSubscriptionStringInput | null,
-  and?: Array< ModelSubscriptionLikeFilterInput | null > | null,
-  or?: Array< ModelSubscriptionLikeFilterInput | null > | null,
-  _deleted?: ModelBooleanInput | null,
-};
-
 export type CreateUserMutationVariables = {
   input: CreateUserInput,
   condition?: ModelUserConditionInput | null,
@@ -909,11 +834,6 @@ export type CreateUserMutation = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -939,7 +859,7 @@ export type CreateUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -964,11 +884,6 @@ export type UpdateUserMutation = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -994,7 +909,7 @@ export type UpdateUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -1019,11 +934,6 @@ export type DeleteUserMutation = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -1049,7 +959,7 @@ export type DeleteUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -1077,7 +987,7 @@ export type CreateFriendshipMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1089,7 +999,7 @@ export type CreateFriendshipMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1119,7 +1029,7 @@ export type UpdateFriendshipMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1131,7 +1041,7 @@ export type UpdateFriendshipMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1161,7 +1071,7 @@ export type DeleteFriendshipMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1173,7 +1083,7 @@ export type DeleteFriendshipMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1203,7 +1113,7 @@ export type CreateFriendRequestMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1215,7 +1125,7 @@ export type CreateFriendRequestMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1247,7 +1157,7 @@ export type UpdateFriendRequestMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1259,7 +1169,7 @@ export type UpdateFriendRequestMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1291,7 +1201,7 @@ export type DeleteFriendRequestMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1303,7 +1213,7 @@ export type DeleteFriendRequestMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1341,7 +1251,7 @@ export type CreatePostMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1409,7 +1319,7 @@ export type UpdatePostMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1477,7 +1387,7 @@ export type DeletePostMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1598,7 +1508,7 @@ export type CreateCommentMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1691,7 +1601,7 @@ export type UpdateCommentMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1784,7 +1694,7 @@ export type DeleteCommentMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1857,7 +1767,7 @@ export type CreateRepostMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -1936,7 +1846,7 @@ export type UpdateRepostMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2015,7 +1925,7 @@ export type DeleteRepostMutation = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2041,99 +1951,6 @@ export type DeleteRepostMutation = {
   } | null,
 };
 
-export type CreateLikeMutationVariables = {
-  input: CreateLikeInput,
-  condition?: ModelLikeConditionInput | null,
-};
-
-export type CreateLikeMutation = {
-  createLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
-  } | null,
-};
-
-export type UpdateLikeMutationVariables = {
-  input: UpdateLikeInput,
-  condition?: ModelLikeConditionInput | null,
-};
-
-export type UpdateLikeMutation = {
-  updateLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
-  } | null,
-};
-
-export type DeleteLikeMutationVariables = {
-  input: DeleteLikeInput,
-  condition?: ModelLikeConditionInput | null,
-};
-
-export type DeleteLikeMutation = {
-  deleteLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
-  } | null,
-};
-
 export type GetUserQueryVariables = {
   id: string,
 };
@@ -2144,11 +1961,6 @@ export type GetUserQuery = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -2174,7 +1986,7 @@ export type GetUserQuery = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -2202,7 +2014,7 @@ export type ListUsersQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2229,7 +2041,7 @@ export type SyncUsersQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2254,7 +2066,7 @@ export type GetFriendshipQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2266,7 +2078,7 @@ export type GetFriendshipQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2344,7 +2156,7 @@ export type GetFriendRequestQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2356,7 +2168,7 @@ export type GetFriendRequestQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2446,7 +2258,7 @@ export type GetPostQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2671,7 +2483,7 @@ export type GetCommentQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2810,7 +2622,7 @@ export type GetRepostQuery = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2897,87 +2709,6 @@ export type SyncRepostsQuery = {
   } | null,
 };
 
-export type GetLikeQueryVariables = {
-  id: string,
-};
-
-export type GetLikeQuery = {
-  getLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
-  } | null,
-};
-
-export type ListLikesQueryVariables = {
-  filter?: ModelLikeFilterInput | null,
-  limit?: number | null,
-  nextToken?: string | null,
-};
-
-export type ListLikesQuery = {
-  listLikes?:  {
-    __typename: "ModelLikeConnection",
-    items:  Array< {
-      __typename: "Like",
-      id: string,
-      postId: string,
-      userLikesId: string,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null >,
-    nextToken?: string | null,
-    startedAt?: number | null,
-  } | null,
-};
-
-export type SyncLikesQueryVariables = {
-  filter?: ModelLikeFilterInput | null,
-  limit?: number | null,
-  nextToken?: string | null,
-  lastSync?: number | null,
-};
-
-export type SyncLikesQuery = {
-  syncLikes?:  {
-    __typename: "ModelLikeConnection",
-    items:  Array< {
-      __typename: "Like",
-      id: string,
-      postId: string,
-      userLikesId: string,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null >,
-    nextToken?: string | null,
-    startedAt?: number | null,
-  } | null,
-};
-
 export type OnCreateUserSubscriptionVariables = {
   filter?: ModelSubscriptionUserFilterInput | null,
 };
@@ -2988,11 +2719,6 @@ export type OnCreateUserSubscription = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -3018,7 +2744,7 @@ export type OnCreateUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -3042,11 +2768,6 @@ export type OnUpdateUserSubscription = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -3072,7 +2793,7 @@ export type OnUpdateUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -3096,11 +2817,6 @@ export type OnDeleteUserSubscription = {
     id: string,
     username: string,
     email: string,
-    likes?:  {
-      __typename: "ModelLikeConnection",
-      nextToken?: string | null,
-      startedAt?: number | null,
-    } | null,
     posts?:  {
       __typename: "ModelPostConnection",
       nextToken?: string | null,
@@ -3126,7 +2842,7 @@ export type OnDeleteUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
-    publicProfile: boolean,
+    publicProfile?: boolean | null,
     reposts?:  {
       __typename: "ModelRepostConnection",
       nextToken?: string | null,
@@ -3153,7 +2869,7 @@ export type OnCreateFriendshipSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3165,7 +2881,7 @@ export type OnCreateFriendshipSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3194,7 +2910,7 @@ export type OnUpdateFriendshipSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3206,7 +2922,7 @@ export type OnUpdateFriendshipSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3235,7 +2951,7 @@ export type OnDeleteFriendshipSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3247,7 +2963,7 @@ export type OnDeleteFriendshipSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3276,7 +2992,7 @@ export type OnCreateFriendRequestSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3288,7 +3004,7 @@ export type OnCreateFriendRequestSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3319,7 +3035,7 @@ export type OnUpdateFriendRequestSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3331,7 +3047,7 @@ export type OnUpdateFriendRequestSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3362,7 +3078,7 @@ export type OnDeleteFriendRequestSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3374,7 +3090,7 @@ export type OnDeleteFriendRequestSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3411,7 +3127,7 @@ export type OnCreatePostSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3478,7 +3194,7 @@ export type OnUpdatePostSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3545,7 +3261,7 @@ export type OnDeletePostSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3665,7 +3381,7 @@ export type OnCreateCommentSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3757,7 +3473,7 @@ export type OnUpdateCommentSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3849,7 +3565,7 @@ export type OnDeleteCommentSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3921,7 +3637,7 @@ export type OnCreateRepostSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3999,7 +3715,7 @@ export type OnUpdateRepostSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -4077,7 +3793,7 @@ export type OnDeleteRepostSubscription = {
       id: string,
       username: string,
       email: string,
-      publicProfile: boolean,
+      publicProfile?: boolean | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -4100,95 +3816,5 @@ export type OnDeleteRepostSubscription = {
     _deleted?: boolean | null,
     _lastChangedAt: number,
     postRepostsId?: string | null,
-  } | null,
-};
-
-export type OnCreateLikeSubscriptionVariables = {
-  filter?: ModelSubscriptionLikeFilterInput | null,
-};
-
-export type OnCreateLikeSubscription = {
-  onCreateLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
-  } | null,
-};
-
-export type OnUpdateLikeSubscriptionVariables = {
-  filter?: ModelSubscriptionLikeFilterInput | null,
-};
-
-export type OnUpdateLikeSubscription = {
-  onUpdateLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
-  } | null,
-};
-
-export type OnDeleteLikeSubscriptionVariables = {
-  filter?: ModelSubscriptionLikeFilterInput | null,
-};
-
-export type OnDeleteLikeSubscription = {
-  onDeleteLike?:  {
-    __typename: "Like",
-    id: string,
-    user?:  {
-      __typename: "User",
-      id: string,
-      username: string,
-      email: string,
-      publicProfile: boolean,
-      createdAt: string,
-      updatedAt: string,
-      _version: number,
-      _deleted?: boolean | null,
-      _lastChangedAt: number,
-    } | null,
-    postId: string,
-    userLikesId: string,
-    createdAt: string,
-    updatedAt: string,
-    _version: number,
-    _deleted?: boolean | null,
-    _lastChangedAt: number,
   } | null,
 };

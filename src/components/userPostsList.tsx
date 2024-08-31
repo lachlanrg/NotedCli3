@@ -28,26 +28,26 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
 
-  const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
+  // const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
 
-  const fetchPostUsername = useCallback(async (postId: string) => {
-    try {
-      const username = await fetchUsernameById(postId);
-      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
-    } catch (error) {
-      console.error('Error fetching username for postId', postId, error);
-      setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
-    }
-  }, []);
-  useEffect(() => {
-    const fetchUsernamesForPosts = async () => {
-      const postIds = posts.map(post => post.userPostsId); 
-      for (const postId of postIds) {
-        await fetchPostUsername(postId);
-      }
-    };
-    fetchUsernamesForPosts();
-  }, [posts, fetchPostUsername]); 
+  // const fetchPostUsername = useCallback(async (postId: string) => {
+  //   try {
+  //     const username = await fetchUsernameById(postId);
+  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
+  //   } catch (error) {
+  //     console.error('Error fetching username for postId', postId, error);
+  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
+  //   }
+  // }, []);
+  // useEffect(() => {
+  //   const fetchUsernamesForPosts = async () => {
+  //     const postIds = posts.map(post => post.userPostsId); 
+  //     for (const postId of postIds) {
+  //       await fetchPostUsername(postId);
+  //     }
+  //   };
+  //   fetchUsernamesForPosts();
+  // }, [posts, fetchPostUsername]); 
 
 
   const fetchUserPosts = useCallback(async () => {
@@ -96,13 +96,8 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
         )}
 
         {item.spotifyAlbumId && (
-          <View>
-            <Text style={styles.user}>
-              {postUsernames[item.userPostsId] 
-               ? postUsernames[item.userPostsId] 
-               : ''
-               } 
-            </Text>            
+          <View>  
+            <Text style={styles.user}>{item.username}</Text>
             <Text style={styles.bodytext}>{item.body}</Text>
             <Text style={styles.bodytext}>Album: {item.spotifyAlbumName}</Text>
             <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
@@ -114,12 +109,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
 
         {item.spotifyTrackId && (
           <View>
-            <Text style={styles.user}>
-              {postUsernames[item.userPostsId] 
-               ? postUsernames[item.userPostsId] 
-               : ''
-               } 
-            </Text>
+            <Text style={styles.user}>{item.username}</Text>
             <Text style={styles.bodytext}>{item.body}</Text>
             <Text style={styles.date}>Track: {item.spotifyTrackName}</Text>
             <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
