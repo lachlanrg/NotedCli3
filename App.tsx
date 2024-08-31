@@ -33,6 +33,7 @@ import ResetPasswordScreen from './src/screens/ProfileStack/ResetPasswordScreen'
 import HomeUserProfileScreen from './src/screens/HomeStack/homeUserProfileScreen';
 import PostRepostScreen from './src/screens/HomeStack/postRepostScreen';
 import RepostOriginalPostScreen from './src/screens/HomeStack/repostOriginalPostScreen';
+import SignUpSpotifyLoginScreen from './src/screens/SignUpSpotifyLogin';
 
 
 //Initialise Amplify Config
@@ -172,6 +173,7 @@ const App = () => {
                 <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="SignUpSpotifyLogin" component={SignUpSpotifyLoginScreen} options={{ headerShown: false }} />
               </Stack.Navigator>
             </NavigationContainer>
           </ThemeProvider>

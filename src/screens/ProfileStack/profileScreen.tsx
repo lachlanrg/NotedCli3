@@ -1,22 +1,17 @@
-import React, { useEffect, useCallback, useRef, useState} from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, Animated, Easing, Dimensions, PanResponder, Modal, ScrollView, ActivityIndicator, RefreshControl, SafeAreaView} from 'react-native';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Dimensions, Animated, Easing, PanResponder } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { IconProp } from '@fortawesome/fontawesome-svg-core'; 
-import { faCog, faTimes, faEdit, faUserPlus } from '@fortawesome/free-solid-svg-icons'; 
-import { faBell } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, placeholder, lgray, dgray, gray, error } from '../../components/colorModes';
+import { faCog, faEdit, faUserPlus, faBell } from '@fortawesome/free-solid-svg-icons';
+import { dark, light, gray, placeholder } from '../../components/colorModes';
 
-import { signOut, getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
-import { resetPassword, confirmResetPassword, type ResetPasswordOutput, type ConfirmResetPasswordInput } from 'aws-amplify/auth';
-
+import { getCurrentUser } from 'aws-amplify/auth';
 import { getFollowCounts } from '../../components/currentUserFollowerFollowingCount';
 import { refreshing, setRefreshing } from '../../components/scrollRefresh';
 
 import UserPostList from '../../components/userPostsList';
-
 import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
 import ProfilePostBottomSheetModal from '../../components/BottomSheets/ProfilePostBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
@@ -29,14 +24,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const [userInfo, setUserInfo] = useState<any>(null);
   const [email, setEmail] = useState<string | null>(null);
-  const [menuVisible, setMenuVisible] = useState<boolean>(false);
-  const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
 
   const menuWidth = Dimensions.get('window').width / 2.3;
-  const menuPosition = useRef(new Animated.Value(-menuWidth)).current;
   const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
-  const [posts, setPosts] = useState<any[]>([]);
-
   const settingsBottomSheetRef = useRef<BottomSheetModal>(null);
   const { dismiss } = useBottomSheetModal();
 
@@ -45,45 +35,19 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   };
 
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
-  const [selectedPost, setSelectedPost] = useState<any>(null); // Store the selected post
+  const [selectedPost, setSelectedPost] = useState<any>(null);
 
   const handlePresentPostModalPress = (post: any) => {
     setSelectedPost(post);
     postBottomSheetRef.current?.present();
   };
 
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
-    setOverlayVisible(!overlayVisible);
-    Animated.timing(menuPosition, {
-      toValue: menuVisible ? -menuWidth : 0,
-      duration: 200,
-      easing: Easing.ease,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: (evt, gestureState) => {
-        // Check if touch starts from the left 50 pixels
-        return gestureState.dx < 30;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dx > 50) {
-          toggleMenu();
-        }
-      },
-      onPanResponderRelease: () => {},
-    })
-  ).current;
-
   const fetchFollowCounts = useCallback(async () => {
     try {
       const counts = await getFollowCounts();
       setFollowCounts(counts);
     } catch (error) {
-      console.error('Error fetching follow counts:', error); 
+      console.error('Error fetching follow counts:', error);
     } finally {
       setRefreshing(false);
     }
@@ -92,79 +56,49 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchFollowCounts(); // Await the promise
-  }, [fetchFollowCounts]); 
+  }, [fetchFollowCounts]);
 
-
-  const currentAuthenticatedUser = async () => {
+  const currentAuthenticatedUser = useCallback(async () => {
     try {
       const user = await getCurrentUser();
-      const { userId, username } = user;
-      // console.log(`The User Id: ${userId}, Username: ${username}`);
-      setUserInfo({ userId, username });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const UserAttributes = async () => {
-    try {
-      const userAttributes = await fetchUserAttributes();
-      if (userAttributes.email) {
-        setEmail(userAttributes.email);
+      if (user) {
+        const { userId, username } = user;
+        console.log(`The User Id: ${userId}, Username: ${username}`);
+        setUserInfo({ userId, username });
+        
       } else {
-        console.log('Email attribute is undefined');
+        console.log('No user found');
       }
     } catch (err) {
       console.log(err);
     }
-  }
+  }, []);
 
-  // async function handleSignOut() {
-  //   try {
-  //     const { username } = await getCurrentUser();
-
-  //     console.log('Attempting to sign out user: ', username);
-  //     await signOut();
-  //     navigation.navigate('Login');
-  //     console.log('User Signed Out');
-  //   } catch (error) {
-  //     console.log('error signing out: ', error);
-  //   }
-  // }
-
-  const handleNavigateToUserSearch = () =>{
+  const handleNavigateToUserSearch = () => {
     navigation.navigate('UserSearch');
-    console.log("Navigating to UserSearch Screen")
-    };
+    console.log("Navigating to UserSearch Screen");
+  };
 
   const handleNotificationPress = () => {
     console.log("Notification button pressed");
     navigation.navigate('Notifications');
-    // Navigate to the notifications screen or handle notifications logic
   };
 
   const handlePostDeleted = () => {
-    // Refetch posts or update the post list in state
     console.log("Post deleted from ProfileScreen");
-    // Assuming you have a function to fetch posts
-    // fetchUserPosts();
   };
 
   useEffect(() => {
     const fetchData = async () => {
       await currentAuthenticatedUser();
-      await fetchUserAttributes();
       await fetchFollowCounts();
     };
     fetchData();
-  }, []);
+  }, [currentAuthenticatedUser, fetchFollowCounts]);
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
       <View style={[styles.container]}>
-        {overlayVisible && (
-          <TouchableOpacity style={styles.overlay} onPress={toggleMenu} />
-        )}
           <View style={styles.header}>
             <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
             <View style={styles.icons}>
@@ -199,7 +133,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
               </TouchableOpacity>
             </View>
-
             <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />

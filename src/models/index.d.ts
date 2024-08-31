@@ -14,13 +14,12 @@ type EagerUser = {
   readonly id: string;
   readonly username: string;
   readonly email: string;
-  readonly likes?: (Like | null)[] | null;
   readonly posts?: (Post | null)[] | null;
   readonly friends?: (Friendship | null)[] | null;
   readonly sentFriendRequests?: (FriendRequest | null)[] | null;
   readonly receivedFriendRequests?: (FriendRequest | null)[] | null;
   readonly comments?: (Comment | null)[] | null;
-  readonly publicProfile: boolean;
+  readonly publicProfile?: boolean | null;
   readonly reposts?: (Repost | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -34,13 +33,12 @@ type LazyUser = {
   readonly id: string;
   readonly username: string;
   readonly email: string;
-  readonly likes: AsyncCollection<Like>;
   readonly posts: AsyncCollection<Post>;
   readonly friends: AsyncCollection<Friendship>;
   readonly sentFriendRequests: AsyncCollection<FriendRequest>;
   readonly receivedFriendRequests: AsyncCollection<FriendRequest>;
   readonly comments: AsyncCollection<Comment>;
-  readonly publicProfile: boolean;
+  readonly publicProfile?: boolean | null;
   readonly reposts: AsyncCollection<Repost>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -306,36 +304,4 @@ export declare type Repost = LazyLoading extends LazyLoadingDisabled ? EagerRepo
 
 export declare const Repost: (new (init: ModelInit<Repost>) => Repost) & {
   copyOf(source: Repost, mutator: (draft: MutableModel<Repost>) => MutableModel<Repost> | void): Repost;
-}
-
-type EagerLike = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Like, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly user?: User | null;
-  readonly postId: string;
-  readonly userLikesId: string;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-type LazyLike = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Like, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly user: AsyncItem<User | undefined>;
-  readonly postId: string;
-  readonly userLikesId: string;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-}
-
-export declare type Like = LazyLoading extends LazyLoadingDisabled ? EagerLike : LazyLike
-
-export declare const Like: (new (init: ModelInit<Like>) => Like) & {
-  copyOf(source: Like, mutator: (draft: MutableModel<Like>) => MutableModel<Like> | void): Like;
 }
