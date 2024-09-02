@@ -66,7 +66,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         console.log(`The User Id: ${userId}, Username: ${username}`);
         setUserInfo({ userId, username });
 
-        
       } else {
         console.log('No user found');
       }

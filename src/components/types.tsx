@@ -35,6 +35,12 @@ export type ProfileStackParamList = {
   UserSearchProfile: { userId: string };
   Notifications: undefined;
   ResetPassword: undefined;
+  GeneralSettings: undefined;
+  AccountSettings: undefined;
+  NotificationsSettings: undefined;
+  SpotifyAccountSettings: undefined;
+  AccessibilitySettings: undefined;
+  PrivacySettings: undefined;
 };
 
 export type ExploreStackParamList ={
