@@ -1,6 +1,6 @@
 // App.tsx
 import * as React from 'react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
@@ -47,6 +47,7 @@ import { useColorScheme } from 'react-native';
 import { ThemeProvider } from './src/utils/ThemeContext';
 
 import { SpotifyProvider } from './src/context/SpotifyContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import Stack ParamLists
 import { SearchScreenStackParamList } from './src/components/types';
@@ -161,6 +162,12 @@ const MainTabNavigator = () => {
   );
 };
 
+
+// const MainScreenWithSpotify = () => ( 
+//   <SpotifyProvider> 
+//     <MainTabNavigator /> 
+//   </SpotifyProvider> 
+// );
 
 const App = () => {
   const colorScheme = useColorScheme();
