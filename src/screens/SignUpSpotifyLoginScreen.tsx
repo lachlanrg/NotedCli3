@@ -25,7 +25,8 @@ type SignUpSpotifyLoginScreenProps = {
 };
 
 const SignUpSpotifyLoginScreen: React.FC<SignUpSpotifyLoginScreenProps> = ({ navigation }) => {
-  const { setSpotifyUser } = useSpotify();
+  const { setSpotifyUser, setSpotifyToken } = useSpotify();
+
 
   useEffect(() => {
     console.log('SignUpSpotifyLogin component mounted');
@@ -124,7 +125,6 @@ const SignUpSpotifyLoginScreen: React.FC<SignUpSpotifyLoginScreenProps> = ({ nav
     try {
       const { accessToken, refreshToken, expiresIn } = tokenResponse;
       const userInfo = await fetchSpotifyUserInfo(accessToken);
-      const { setSpotifyUser, setSpotifyToken } = useSpotify();
 
       setSpotifyUser(userInfo);
       setSpotifyToken(accessToken);

@@ -87,7 +87,7 @@ const HomeScreen: React.FC = () => {
 
   const [following, setFollowing] = useState<string[]>([]);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
-  const { spotifyUser, spotifyToken, refreshSpotifyToken } = useSpotify();
+  const { spotifyUser } = useSpotify();
 
   React.useEffect(() => {
     currentAuthenticatedUser();
@@ -103,29 +103,6 @@ const HomeScreen: React.FC = () => {
       console.log(err);
     }
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      console.log('Refreshing Spotify token in HomeScreen...');
-      try {
-        await refreshSpotifyToken();
-        // Fetch the latest token from AsyncStorage after refresh
-        const latestToken = await AsyncStorage.getItem('spotifyAccessToken');
-        console.log('Spotify token refreshed successfully');
-        console.log('Current Spotify token:', latestToken);
-      } catch (error) {
-        console.error('Error refreshing Spotify token:', error);
-      }
-    };
-  
-    fetchData();
-  
-    // Set up an interval to refresh the token every 50 minutes
-    const refreshInterval = setInterval(fetchData, 50 * 60 * 1000);
-  
-    // Clean up the interval when the component unmounts
-    return () => clearInterval(refreshInterval);
-  }, [refreshSpotifyToken]);
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
