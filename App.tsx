@@ -33,7 +33,7 @@ import ResetPasswordScreen from './src/screens/ProfileStack/ResetPasswordScreen'
 import HomeUserProfileScreen from './src/screens/HomeStack/homeUserProfileScreen';
 import PostRepostScreen from './src/screens/HomeStack/postRepostScreen';
 import RepostOriginalPostScreen from './src/screens/HomeStack/repostOriginalPostScreen';
-import SignUpSpotifyLoginScreen from './src/screens/SignUpSpotifyLogin';
+import SignUpSpotifyLoginScreen from './src/screens/SignUpSpotifyLoginScreen';
 
 
 //Initialise Amplify Config
@@ -45,6 +45,8 @@ import config from './src/amplifyconfiguration.json';
 
 import { useColorScheme } from 'react-native'; 
 import { ThemeProvider } from './src/utils/ThemeContext';
+
+import { SpotifyProvider } from './src/context/SpotifyContext';
 
 // Import Stack ParamLists
 import { SearchScreenStackParamList } from './src/components/types';
@@ -164,22 +166,24 @@ const App = () => {
   const colorScheme = useColorScheme();
 
   return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheetModalProvider>
-          <ThemeProvider>
-            <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-              <Stack.Navigator>
-                <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
-                <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="SignUpSpotifyLogin" component={SignUpSpotifyLoginScreen} options={{ headerShown: false }} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </ThemeProvider>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
+    <SpotifyProvider>
+      <SafeAreaProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <BottomSheetModalProvider>
+            <ThemeProvider>
+              <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack.Navigator>
+                  <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+                  <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
+                  <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+                  <Stack.Screen name="SignUpSpotifyLogin" component={SignUpSpotifyLoginScreen} options={{ headerShown: false }} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </ThemeProvider>
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
+    </SpotifyProvider>
   );
 };
 

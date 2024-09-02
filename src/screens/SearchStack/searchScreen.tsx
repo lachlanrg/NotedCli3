@@ -43,6 +43,7 @@ import { searchSCTracks } from '../../soundcloudConfig/scTrackSearch';
 import { scTrack } from '../../soundcloudConfig/itemInterface';
 import useSpotifySearch from '../../spotifyConfig/spotifySearchAll';
 import { MenuItem } from '@aws-amplify/ui-react';
+import { useSpotify } from '../../context/SpotifyContext';
 
 //Apparently including this is the only way for it to work in the albumDetailsScreen
 export interface Album {
@@ -90,6 +91,9 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   const bottomSheetHeight = useRef(new Animated.Value(0)).current;
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false); 
   const scrollViewRef = useRef<ScrollView>(null);
+
+  const { spotifyUser } = useSpotify();
+
  
 // Get the Spotify Access Token, Also in the spotifySearchAll.tsx, 
 // but might be useful staying here aswell as it wont need 
@@ -353,7 +357,13 @@ const closeSCBottomSheet = () => {
             />      
           </TouchableOpacity>
         </View>
-
+        {spotifyUser && (
+          <View style={styles.spotifySection}>
+            <Text style={styles.spotifyText}>
+              Spotify Account: {spotifyUser.id}
+            </Text>
+          </View>
+        )}
           {searchInput === '' && recentSearches.length > 0 && (
             <ScrollView style={styles.recentSearchesContainer}>
               <Text style={styles.recentSearchesTitle}>Recently Searched</Text>
@@ -705,6 +715,16 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark, // or your background color
+  },
+  spotifyText: {
+    color: light,
+    fontSize: 16,
+  },
+  spotifySection: {
+    padding: 10,
+    backgroundColor: dark,
+    borderRadius: 5,
+    marginTop: 10,
   },
 });
 
