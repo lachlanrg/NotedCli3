@@ -34,7 +34,12 @@ import HomeUserProfileScreen from './src/screens/HomeStack/homeUserProfileScreen
 import PostRepostScreen from './src/screens/HomeStack/postRepostScreen';
 import RepostOriginalPostScreen from './src/screens/HomeStack/repostOriginalPostScreen';
 import SignUpSpotifyLoginScreen from './src/screens/SignUpSpotifyLoginScreen';
-
+import GeneralSettingsScreen from './src/screens/ProfileStack/generalSettingsScreen';
+import AccountSettingsScreen from './src/screens/ProfileStack/accountSettingsScreen';
+import NotificationsSettingsScreen from './src/screens/ProfileStack/notificationsSettingsScreen';
+import SpotifyAccountSettingsScreen from './src/screens/ProfileStack/spotifyAccountSettingsScreen';
+import AccessibilitySettingsScreen from './src/screens/ProfileStack/accessibilitySettingsScreen';
+import PrivacySettingsScreen from './src/screens/ProfileStack/privacySettingsScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -110,6 +115,13 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="UserSearchProfile" component={UserSearchProfileScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="GeneralSettings" component={GeneralSettingsScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="AccountSettings" component={AccountSettingsScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="NotificationsSettings" component={NotificationsSettingsScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="SpotifyAccountSettings" component={SpotifyAccountSettingsScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />
+
     </ProfileStack.Navigator>
   );
 };

@@ -1,21 +1,36 @@
-import React, { useMemo, forwardRef, useCallback, useState } from "react";
-import { View, Text, StyleSheet, Button, TouchableOpacity, Alert } from "react-native";
+import React, { useMemo, forwardRef, useCallback, useState, useEffect, MutableRefObject } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { dark, light } from "../colorModes";
+import { NavigationProp, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { signOut, getCurrentUser } from 'aws-amplify/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faGear, faUser, faBell, faEye, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { dark, light } from "../colorModes";
 
 export type Ref = BottomSheetModal;
 
 const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
-  const snapPoints = useMemo(() => ['60%'], []);
+  const snapPoints = useMemo(() => ['70%'], []);
   const [userInfo, setUserId] = useState<any>(null);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
   const navigation = useNavigation<any>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     currentAuthenticatedUser();
-  }, []); 
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const modalRef = ref as MutableRefObject<BottomSheetModal | null>;
+      if (shouldShowModal && modalRef.current) {
+        modalRef.current.present();
+        setShouldShowModal(false);
+      }
+    }, [shouldShowModal])
+  );
 
   async function currentAuthenticatedUser() {
     try {
@@ -33,9 +48,10 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
 
   const { dismiss } = useBottomSheetModal();
 
-  const handleNavigateToResetPassword = () => {
-    dismiss(); // Close the bottom sheet
-    navigation.navigate('ResetPassword'); 
+  const handleNavigate = (screen: string) => {
+    setShouldShowModal(true);
+    dismiss();
+    navigation.navigate(screen);
   };
 
   async function handleSignOut() {
@@ -43,7 +59,7 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
       const { username } = await getCurrentUser();
       console.log('Attempting to sign out user: ', username);
       await signOut();
-      navigation.navigate('Login'); 
+      navigation.navigate('Login');
       console.log('User Signed Out');
     } catch (error) {
       console.log('error signing out: ', error);
@@ -52,15 +68,11 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
 
   async function handleSpotifySignOut() {
     try {
-      // Clear Spotify-related data from AsyncStorage
       await AsyncStorage.removeItem('spotifyAccessToken');
       await AsyncStorage.removeItem('spotifyRefreshToken');
       await AsyncStorage.removeItem('spotifyTokenExpiration');
       await AsyncStorage.removeItem('spotifyUser');
-      
       console.log('Spotify user signed out');
-      // Optionally, you can update your app's state or navigate to a different screen
-      // For example: navigation.navigate('SpotifyLogin');
       Alert.alert("Success", "Signed out of Spotify Account.");
     } catch (error) {
       console.log('Error signing out Spotify user: ', error);
@@ -70,38 +82,88 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
   return (
     <BottomSheetModal
       ref={ref}
-      index={0} 
+      index={0}
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
     >
-      <View style={styles.contentContainer}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.containerHeadline}>Settings</Text>
 
-        <TouchableOpacity onPress={handleNavigateToResetPassword}>
-          <Text>Reset Password</Text>
+        <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('GeneralSettings')}>
+          <FontAwesomeIcon icon={faGear as IconProp} size={24} color={dark}/>
+          <Text style={styles.optionText}>General</Text>
         </TouchableOpacity>
-        <Button 
-          title="Logout" 
-          onPress={handleSignOut}
-        />
-        <Button 
-          title="Spotify Logout" 
-          onPress={handleSpotifySignOut}
-        />
-      </View>
+
+        <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('AccountSettings')}>
+          <FontAwesomeIcon icon={faUser as IconProp} size={24} color={dark}/>
+          <Text style={styles.optionText}>Account</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('NotificationsSettings')}>
+          <FontAwesomeIcon icon={faBell as IconProp} size={24} color={dark}/>
+          <Text style={styles.optionText}>Notifications</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('SpotifyAccountSettings')}>
+          <FontAwesomeIcon icon={faSpotify as IconProp} size={24} color={dark}/>
+          <Text style={styles.optionText}>Spotify Account</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('AccessibilitySettings')}>
+          <FontAwesomeIcon icon={faEye as IconProp} size={24}color={dark}/>
+          <Text style={styles.optionText}>Accessibility</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('PrivacySettings')}>
+          <FontAwesomeIcon icon={faLock as IconProp} size={24} color={dark}/>
+          <Text style={styles.optionText}>Privacy</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.logoutOptionContainer, styles.logoutButton]} onPress={handleSignOut}>
+          <Text style={[styles.logoutText]}>Logout</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </BottomSheetModal>
   );
 });
 
 const styles = StyleSheet.create({
   contentContainer: {
-    flex: 1,
-    padding: 16,
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   containerHeadline: {
     fontSize: 24,
-    marginBottom: 16,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomColor: '#e0e0e0',
+    borderBottomWidth: 1,
+  },
+  optionText: {
+    fontSize: 18,
+    marginLeft: 15,
+  },
+  logoutOptionContainer: {
+    alignItems: 'center',
+    paddingVertical: 15,
+  },
+  logoutButton: {
+    marginTop: 20,
+    paddingTop: 15,
+  },
+  logoutText: {
+    color: 'red',
+    textAlign: 'center',
+    fontSize: 18,
   },
 });
 
