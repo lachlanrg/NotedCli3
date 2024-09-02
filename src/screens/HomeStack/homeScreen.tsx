@@ -35,6 +35,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
 import { Repost } from '../../models';
 import { listRepostsWithOriginalPost } from '../../utils/customQueries';
+import { useSpotify } from '../../context/SpotifyContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 Amplify.configure(awsconfig);
 
@@ -83,6 +87,7 @@ const HomeScreen: React.FC = () => {
 
   const [following, setFollowing] = useState<string[]>([]);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
+  const { spotifyUser, spotifyToken, refreshSpotifyToken } = useSpotify();
 
   React.useEffect(() => {
     currentAuthenticatedUser();
@@ -98,6 +103,29 @@ const HomeScreen: React.FC = () => {
       console.log(err);
     }
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log('Refreshing Spotify token in HomeScreen...');
+      try {
+        await refreshSpotifyToken();
+        // Fetch the latest token from AsyncStorage after refresh
+        const latestToken = await AsyncStorage.getItem('spotifyAccessToken');
+        console.log('Spotify token refreshed successfully');
+        console.log('Current Spotify token:', latestToken);
+      } catch (error) {
+        console.error('Error refreshing Spotify token:', error);
+      }
+    };
+  
+    fetchData();
+  
+    // Set up an interval to refresh the token every 50 minutes
+    const refreshInterval = setInterval(fetchData, 50 * 60 * 1000);
+  
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(refreshInterval);
+  }, [refreshSpotifyToken]);
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
@@ -598,6 +626,13 @@ const HomeScreen: React.FC = () => {
           <View style={styles.topButtonArea} />
         </TouchableOpacity>
         <View style={styles.buttonContainer}>
+        {spotifyUser && (
+          <View style={styles.spotifySection}>
+            <Text style={styles.spotifyText}>
+              Spotify Account: {spotifyUser.id}
+            </Text>
+          </View>
+        )}
           <TouchableOpacity style={styles.button}>
             <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
           </TouchableOpacity>
@@ -840,6 +875,16 @@ const styles = StyleSheet.create({
   repostDate: {
     color: '#888',
     fontSize: 12,
+  },
+  spotifyText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  spotifySection: {
+    padding: 10,
+    backgroundColor: dark,
+    borderRadius: 5,
+    marginTop: 10,
   },
 });
 

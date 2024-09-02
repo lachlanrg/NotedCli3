@@ -24,7 +24,7 @@ type SignUpParameters = {
   username: string;
   password: string;
   email: string;
-  publicProfile: boolean;
+  publicProfile: Boolean;
 };
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
@@ -46,8 +46,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           userAttributes: {
             email,
           },
+          autoSignIn: true,
         },
       });
+      
       setIsConfirmationStep(true);
 
       console.log('Input - Sign up successful for user:', username);
@@ -65,8 +67,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       await confirmSignUp({
         username,
         confirmationCode,
-      }
-    );
+      });
 
       await handleAutoSignIn();
       console.log('Cognito - Sign up confirmed for user:', username);
@@ -75,7 +76,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       await createUserInGraphQL(userId);
 
       // navigation.navigate('Main');
-      navigation.navigate('SignUpSpotifyLogin'); 
+      navigation.navigate("SignUpSpotifyLogin");
+
+
 
     } catch (error: any) {
       console.error('Error confirming sign up:', error);
