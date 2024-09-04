@@ -6,6 +6,7 @@ import {
   StyleSheet, 
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
@@ -27,28 +28,6 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
-
-  // const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({}); 
-
-  // const fetchPostUsername = useCallback(async (postId: string) => {
-  //   try {
-  //     const username = await fetchUsernameById(postId);
-  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: username }));
-  //   } catch (error) {
-  //     console.error('Error fetching username for postId', postId, error);
-  //     setPostUsernames(prevUsernames => ({ ...prevUsernames, [postId]: null }));
-  //   }
-  // }, []);
-  // useEffect(() => {
-  //   const fetchUsernamesForPosts = async () => {
-  //     const postIds = posts.map(post => post.userPostsId); 
-  //     for (const postId of postIds) {
-  //       await fetchPostUsername(postId);
-  //     }
-  //   };
-  //   fetchUsernamesForPosts();
-  // }, [posts, fetchPostUsername]); 
-
 
   const fetchUserPosts = useCallback(async () => {
     setIsLoading(true);
@@ -81,6 +60,10 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
 
 
   return (
+    <View> 
+    {/* {isLoading ? ( 
+      <ActivityIndicator size="small" color="#fff" style={{ marginTop: 100 }} />
+    ) : ( */}
     <ScrollView contentContainerStyle={styles.container}>
       {posts.map((item) => (
         <TouchableOpacity key={item.id} onPress={() => onPostPress(item)}>
@@ -124,13 +107,20 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
       )
     }
     </ScrollView>
+     {/* )} */}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+
+  container: { // Update container styles for loading
+    flex: 1,             // Take up available space
     padding: 20,
     backgroundColor: dark, 
+  },
+  scrollViewContent: {
+    padding: 0, // Remove default padding from ScrollView content
   },
   postContainer: {
     marginTop: 4,

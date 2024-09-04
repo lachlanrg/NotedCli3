@@ -13,7 +13,7 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { dark, light, gray, error, lgray, dgray } from '../../components/colorModes';
 import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid, faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
@@ -69,6 +69,7 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const client = generateClient();
   const [refreshing, setRefreshing] = useState(false);
   const showRefreshIcon = useRef(new Animated.Value(0)).current;
@@ -89,7 +90,7 @@ const HomeScreen: React.FC = () => {
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const { spotifyUser } = useSpotify();
 
-  React.useEffect(() => {
+  useEffect(() => {
     currentAuthenticatedUser();
   }, []);
 
@@ -113,8 +114,7 @@ const HomeScreen: React.FC = () => {
           query: queries.listPosts,
           variables: {
             filter: {
-              userPostsId: { eq: userId }
-              // Remove _deleted filter here
+              userPostsId: { eq: userId },
             },
           },
         });
@@ -126,8 +126,7 @@ const HomeScreen: React.FC = () => {
         query: queries.listPosts,
         variables: {
           filter: {
-            userPostsId: { eq: userInfo?.userId }
-            // Remove _deleted filter here
+            userPostsId: { eq: userInfo?.userId },
           },
         },
       }).then(response => response.data.listPosts.items);
@@ -138,7 +137,7 @@ const HomeScreen: React.FC = () => {
           query: listRepostsWithOriginalPost, // Use the custom query here
           variables: {
             filter: {
-              userRepostsId: { eq: userId }
+              userRepostsId: { eq: userId },
             },
           },
         });
@@ -150,7 +149,7 @@ const HomeScreen: React.FC = () => {
         query: listRepostsWithOriginalPost, // Use the custom query here
         variables: {
           filter: {
-            userRepostsId: { eq: userInfo?.userId }
+            userRepostsId: { eq: userInfo?.userId },
           },
         },
       }).then(response => response.data.listReposts.items);
@@ -170,7 +169,7 @@ const HomeScreen: React.FC = () => {
       const flattenedPosts = allPosts.flat();
       const flattenedReposts = allReposts.flat();
 
-      // 7. Filter out deleted posts and reposts after fetching
+      // // 7. Filter out deleted posts and reposts after fetching
       const filteredPosts = flattenedPosts.filter(post => !post._deleted);
       const filteredReposts = flattenedReposts.filter(repost => !repost._deleted);
 
@@ -191,9 +190,9 @@ const HomeScreen: React.FC = () => {
     }
   }, [following, userInfo?.userId]);
 
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  // useEffect(() => {
+  //   fetchPosts();
+  // }, [fetchPosts]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

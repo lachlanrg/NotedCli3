@@ -31,8 +31,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
       if (isSignedIn) {
         console.log("Successful Sign In with:", username);
-        // navigation.navigate('Main'); 
-        navigation.navigate("SignUpSpotifyLogin");
+        navigation.navigate('Main'); 
+        // navigation.navigate("SignUpSpotifyLogin");
 
       } else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_UP') {
         console.log('User not confirmed. Showing confirmation modal...');

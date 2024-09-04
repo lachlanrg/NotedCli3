@@ -15,6 +15,7 @@ import UserPostList from '../../components/userPostsList';
 import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
 import ProfilePostBottomSheetModal from '../../components/BottomSheets/ProfilePostBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import { useFocusEffect } from '@react-navigation/native';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -36,6 +37,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [refresh, setRefresh] = React.useState(false);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // This will run when the screen comes into focus
+  //     setRefresh(prev => !prev);
+  //   }, [])
+  // );
 
   const handlePresentPostModalPress = (post: any) => {
     setSelectedPost(post);
@@ -133,7 +142,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
               </TouchableOpacity>
             </View>
-            <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
+            <UserPostList key={String(refresh)} userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />
           <ProfilePostBottomSheetModal ref={postBottomSheetRef} post={selectedPost} onPostDelete={handlePostDeleted}/>

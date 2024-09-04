@@ -69,7 +69,7 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
                      {/* {expirationDate && (
                         <Text>Token expires in: {convertMillisecondsToMinutes(parseInt(expirationDate))} minutes</Text>
                     )} */}
-                    <Text style={styles.label}><Text style={styles.boldText}>Token expires in:</Text> {expirationDate ? Math.floor(parseInt(expirationDate) / 60000) : 'N/A'} minutes</Text>
+                    <Text style={styles.label}><Text style={styles.boldText}>Token Expiry:</Text> {expirationDate}</Text>
                 </View>
                 </View>
                 <View style={styles.logoutContainer}>
