@@ -16,6 +16,7 @@ import { formatRelativeTime } from './formatComponents';
 import { fetchUsernameById } from './getUserUsername';
 
 import { dark, light } from './colorModes'; 
+import { getCurrentUser } from '@aws-amplify/auth';
 
 Amplify.configure(awsmobile);
 
@@ -31,6 +32,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
 
   const fetchUserPosts = useCallback(async () => {
     setIsLoading(true);
+    const { userId  } = await getCurrentUser();
     try {
       const response = await client.graphql({ 
         query: listPosts,
