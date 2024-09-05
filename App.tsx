@@ -40,9 +40,11 @@ import NotificationsSettingsScreen from './src/screens/ProfileStack/notification
 import SpotifyAccountSettingsScreen from './src/screens/ProfileStack/spotifyAccountSettingsScreen';
 import AccessibilitySettingsScreen from './src/screens/ProfileStack/accessibilitySettingsScreen';
 import PrivacySettingsScreen from './src/screens/ProfileStack/privacySettingsScreen';
+import AppLoadingScreen from './src/screens/AppLoadingScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
+import { fetchAuthSession, getCurrentUser } from '@aws-amplify/auth';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import awsconfig from './src/aws-exports';
 import { generateClient } from 'aws-amplify/api';
@@ -53,6 +55,7 @@ import { ThemeProvider } from './src/utils/ThemeContext';
 
 import { SpotifyProvider } from './src/context/SpotifyContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 // Import Stack ParamLists
 import { SearchScreenStackParamList } from './src/components/types';
@@ -183,6 +186,25 @@ const MainTabNavigator = () => {
 
 const App = () => {
   const colorScheme = useColorScheme();
+  const navigationRef = useRef(null);
+
+  // useEffect(() => {
+  //   const checkUserSession = async () => {
+  //     try {
+  //       const session = await fetchAuthSession();
+  //       const { accessToken, idToken } = session.tokens ?? {};
+  //       if (accessToken && idToken) {
+  //         // Navigate to Main stack if tokens are valid
+  //         (navigationRef.current as any)?.navigate('Main');
+  //       }
+  //     } catch (err) {
+  //       console.log('No valid session found:', err);
+  //     }
+  //   };
+
+  //   checkUserSession();
+  // }, []);
+
 
   return (
     <SpotifyProvider>
@@ -190,8 +212,10 @@ const App = () => {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <BottomSheetModalProvider>
             <ThemeProvider>
-              <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <Stack.Navigator>
+              <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} ref={navigationRef}>
+                <Stack.Navigator initialRouteName="AppLoading">
+                  <Stack.Screen name="AppLoading" component={AppLoadingScreen} options={{ headerShown: false }} />
+
                   <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
                   <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
                   <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />

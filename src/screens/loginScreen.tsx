@@ -8,6 +8,7 @@ import { dark, light, error, gray, placeholder } from '../components/colorModes'
 import { createUser } from '../graphql/mutations';
 import { generateClient } from 'aws-amplify/api';
 import ConfirmationCodeInput from '../components/ConfirmationCodeInput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -114,7 +115,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       await signOut();
       navigation.navigate('Login');
       console.log('User Signed Out');
-
+      
 
     } catch (error) {
       console.log('error signing out: ', error);

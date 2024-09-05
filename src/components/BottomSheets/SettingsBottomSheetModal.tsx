@@ -1,3 +1,4 @@
+// SettingsBottomSheetModal.tsx
 import React, { useMemo, forwardRef, useCallback, useState, useEffect, MutableRefObject } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
@@ -59,23 +60,14 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
       const { username } = await getCurrentUser();
       console.log('Attempting to sign out user: ', username);
       await signOut();
-      navigation.navigate('Login');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+    });
       console.log('User Signed Out');
+      dismiss();
     } catch (error) {
       console.log('error signing out: ', error);
-    }
-  }
-
-  async function handleSpotifySignOut() {
-    try {
-      await AsyncStorage.removeItem('spotifyAccessToken');
-      await AsyncStorage.removeItem('spotifyRefreshToken');
-      await AsyncStorage.removeItem('spotifyTokenExpiration');
-      await AsyncStorage.removeItem('spotifyUser');
-      console.log('Spotify user signed out');
-      Alert.alert("Success", "Signed out of Spotify Account.");
-    } catch (error) {
-      console.log('Error signing out Spotify user: ', error);
     }
   }
 
