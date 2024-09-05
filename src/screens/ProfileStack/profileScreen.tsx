@@ -6,6 +6,8 @@ import { ProfileStackParamList } from '../../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCog, faEdit, faUserPlus, faBell } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, gray, placeholder } from '../../components/colorModes';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 import { getCurrentUser } from 'aws-amplify/auth';
 import { getFollowCounts } from '../../components/currentUserFollowerFollowingCount';
@@ -16,10 +18,14 @@ import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomShe
 import ProfilePostBottomSheetModal from '../../components/BottomSheets/ProfilePostBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useFocusEffect } from '@react-navigation/native';
+import { useSpotify } from '../../context/SpotifyContext';
+
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
+
+const spotifyIcon = faSpotify as IconProp;
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
@@ -38,6 +44,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [refresh, setRefresh] = React.useState(false);
+  const { recentlyPlayed } = useSpotify();
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -142,6 +149,30 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
               </TouchableOpacity>
             </View>
+            {recentlyPlayed.length > 0 && ( 
+              <View style={styles.recentlyPlayedBox}>
+                <View style={styles.spotifyIcon}>
+                  <FontAwesomeIcon icon={spotifyIcon} size={20} color={light}/>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <Text style={styles.recentlyPlayedText}>
+                    {recentlyPlayed[0].track.name} -{' '}
+                    {recentlyPlayed[0].track.artists[0].name} 
+                  </Text>
+                </ScrollView>
+              </View>
+            )}
+            {/* {recentlyPlayed.length > 0 && ( 
+              <View style={styles.recentlyPlayedBox}>
+                <View style={styles.spotifyIcon}>
+                  <FontAwesomeIcon icon={spotifyIcon} size={20} color={light}/>
+                </View>
+                <Text style={styles.recentlyPlayedText} numberOfLines={1} ellipsizeMode="tail">
+                  {recentlyPlayed[0].track.name} -{' '}
+                  {recentlyPlayed[0].track.artists[0].name} 
+                </Text>
+              </View>
+            )} */}
             <UserPostList key={String(refresh)} userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />
@@ -151,7 +182,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       </SafeAreaView>
     );
   };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -209,13 +239,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     overflow: 'hidden',
   },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    color: light,
-  },
   userInfoContainer: {
     borderWidth: 1,
     borderRadius: 5,
@@ -229,129 +252,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: light,
   },
-  settingsMenu: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    backgroundColor: gray,
-    elevation: 8,
-    shadowColor: dark,
-    borderBottomLeftRadius: 25,
-    borderTopLeftRadius: 25,
-    paddingTop: 20,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    paddingHorizontal: 20, // Add some padding around the settings
-    justifyContent: 'flex-start', // Space between settings and logout
-  },
-  settingsContainer: {
-    alignItems: 'flex-end', // Align settings to the right
-    marginTop: 20, // Add top margin to settings
-    flex: 1, // Take up all remaining space
-  },
-  closeButton: {
-    alignSelf: 'flex-end', 
-    paddingTop: 10,
-  },
-  settingsText: {
-    marginBottom: 10, // Add space between settings items
-    color: light,
-  },
-  logoutButtonContainer: {
-    marginBottom: 20, // Add space at the bottom
-  },
-  logoutButton: {
-    backgroundColor: 'red', // Red background for logout button
-    marginBottom: 20, // Add space at the bottom
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    },
-  modalContainer: {
-    position: 'absolute', 
-    top: 0, 
-    bottom: 50,
-    left: 0,
-    right: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBackgroundContainer: {
-    flex: 1, 
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)' 
-  },
-  modalContent: {
-    backgroundColor: gray,
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: gray,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: 300,
-    // Adjust initial and final height as needed
-    // The initial height should accommodate the content of the first phase
-    height: 200, 
-    bottom: '12%',  
-  },
-  startPhaseHeight: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 150, 
-  },
-  codeSentPhaseHeight: {
-    top: 0, 
-    bottom: 0,
-    left: 0,
-    right: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 320, 
-  },
-  donePhaseHeight: {
-    height: 100, 
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: light,
-  },
-  doneModalText: {
-    fontSize: 16,
-    marginBottom: 10,
-    textAlign: 'center',
-    color: light,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: placeholder,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 2,
-    textAlign: 'center',
-    fontSize: 12,
-  },
   scrollViewContent: {
     flex: 1,
+    marginRight: 20,
   },
   refreshIconContainer: {
     position: 'absolute',
@@ -360,6 +263,23 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     zIndex: 1,
+  },
+  recentlyPlayedBox: {
+    backgroundColor: gray,
+    padding: 15,
+    borderRadius: 8,
+    // marginBottom: 20,
+    alignSelf: 'flex-start', // Align to the left
+    // marginHorizontal: 20, 
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  recentlyPlayedText: {
+    color: light,
+    fontSize: 16,
+  },
+  spotifyIcon: {
+    paddingRight: 10,
   },
   safeAreaContainer: {
     flex: 1,
