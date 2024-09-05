@@ -17,6 +17,7 @@ const SCOPES = [
   'user-read-playback-state',
   'user-read-currently-playing',
   'app-remote-control',
+  'user-read-recently-played',
 ].join(' ');
 const AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize';
 
@@ -158,7 +159,8 @@ const SignUpSpotifyLoginScreen: React.FC<SignUpSpotifyLoginScreenProps> = ({ nav
     const refreshToken = await AsyncStorage.getItem('spotifyRefreshToken');
 
     if (!accessToken || !expirationTime || !refreshToken) {
-      throw new Error('No Spotify tokens found');
+      
+      throw console.log("No Spotify tokens found")
     }
 
     if (Date.now() > parseInt(expirationTime)) {

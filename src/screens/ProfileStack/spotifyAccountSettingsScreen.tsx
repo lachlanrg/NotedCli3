@@ -6,9 +6,11 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dark, gray, light } from '../../components/colorModes';
 import { convertMillisecondsToMinutes } from '../../utils/timeUtils';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 
 const SpotifyAccountSettingsScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(null);
     const [expirationDate, setExpirationDate] = useState<string | null>(null);
@@ -60,6 +62,15 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Spotify Account Settings</Text>
                 </View>
+
+                {!accessToken ? ( 
+                    <TouchableOpacity 
+                    onPress={() => navigation.navigate('SignUpSpotifyLogin')}
+                    style={styles.loginButton} 
+                    >
+                    <Text style={styles.loginButtonText}>Login</Text>
+                    </TouchableOpacity>
+                ) : (
                 <View style={styles.content}>
                     <Text style={styles.label}><Text style={styles.boldText}>User ID:</Text> {userId}</Text>
                     <Text style={styles.label}><Text style={styles.boldText}>Display Name:</Text> {displayName}</Text>
@@ -71,12 +82,19 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
                     )} */}
                     <Text style={styles.label}><Text style={styles.boldText}>Token Expiry:</Text> {expirationDate}</Text>
                 </View>
+                 )}
+
                 </View>
+                {accessToken && (
                 <View style={styles.logoutContainer}>
-                    <TouchableOpacity onPress={handleSpotifySignOut} style={styles.logoutButton}>
-                        <Text style={styles.logoutButtonText}>Logout</Text>
+                    <TouchableOpacity 
+                    onPress={handleSpotifySignOut} 
+                    style={styles.logoutButton}
+                    >
+                    <Text style={styles.logoutButtonText}>Logout</Text>
                     </TouchableOpacity>
                 </View>
+                )}
         </SafeAreaView>
     );
 };
@@ -140,6 +158,18 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    loginButton: { // Style this similar to your logoutButton if needed
+        backgroundColor: 'green', 
+        padding: 15,
+        borderRadius: 8,
+        margin: 20,
+        alignItems: 'center',
+        width: 200, 
+      },
+      loginButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+      },
 });
 
 export default SpotifyAccountSettingsScreen;
