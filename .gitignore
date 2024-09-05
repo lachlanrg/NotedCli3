@@ -87,4 +87,4 @@ amplifytools.xcconfig
 **.sample
 #amplify-do-not-edit-end
 
-config.js
+src/config.js
