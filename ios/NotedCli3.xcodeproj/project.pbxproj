@@ -11,9 +11,9 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1E8E3949D977FC123FBC4C6F /* libPods-NotedCli3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DEC12B9FB2F1C7D07D3F776 /* libPods-NotedCli3.a */; };
+		25262B786330C7D6973E7378 /* libPods-NotedCli3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C6FF1C518E53A249110E07 /* libPods-NotedCli3.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		AA43F6C0F5996CB35F0E2E34 /* libPods-NotedCli3-NotedCli3Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FED159AD40F9AF533E784FAB /* libPods-NotedCli3-NotedCli3Tests.a */; };
+		A5414F75C2D392B712264542 /* libPods-NotedCli3-NotedCli3Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 075AFE509CB2C2FEC82A8B0D /* libPods-NotedCli3-NotedCli3Tests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,20 +30,20 @@
 		00E356EE1AD99517003FC87E /* NotedCli3Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NotedCli3Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* NotedCli3Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotedCli3Tests.m; sourceTree = "<group>"; };
-		02CC47B079CF1AA3B07D2225 /* Pods-NotedCli3-NotedCli3Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3-NotedCli3Tests.debug.xcconfig"; path = "Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		0D396C141E1448347CDEECC7 /* Pods-NotedCli3-NotedCli3Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3-NotedCli3Tests.release.xcconfig"; path = "Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests.release.xcconfig"; sourceTree = "<group>"; };
+		075AFE509CB2C2FEC82A8B0D /* libPods-NotedCli3-NotedCli3Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotedCli3-NotedCli3Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		12C6FF1C518E53A249110E07 /* libPods-NotedCli3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotedCli3.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* NotedCli3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NotedCli3.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = NotedCli3/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = NotedCli3/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = NotedCli3/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = NotedCli3/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = NotedCli3/main.m; sourceTree = "<group>"; };
-		21D401E861697CE091800D49 /* Pods-NotedCli3.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3.release.xcconfig"; path = "Target Support Files/Pods-NotedCli3/Pods-NotedCli3.release.xcconfig"; sourceTree = "<group>"; };
-		3C4C048FF6193AE4EA52B31E /* Pods-NotedCli3.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3.debug.xcconfig"; path = "Target Support Files/Pods-NotedCli3/Pods-NotedCli3.debug.xcconfig"; sourceTree = "<group>"; };
-		7DEC12B9FB2F1C7D07D3F776 /* libPods-NotedCli3.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotedCli3.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6CF8C27CBDD05290C70C45 /* Pods-NotedCli3-NotedCli3Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3-NotedCli3Tests.debug.xcconfig"; path = "Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		46693FF8C4F7237348D6310B /* Pods-NotedCli3.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3.release.xcconfig"; path = "Target Support Files/Pods-NotedCli3/Pods-NotedCli3.release.xcconfig"; sourceTree = "<group>"; };
+		537C1D64862FC04ACD996C2A /* Pods-NotedCli3.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3.debug.xcconfig"; path = "Target Support Files/Pods-NotedCli3/Pods-NotedCli3.debug.xcconfig"; sourceTree = "<group>"; };
+		5EEC8311E5DEA44D83DD801A /* Pods-NotedCli3-NotedCli3Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotedCli3-NotedCli3Tests.release.xcconfig"; path = "Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = NotedCli3/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FED159AD40F9AF533E784FAB /* libPods-NotedCli3-NotedCli3Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotedCli3-NotedCli3Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA43F6C0F5996CB35F0E2E34 /* libPods-NotedCli3-NotedCli3Tests.a in Frameworks */,
+				A5414F75C2D392B712264542 /* libPods-NotedCli3-NotedCli3Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1E8E3949D977FC123FBC4C6F /* libPods-NotedCli3.a in Frameworks */,
+				25262B786330C7D6973E7378 /* libPods-NotedCli3.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,8 +100,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				7DEC12B9FB2F1C7D07D3F776 /* libPods-NotedCli3.a */,
-				FED159AD40F9AF533E784FAB /* libPods-NotedCli3-NotedCli3Tests.a */,
+				12C6FF1C518E53A249110E07 /* libPods-NotedCli3.a */,
+				075AFE509CB2C2FEC82A8B0D /* libPods-NotedCli3-NotedCli3Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -140,10 +140,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3C4C048FF6193AE4EA52B31E /* Pods-NotedCli3.debug.xcconfig */,
-				21D401E861697CE091800D49 /* Pods-NotedCli3.release.xcconfig */,
-				02CC47B079CF1AA3B07D2225 /* Pods-NotedCli3-NotedCli3Tests.debug.xcconfig */,
-				0D396C141E1448347CDEECC7 /* Pods-NotedCli3-NotedCli3Tests.release.xcconfig */,
+				537C1D64862FC04ACD996C2A /* Pods-NotedCli3.debug.xcconfig */,
+				46693FF8C4F7237348D6310B /* Pods-NotedCli3.release.xcconfig */,
+				1D6CF8C27CBDD05290C70C45 /* Pods-NotedCli3-NotedCli3Tests.debug.xcconfig */,
+				5EEC8311E5DEA44D83DD801A /* Pods-NotedCli3-NotedCli3Tests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -155,12 +155,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NotedCli3Tests" */;
 			buildPhases = (
-				49248458601A72BBC78A9244 /* [CP] Check Pods Manifest.lock */,
+				731970A6147D86BA23751410 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				85BE36D7BB31771068A74421 /* [CP] Embed Pods Frameworks */,
-				81E4CB81E1ACB7723878574B /* [CP] Copy Pods Resources */,
+				FE1DEE54AC8BC6578E5C1D22 /* [CP] Embed Pods Frameworks */,
+				46073FC92AA3B61EC741BA95 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -176,13 +176,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "NotedCli3" */;
 			buildPhases = (
-				B4B3C0F47D77FD2C30CCDBEE /* [CP] Check Pods Manifest.lock */,
+				05C9BF393270285C510E3706 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
-				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				40B974330D7E55DD4979E2A0 /* [CP] Embed Pods Frameworks */,
-				2077D5D796B4AFF3C61F6BE5 /* [CP] Copy Pods Resources */,
+				13B07F8E1A680F5B00A75B9A /* Resources */,
+				A4755D73C083EA80616D8895 /* [CP] Embed Pods Frameworks */,
+				E017BDEDB88924E8A6518DD4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -266,41 +266,46 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		2077D5D796B4AFF3C61F6BE5 /* [CP] Copy Pods Resources */ = {
+		05C9BF393270285C510E3706 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NotedCli3-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		46073FC92AA3B61EC741BA95 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		40B974330D7E55DD4979E2A0 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		49248458601A72BBC78A9244 /* [CP] Check Pods Manifest.lock */ = {
+		731970A6147D86BA23751410 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -322,24 +327,41 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		81E4CB81E1ACB7723878574B /* [CP] Copy Pods Resources */ = {
+		A4755D73C083EA80616D8895 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		85BE36D7BB31771068A74421 /* [CP] Embed Pods Frameworks */ = {
+		E017BDEDB88924E8A6518DD4 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3/Pods-NotedCli3-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FE1DEE54AC8BC6578E5C1D22 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -354,28 +376,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NotedCli3-NotedCli3Tests/Pods-NotedCli3-NotedCli3Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B4B3C0F47D77FD2C30CCDBEE /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-NotedCli3-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -411,7 +411,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 02CC47B079CF1AA3B07D2225 /* Pods-NotedCli3-NotedCli3Tests.debug.xcconfig */;
+			baseConfigurationReference = 1D6CF8C27CBDD05290C70C45 /* Pods-NotedCli3-NotedCli3Tests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -439,7 +439,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0D396C141E1448347CDEECC7 /* Pods-NotedCli3-NotedCli3Tests.release.xcconfig */;
+			baseConfigurationReference = 5EEC8311E5DEA44D83DD801A /* Pods-NotedCli3-NotedCli3Tests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -464,7 +464,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3C4C048FF6193AE4EA52B31E /* Pods-NotedCli3.debug.xcconfig */;
+			baseConfigurationReference = 537C1D64862FC04ACD996C2A /* Pods-NotedCli3.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -494,7 +494,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 21D401E861697CE091800D49 /* Pods-NotedCli3.release.xcconfig */;
+			baseConfigurationReference = 46693FF8C4F7237348D6310B /* Pods-NotedCli3.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
