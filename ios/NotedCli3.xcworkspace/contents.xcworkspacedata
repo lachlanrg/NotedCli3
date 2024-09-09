@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:NotedCli3.xcodeproj">
+      location = "group:/Users/lachlangreig/Documents/ReactApps/NotedCli3/ios/NotedCli3.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
