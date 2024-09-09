@@ -1111,8 +1111,6 @@ PODS:
     - RNSound/Core (= 0.11.2)
   - RNSound/Core (0.11.2):
     - React-Core
-  - RNSpotifyRemote (0.3.10):
-    - React-Core
   - RNSVG (15.5.0):
     - React-Core
   - SocketRocket (0.6.1)
@@ -1183,7 +1181,6 @@ DEPENDENCIES:
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSound (from `../node_modules/react-native-sound`)
-  - RNSpotifyRemote (from `../node_modules/react-native-spotify-remote`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -1317,8 +1314,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSound:
     :path: "../node_modules/react-native-sound"
-  RNSpotifyRemote:
-    :path: "../node_modules/react-native-spotify-remote"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   Yoga:
@@ -1388,12 +1383,11 @@ SPEC CHECKSUMS:
   RNReanimated: ba95f6d26ca4b8a8f7f2b15f62a3513750762f6b
   RNScreens: 17e2f657f1b09a71ec3c821368a04acbb7ebcb46
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
-  RNSpotifyRemote: d99bc5dc5b59df472c51b3f8e6231259de26830a
   RNSVG: b986585e367f4a49d8aa43065066cc9c290b3d9b
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   SwiftAudioEx: f6aa653770f3a0d3851edaf8d834a30aee4a7646
   Yoga: 9e6a04eacbd94f97d94577017e9f23b3ab41cf6c
 
-PODFILE CHECKSUM: 0f7f33a95fe571cc40bbc1099d86fbd832eb4cab
+PODFILE CHECKSUM: 8fdaf9dc47a7b09f9e6cf121ff5fa65628229850
 
 COCOAPODS: 1.15.2
