@@ -7,14 +7,13 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import { listPosts } from '../graphql/queries';
 import awsmobile from '../aws-exports';
 import { formatRelativeTime } from './formatComponents';
-import { fetchUsernameById } from './getUserUsername';
-
 import { dark, light } from './colorModes'; 
 import { getCurrentUser } from '@aws-amplify/auth';
 
@@ -22,7 +21,7 @@ Amplify.configure(awsmobile);
 
 interface UserPostListProps {
   userId: string; 
-  onPostPress: (postId: string) => void; // Add onPostPress prop
+  onPostPress: (postId: string) => void;
 }
 
 const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
@@ -42,116 +41,135 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
           }
         }
       });
-      // Sort by createdAt in descending order
       const sortedPosts = response.data.listPosts.items
-      .filter(post => !post._deleted)
-      .sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-    setPosts(sortedPosts);
-  } catch (error) {
-    console.error('Error fetching user posts:', error);
-  } finally {
-    setIsLoading(false);
-  }
-}, [userId]);
+        .filter(post => !post._deleted)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setPosts(sortedPosts);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
 
   useEffect(() => {
     fetchUserPosts();
   }, [fetchUserPosts]);
 
+  const renderPostItem = (item: any) => {
+    const isSoundCloud = item.scTrackId;
+    const isSpotifyAlbum = item.spotifyAlbumId;
+    const isSpotifyTrack = item.spotifyTrackId;
+
+    return (
+      <TouchableOpacity key={item.id} onPress={() => onPostPress(item)}>
+        <View style={styles.postContainer}>
+          {isSoundCloud && (
+            <View style={styles.mediaContainer}>
+              <Image
+                source={{ uri: item.scTrackArtworkUrl }}
+                style={styles.image}
+              />
+              <View style={styles.mediaInfo}>
+                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.scTrackTitle}</Text>
+                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+              </View>
+            </View>
+          )}
+
+          {isSpotifyAlbum && (
+            <View style={styles.mediaContainer}>
+              <Image
+                source={{ uri: item.spotifyAlbumImageUrl }}
+                style={styles.image}
+              />
+              <View style={styles.mediaInfo}>
+                <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {item.spotifyAlbumName}</Text>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumArtists}</Text>
+                <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
+                <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
+                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+              </View>
+            </View>
+          )}
+
+          {isSpotifyTrack && (
+            <View style={styles.mediaContainer}>
+              <Image
+                source={{ uri: item.spotifyTrackImageUrl }}
+                style={styles.image}
+              />
+              <View style={styles.mediaInfo}>
+                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {item.spotifyTrackName}</Text>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
+                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" color="#fff" style={styles.loader} />;
+  }
 
   return (
-    <View> 
-    {/* {isLoading ? ( 
-      <ActivityIndicator size="small" color="#fff" style={{ marginTop: 100 }} />
-    ) : ( */}
     <ScrollView contentContainerStyle={styles.container}>
-      {posts.map((item) => (
-        <TouchableOpacity key={item.id} onPress={() => onPostPress(item)}>
-        <View key={item.id} style={styles.postContainer}>
-          <View style={styles.post}>
-          {item.scTrackId && (
-          <View>
-            <Text style={styles.user}>{item.username}</Text>
-            <Text style={styles.bodytext}>{item.body}</Text>
-            <Text style={styles.date}>SoundCloud Track: {item.scTrackTitle}</Text>
-            <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-        )}
-
-        {item.spotifyAlbumId && (
-          <View>  
-            <Text style={styles.user}>{item.username}</Text>
-            <Text style={styles.bodytext}>{item.body}</Text>
-            <Text style={styles.bodytext}>Album: {item.spotifyAlbumName}</Text>
-            <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
-            <Text style={styles.date}>{item.spotifyAlbumReleaseDate}</Text>
-            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumArtists}</Text>
-            <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-        )}
-
-        {item.spotifyTrackId && (
-          <View>
-            <Text style={styles.user}>{item.username}</Text>
-            <Text style={styles.bodytext}>{item.body}</Text>
-            <Text style={styles.date}>Track: {item.spotifyTrackName}</Text>
-            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
-            <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-          
-        )}
-        </View>
-        </View>
-        </TouchableOpacity>
-      )
-      )
-    }
+      {posts.map(renderPostItem)}
     </ScrollView>
-     {/* )} */}
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
-
-  container: { // Update container styles for loading
-    flex: 1,             // Take up available space
-    padding: 20,
-    backgroundColor: dark, 
+  container: {
+    padding: 10,
+    backgroundColor: dark,
   },
-  scrollViewContent: {
-    padding: 0, // Remove default padding from ScrollView content
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   postContainer: {
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  post: {
-    padding: 8,
-    borderRadius: 8,
-  },
-  user: {
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 20,
   },
   bodytext: {
+    // This style can be removed if it's not used elsewhere
+  },
+  mediaContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  image: {
+    width: 60,
+    height: 60,
+    borderRadius: 5,
+  },
+  mediaInfo: {
+    flex: 1,
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  trackTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  albumTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  artist: {
     color: '#ccc',
-    marginBottom: 5,
+    fontSize: 12,
   },
   date: {
     color: '#888',
     fontSize: 12,
-  },
-  artist: {
-    fontSize: 12,
-    color: '#888',
-  },
-  separator: {
-    height: 0.5,
-    backgroundColor: '#333',
+    marginTop: 2,
   },
 });
 

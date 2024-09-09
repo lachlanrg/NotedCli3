@@ -4,7 +4,7 @@ import { schema } from './schema';
 
 
 
-const { User, Friendship, FriendRequest, Post, Comment, Repost } = initSchema(schema);
+const { User, Friendship, FriendRequest, Post, Comment, Repost, SpotifyRecentlyPlayedTrack } = initSchema(schema);
 
 export {
   User,
@@ -12,5 +12,6 @@ export {
   FriendRequest,
   Post,
   Comment,
-  Repost
+  Repost,
+  SpotifyRecentlyPlayedTrack
 };

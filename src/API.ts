@@ -8,6 +8,7 @@ export type CreateUserInput = {
   email: string,
   publicProfile?: boolean | null,
   _version?: number | null,
+  userSpotifyRecentlyPlayedTrackId?: string | null,
 };
 
 export type ModelUserConditionInput = {
@@ -20,6 +21,7 @@ export type ModelUserConditionInput = {
   _deleted?: ModelBooleanInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
+  userSpotifyRecentlyPlayedTrackId?: ModelIDInput | null,
 };
 
 export type ModelStringInput = {
@@ -69,6 +71,22 @@ export type ModelBooleanInput = {
   attributeType?: ModelAttributeTypes | null,
 };
 
+export type ModelIDInput = {
+  ne?: string | null,
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  contains?: string | null,
+  notContains?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+  size?: ModelSizeInput | null,
+};
+
 export type User = {
   __typename: "User",
   id: string,
@@ -81,11 +99,13 @@ export type User = {
   comments?: ModelCommentConnection | null,
   publicProfile?: boolean | null,
   reposts?: ModelRepostConnection | null,
+  spotifyRecentlyPlayedTrack?: SpotifyRecentlyPlayedTrack | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
+  userSpotifyRecentlyPlayedTrackId?: string | null,
 };
 
 export type ModelPostConnection = {
@@ -236,12 +256,31 @@ export type FriendRequest = {
   userReceivedFriendRequestsId?: string | null,
 };
 
+export type SpotifyRecentlyPlayedTrack = {
+  __typename: "SpotifyRecentlyPlayedTrack",
+  id: string,
+  user?: User | null,
+  trackId: string,
+  trackName: string,
+  artistName: string,
+  albumName?: string | null,
+  albumImageUrl?: string | null,
+  playedAt: string,
+  createdAt: string,
+  updatedAt: string,
+  _version: number,
+  _deleted?: boolean | null,
+  _lastChangedAt: number,
+  spotifyRecentlyPlayedTrackUserId?: string | null,
+};
+
 export type UpdateUserInput = {
   id: string,
   username?: string | null,
   email?: string | null,
   publicProfile?: boolean | null,
   _version?: number | null,
+  userSpotifyRecentlyPlayedTrackId?: string | null,
 };
 
 export type DeleteUserInput = {
@@ -263,22 +302,6 @@ export type ModelFriendshipConditionInput = {
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   userFriendsId?: ModelIDInput | null,
-};
-
-export type ModelIDInput = {
-  ne?: string | null,
-  eq?: string | null,
-  le?: string | null,
-  lt?: string | null,
-  ge?: string | null,
-  gt?: string | null,
-  contains?: string | null,
-  notContains?: string | null,
-  between?: Array< string | null > | null,
-  beginsWith?: string | null,
-  attributeExists?: boolean | null,
-  attributeType?: ModelAttributeTypes | null,
-  size?: ModelSizeInput | null,
 };
 
 export type UpdateFriendshipInput = {
@@ -547,6 +570,51 @@ export type DeleteRepostInput = {
   _version?: number | null,
 };
 
+export type CreateSpotifyRecentlyPlayedTrackInput = {
+  id?: string | null,
+  trackId: string,
+  trackName: string,
+  artistName: string,
+  albumName?: string | null,
+  albumImageUrl?: string | null,
+  playedAt: string,
+  _version?: number | null,
+  spotifyRecentlyPlayedTrackUserId?: string | null,
+};
+
+export type ModelSpotifyRecentlyPlayedTrackConditionInput = {
+  trackId?: ModelStringInput | null,
+  trackName?: ModelStringInput | null,
+  artistName?: ModelStringInput | null,
+  albumName?: ModelStringInput | null,
+  albumImageUrl?: ModelStringInput | null,
+  playedAt?: ModelStringInput | null,
+  and?: Array< ModelSpotifyRecentlyPlayedTrackConditionInput | null > | null,
+  or?: Array< ModelSpotifyRecentlyPlayedTrackConditionInput | null > | null,
+  not?: ModelSpotifyRecentlyPlayedTrackConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  spotifyRecentlyPlayedTrackUserId?: ModelIDInput | null,
+};
+
+export type UpdateSpotifyRecentlyPlayedTrackInput = {
+  id: string,
+  trackId?: string | null,
+  trackName?: string | null,
+  artistName?: string | null,
+  albumName?: string | null,
+  albumImageUrl?: string | null,
+  playedAt?: string | null,
+  _version?: number | null,
+  spotifyRecentlyPlayedTrackUserId?: string | null,
+};
+
+export type DeleteSpotifyRecentlyPlayedTrackInput = {
+  id: string,
+  _version?: number | null,
+};
+
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -558,6 +626,7 @@ export type ModelUserFilterInput = {
   or?: Array< ModelUserFilterInput | null > | null,
   not?: ModelUserFilterInput | null,
   _deleted?: ModelBooleanInput | null,
+  userSpotifyRecentlyPlayedTrackId?: ModelIDInput | null,
 };
 
 export type ModelUserConnection = {
@@ -667,6 +736,30 @@ export type ModelRepostFilterInput = {
   postRepostsId?: ModelIDInput | null,
 };
 
+export type ModelSpotifyRecentlyPlayedTrackFilterInput = {
+  id?: ModelIDInput | null,
+  trackId?: ModelStringInput | null,
+  trackName?: ModelStringInput | null,
+  artistName?: ModelStringInput | null,
+  albumName?: ModelStringInput | null,
+  albumImageUrl?: ModelStringInput | null,
+  playedAt?: ModelStringInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  and?: Array< ModelSpotifyRecentlyPlayedTrackFilterInput | null > | null,
+  or?: Array< ModelSpotifyRecentlyPlayedTrackFilterInput | null > | null,
+  not?: ModelSpotifyRecentlyPlayedTrackFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
+  spotifyRecentlyPlayedTrackUserId?: ModelIDInput | null,
+};
+
+export type ModelSpotifyRecentlyPlayedTrackConnection = {
+  __typename: "ModelSpotifyRecentlyPlayedTrackConnection",
+  items:  Array<SpotifyRecentlyPlayedTrack | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
+};
+
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
@@ -683,6 +776,7 @@ export type ModelSubscriptionUserFilterInput = {
   userReceivedFriendRequestsId?: ModelSubscriptionIDInput | null,
   userCommentsId?: ModelSubscriptionIDInput | null,
   userRepostsId?: ModelSubscriptionIDInput | null,
+  userSpotifyRecentlyPlayedTrackId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionIDInput = {
@@ -823,6 +917,22 @@ export type ModelSubscriptionRepostFilterInput = {
   repostCommentsId?: ModelSubscriptionIDInput | null,
 };
 
+export type ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  trackId?: ModelSubscriptionStringInput | null,
+  trackName?: ModelSubscriptionStringInput | null,
+  artistName?: ModelSubscriptionStringInput | null,
+  albumName?: ModelSubscriptionStringInput | null,
+  albumImageUrl?: ModelSubscriptionStringInput | null,
+  playedAt?: ModelSubscriptionStringInput | null,
+  createdAt?: ModelSubscriptionStringInput | null,
+  updatedAt?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput | null > | null,
+  or?: Array< ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
+  spotifyRecentlyPlayedTrackUserId?: ModelSubscriptionIDInput | null,
+};
+
 export type CreateUserMutationVariables = {
   input: CreateUserInput,
   condition?: ModelUserConditionInput | null,
@@ -865,11 +975,28 @@ export type CreateUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -915,11 +1042,28 @@ export type UpdateUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -965,11 +1109,28 @@ export type DeleteUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -993,6 +1154,7 @@ export type CreateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -1005,6 +1167,7 @@ export type CreateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -1035,6 +1198,7 @@ export type UpdateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -1047,6 +1211,7 @@ export type UpdateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -1077,6 +1242,7 @@ export type DeleteFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -1089,6 +1255,7 @@ export type DeleteFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -1119,6 +1286,7 @@ export type CreateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -1131,6 +1299,7 @@ export type CreateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -1163,6 +1332,7 @@ export type UpdateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -1175,6 +1345,7 @@ export type UpdateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -1207,6 +1378,7 @@ export type DeleteFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -1219,6 +1391,7 @@ export type DeleteFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -1257,6 +1430,7 @@ export type CreatePostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -1325,6 +1499,7 @@ export type UpdatePostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -1393,6 +1568,7 @@ export type DeletePostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -1514,6 +1690,7 @@ export type CreateCommentMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -1607,6 +1784,7 @@ export type UpdateCommentMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -1700,6 +1878,7 @@ export type DeleteCommentMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -1773,6 +1952,7 @@ export type CreateRepostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -1852,6 +2032,7 @@ export type UpdateRepostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -1931,6 +2112,7 @@ export type DeleteRepostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -1948,6 +2130,117 @@ export type DeleteRepostMutation = {
     _deleted?: boolean | null,
     _lastChangedAt: number,
     postRepostsId?: string | null,
+  } | null,
+};
+
+export type CreateSpotifyRecentlyPlayedTrackMutationVariables = {
+  input: CreateSpotifyRecentlyPlayedTrackInput,
+  condition?: ModelSpotifyRecentlyPlayedTrackConditionInput | null,
+};
+
+export type CreateSpotifyRecentlyPlayedTrackMutation = {
+  createSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
+  } | null,
+};
+
+export type UpdateSpotifyRecentlyPlayedTrackMutationVariables = {
+  input: UpdateSpotifyRecentlyPlayedTrackInput,
+  condition?: ModelSpotifyRecentlyPlayedTrackConditionInput | null,
+};
+
+export type UpdateSpotifyRecentlyPlayedTrackMutation = {
+  updateSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
+  } | null,
+};
+
+export type DeleteSpotifyRecentlyPlayedTrackMutationVariables = {
+  input: DeleteSpotifyRecentlyPlayedTrackInput,
+  condition?: ModelSpotifyRecentlyPlayedTrackConditionInput | null,
+};
+
+export type DeleteSpotifyRecentlyPlayedTrackMutation = {
+  deleteSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
   } | null,
 };
 
@@ -1992,11 +2285,28 @@ export type GetUserQuery = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -2020,6 +2330,7 @@ export type ListUsersQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -2047,6 +2358,7 @@ export type SyncUsersQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -2072,6 +2384,7 @@ export type GetFriendshipQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -2084,6 +2397,7 @@ export type GetFriendshipQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -2162,6 +2476,7 @@ export type GetFriendRequestQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -2174,6 +2489,7 @@ export type GetFriendRequestQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -2264,6 +2580,7 @@ export type GetPostQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2489,6 +2806,7 @@ export type GetCommentQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2628,6 +2946,7 @@ export type GetRepostQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -2709,6 +3028,103 @@ export type SyncRepostsQuery = {
   } | null,
 };
 
+export type GetSpotifyRecentlyPlayedTrackQueryVariables = {
+  id: string,
+};
+
+export type GetSpotifyRecentlyPlayedTrackQuery = {
+  getSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
+  } | null,
+};
+
+export type ListSpotifyRecentlyPlayedTracksQueryVariables = {
+  filter?: ModelSpotifyRecentlyPlayedTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListSpotifyRecentlyPlayedTracksQuery = {
+  listSpotifyRecentlyPlayedTracks?:  {
+    __typename: "ModelSpotifyRecentlyPlayedTrackConnection",
+    items:  Array< {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SyncSpotifyRecentlyPlayedTracksQueryVariables = {
+  filter?: ModelSpotifyRecentlyPlayedTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+  lastSync?: number | null,
+};
+
+export type SyncSpotifyRecentlyPlayedTracksQuery = {
+  syncSpotifyRecentlyPlayedTracks?:  {
+    __typename: "ModelSpotifyRecentlyPlayedTrackConnection",
+    items:  Array< {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscriptionVariables = {
   filter?: ModelSubscriptionUserFilterInput | null,
 };
@@ -2750,11 +3166,28 @@ export type OnCreateUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -2799,11 +3232,28 @@ export type OnUpdateUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -2848,11 +3298,28 @@ export type OnDeleteUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    spotifyRecentlyPlayedTrack?:  {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyRecentlyPlayedTrackUserId?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userSpotifyRecentlyPlayedTrackId?: string | null,
   } | null,
 };
 
@@ -2875,6 +3342,7 @@ export type OnCreateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -2887,6 +3355,7 @@ export type OnCreateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -2916,6 +3385,7 @@ export type OnUpdateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -2928,6 +3398,7 @@ export type OnUpdateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -2957,6 +3428,7 @@ export type OnDeleteFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -2969,6 +3441,7 @@ export type OnDeleteFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -2998,6 +3471,7 @@ export type OnCreateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -3010,6 +3484,7 @@ export type OnCreateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -3041,6 +3516,7 @@ export type OnUpdateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -3053,6 +3529,7 @@ export type OnUpdateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -3084,6 +3561,7 @@ export type OnDeleteFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -3096,6 +3574,7 @@ export type OnDeleteFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -3133,6 +3612,7 @@ export type OnCreatePostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3200,6 +3680,7 @@ export type OnUpdatePostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3267,6 +3748,7 @@ export type OnDeletePostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3387,6 +3869,7 @@ export type OnCreateCommentSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3479,6 +3962,7 @@ export type OnUpdateCommentSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3571,6 +4055,7 @@ export type OnDeleteCommentSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3643,6 +4128,7 @@ export type OnCreateRepostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -3721,6 +4207,7 @@ export type OnUpdateRepostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -3799,6 +4286,7 @@ export type OnDeleteRepostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -3816,5 +4304,113 @@ export type OnDeleteRepostSubscription = {
     _deleted?: boolean | null,
     _lastChangedAt: number,
     postRepostsId?: string | null,
+  } | null,
+};
+
+export type OnCreateSpotifyRecentlyPlayedTrackSubscriptionVariables = {
+  filter?: ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput | null,
+};
+
+export type OnCreateSpotifyRecentlyPlayedTrackSubscription = {
+  onCreateSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
+  } | null,
+};
+
+export type OnUpdateSpotifyRecentlyPlayedTrackSubscriptionVariables = {
+  filter?: ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput | null,
+};
+
+export type OnUpdateSpotifyRecentlyPlayedTrackSubscription = {
+  onUpdateSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
+  } | null,
+};
+
+export type OnDeleteSpotifyRecentlyPlayedTrackSubscriptionVariables = {
+  filter?: ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput | null,
+};
+
+export type OnDeleteSpotifyRecentlyPlayedTrackSubscription = {
+  onDeleteSpotifyRecentlyPlayedTrack?:  {
+    __typename: "SpotifyRecentlyPlayedTrack",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+    } | null,
+    trackId: string,
+    trackName: string,
+    artistName: string,
+    albumName?: string | null,
+    albumImageUrl?: string | null,
+    playedAt: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyRecentlyPlayedTrackUserId?: string | null,
   } | null,
 };

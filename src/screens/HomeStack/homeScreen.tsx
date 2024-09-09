@@ -69,22 +69,16 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
   const client = generateClient();
   const [refreshing, setRefreshing] = useState(false);
   const showRefreshIcon = useRef(new Animated.Value(0)).current;
-  const [selectedTrack, setSelectedTrack] = useState<any>(null);
   const flatListRef = useRef<FlatList>(null);
-
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-  const commentMenuHeight = useRef(new Animated.Value(0)).current;
 
   const [likedPosts, setLikedPosts] = useState<{ postId: string, likeId: string }[]>([]);
   const [userInfo, setUserId] = React.useState<any>(null);
   const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
 
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
-  const [postUsernames, setPostUsernames] = useState<{ [postId: string]: string | null }>({});
 
   const [following, setFollowing] = useState<string[]>([]);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);

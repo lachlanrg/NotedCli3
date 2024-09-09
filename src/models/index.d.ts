@@ -21,8 +21,10 @@ type EagerUser = {
   readonly comments?: (Comment | null)[] | null;
   readonly publicProfile?: boolean | null;
   readonly reposts?: (Repost | null)[] | null;
+  readonly spotifyRecentlyPlayedTrack?: SpotifyRecentlyPlayedTrack | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly userSpotifyRecentlyPlayedTrackId?: string | null;
 }
 
 type LazyUser = {
@@ -40,8 +42,10 @@ type LazyUser = {
   readonly comments: AsyncCollection<Comment>;
   readonly publicProfile?: boolean | null;
   readonly reposts: AsyncCollection<Repost>;
+  readonly spotifyRecentlyPlayedTrack: AsyncItem<SpotifyRecentlyPlayedTrack | undefined>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly userSpotifyRecentlyPlayedTrackId?: string | null;
 }
 
 export declare type User = LazyLoading extends LazyLoadingDisabled ? EagerUser : LazyUser
@@ -304,4 +308,46 @@ export declare type Repost = LazyLoading extends LazyLoadingDisabled ? EagerRepo
 
 export declare const Repost: (new (init: ModelInit<Repost>) => Repost) & {
   copyOf(source: Repost, mutator: (draft: MutableModel<Repost>) => MutableModel<Repost> | void): Repost;
+}
+
+type EagerSpotifyRecentlyPlayedTrack = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SpotifyRecentlyPlayedTrack, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user?: User | null;
+  readonly trackId: string;
+  readonly trackName: string;
+  readonly artistName: string;
+  readonly albumName?: string | null;
+  readonly albumImageUrl?: string | null;
+  readonly playedAt: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly spotifyRecentlyPlayedTrackUserId?: string | null;
+}
+
+type LazySpotifyRecentlyPlayedTrack = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SpotifyRecentlyPlayedTrack, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user: AsyncItem<User | undefined>;
+  readonly trackId: string;
+  readonly trackName: string;
+  readonly artistName: string;
+  readonly albumName?: string | null;
+  readonly albumImageUrl?: string | null;
+  readonly playedAt: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly spotifyRecentlyPlayedTrackUserId?: string | null;
+}
+
+export declare type SpotifyRecentlyPlayedTrack = LazyLoading extends LazyLoadingDisabled ? EagerSpotifyRecentlyPlayedTrack : LazySpotifyRecentlyPlayedTrack
+
+export declare const SpotifyRecentlyPlayedTrack: (new (init: ModelInit<SpotifyRecentlyPlayedTrack>) => SpotifyRecentlyPlayedTrack) & {
+  copyOf(source: SpotifyRecentlyPlayedTrack, mutator: (draft: MutableModel<SpotifyRecentlyPlayedTrack>) => MutableModel<SpotifyRecentlyPlayedTrack> | void): SpotifyRecentlyPlayedTrack;
 }
