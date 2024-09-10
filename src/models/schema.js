@@ -127,6 +127,24 @@ export const schema = {
                         ]
                     }
                 },
+                "spotifyRecentlyPlayedTrack": {
+                    "name": "spotifyRecentlyPlayedTrack",
+                    "isArray": false,
+                    "type": {
+                        "model": "SpotifyRecentlyPlayedTrack"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "HAS_ONE",
+                        "associatedWith": [
+                            "id"
+                        ],
+                        "targetNames": [
+                            "userSpotifyRecentlyPlayedTrackId"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -142,6 +160,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
+                },
+                "userSpotifyRecentlyPlayedTrackId": {
+                    "name": "userSpotifyRecentlyPlayedTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
                 }
             },
             "syncable": true,
@@ -979,10 +1004,126 @@ export const schema = {
                     }
                 }
             ]
+        },
+        "SpotifyRecentlyPlayedTrack": {
+            "name": "SpotifyRecentlyPlayedTrack",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "user": {
+                    "name": "user",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "spotifyRecentlyPlayedTrackUserId"
+                        ]
+                    }
+                },
+                "trackId": {
+                    "name": "trackId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "trackName": {
+                    "name": "trackName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "artistName": {
+                    "name": "artistName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "albumName": {
+                    "name": "albumName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "albumImageUrl": {
+                    "name": "albumImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "playedAt": {
+                    "name": "playedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "spotifyRecentlyPlayedTrackUserId": {
+                    "name": "spotifyRecentlyPlayedTrackUserId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "SpotifyRecentlyPlayedTracks",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     },
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "283b8e899e3ef9ceb604c468812228cc"
+    "version": "86f8e60702c9c333a084281a5381f74e"
 };

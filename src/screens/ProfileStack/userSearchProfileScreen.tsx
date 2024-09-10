@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert, SafeAreaView, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -16,6 +16,7 @@ import { generateClient } from 'aws-amplify/api';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
 
+import { SpotifyRecentlyPlayedTrack } from '../../API'; // Update the import path as needed
 
 import { formatRelativeTime } from '../../components/formatComponents';
 
@@ -34,6 +35,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
   const [existingFriendRequest, setExistingFriendRequest] = useState<any | null>(null); // State to store existing friend request
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'cancel' | 'unfollow' | null>(null); // State to store the type of modal
+  const [recentlyPlayedTrack, setRecentlyPlayedTrack] = useState<SpotifyRecentlyPlayedTrack | null>(null);
 
   const client = generateClient();
 
@@ -68,6 +70,11 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
         if (response.data && response.data.getUser) { 
           const fetchedUser = response.data.getUser;
           setUser(fetchedUser); 
+  
+          // Fetch the recently played track
+          if (fetchedUser.spotifyRecentlyPlayedTrack) {
+            setRecentlyPlayedTrack(fetchedUser.spotifyRecentlyPlayedTrack);
+          }
   
           // Now it's safe to use fetchedUser.publicProfile:
           if (fetchedUser.publicProfile || friendRequestStatus === 'Following') {
@@ -345,6 +352,19 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           <Text style={styles.email}>{user.email}</Text>
           <Text style={styles.email}>{user.id}</Text>
           {/* Add more user details here */}
+
+          {recentlyPlayedTrack && (
+            <View>
+              <Text>Recently Played:</Text>
+              <Text>{recentlyPlayedTrack.trackName} by {recentlyPlayedTrack.artistName}</Text>
+              {recentlyPlayedTrack.albumImageUrl && (
+                <Image 
+                  source={{ uri: recentlyPlayedTrack.albumImageUrl }} 
+                  style={{ width: 50, height: 50 }} 
+                />
+              )}
+            </View>
+          )}
 
         <View style={styles.followRequestContainer}>
             <TouchableOpacity onPress={handleButtonPress} style={styles.followButton}>

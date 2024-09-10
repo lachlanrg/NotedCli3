@@ -5,7 +5,7 @@ import { ProfileStackParamList } from '../../components/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCog, faEdit, faUserPlus, faBell } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, gray, placeholder } from '../../components/colorModes';
+import { dark, light, gray, placeholder, dgray } from '../../components/colorModes';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
@@ -17,7 +17,6 @@ import UserPostList from '../../components/userPostsList';
 import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
 import ProfilePostBottomSheetModal from '../../components/BottomSheets/ProfilePostBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import { useFocusEffect } from '@react-navigation/native';
 import { useSpotify } from '../../context/SpotifyContext';
 
 
@@ -28,34 +27,20 @@ type ProfileScreenProps = {
 const spotifyIcon = faSpotify as IconProp;
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
-
   const [userInfo, setUserInfo] = useState<any>(null);
-  const [email, setEmail] = useState<string | null>(null);
-
-  const menuWidth = Dimensions.get('window').width / 2.3;
   const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
   const settingsBottomSheetRef = useRef<BottomSheetModal>(null);
-  const { dismiss } = useBottomSheetModal();
-
-  const handlePresentSettingsModalPress = () => { 
-    settingsBottomSheetRef.current?.present();
-  };
-
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
-  const [refresh, setRefresh] = React.useState(false);
   const { recentlyPlayed } = useSpotify();
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     // This will run when the screen comes into focus
-  //     setRefresh(prev => !prev);
-  //   }, [])
-  // );
 
   const handlePresentPostModalPress = (post: any) => {
     setSelectedPost(post);
     postBottomSheetRef.current?.present();
+  };
+
+  const handlePresentSettingsModalPress = () => { 
+    settingsBottomSheetRef.current?.present();
   };
 
   const fetchFollowCounts = useCallback(async () => {
@@ -68,11 +53,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       setRefreshing(false);
     }
   }, []);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchFollowCounts(); // Await the promise
-  }, [fetchFollowCounts]);
 
   const currentAuthenticatedUser = useCallback(async () => {
     try {
@@ -90,6 +70,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        currentAuthenticatedUser(),
+        fetchFollowCounts()
+      ]);
+    };
+    fetchData();
+  }, [currentAuthenticatedUser, fetchFollowCounts]);
+
   const handleNavigateToUserSearch = () => {
     navigation.navigate('UserSearch');
     console.log("Navigating to UserSearch Screen");
@@ -104,13 +94,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     console.log("Post deleted from ProfileScreen");
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await currentAuthenticatedUser();
-      await fetchFollowCounts();
-    };
-    fetchData();
-  }, [currentAuthenticatedUser, fetchFollowCounts]);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchFollowCounts(); // Await the promise
+  }, [fetchFollowCounts]);
+
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
@@ -132,7 +120,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
           <ScrollView
               style={styles.scrollViewContent}
-              // onScroll={handleScrollRefresh}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
               scrollEventThrottle={16}
             >
@@ -150,16 +137,17 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
             {recentlyPlayed.length > 0 && ( 
-              <View style={styles.recentlyPlayedBox}>
+              <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
                 <View style={styles.spotifyIcon}>
-                  <FontAwesomeIcon icon={spotifyIcon} size={20} color={light}/>
+                  <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
                 </View>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.rpTitle}>Recently Played</Text>
                   <Text style={styles.recentlyPlayedText}>
                     {recentlyPlayed[0].track.name} -{' '}
                     {recentlyPlayed[0].track.artists[0].name} 
                   </Text>
-                </ScrollView>
+                </View>
               </View>
             )}
             {/* {recentlyPlayed.length > 0 && ( 
@@ -173,7 +161,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </Text>
               </View>
             )} */}
-            <UserPostList key={String(refresh)} userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
+            <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />
           <ProfilePostBottomSheetModal ref={postBottomSheetRef} post={selectedPost} onPostDelete={handlePostDeleted}/>
@@ -254,7 +242,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flex: 1,
-    marginRight: 20,
+    marginRight: 10,
   },
   refreshIconContainer: {
     position: 'absolute',
@@ -274,12 +262,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 10,
   },
+  rpTitle: {
+    color: dgray,
+    fontSize: 10,
+    fontStyle: 'italic',
+  },
   recentlyPlayedText: {
     color: light,
     fontSize: 16,
   },
   spotifyIcon: {
-    paddingRight: 10,
+    paddingRight: 2,
   },
   safeAreaContainer: {
     flex: 1,

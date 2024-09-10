@@ -44,11 +44,28 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       startedAt
       __typename
     }
+    spotifyRecentlyPlayedTrack {
+      id
+      trackId
+      trackName
+      artistName
+      albumName
+      albumImageUrl
+      playedAt
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyRecentlyPlayedTrackUserId
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -69,6 +86,7 @@ export const listUsers = /* GraphQL */ `query ListUsers(
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     nextToken
@@ -99,6 +117,7 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     nextToken
@@ -120,6 +139,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -132,6 +152,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -216,6 +237,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -228,6 +250,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -324,6 +347,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -546,6 +570,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -691,6 +716,7 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -780,4 +806,111 @@ export const syncReposts = /* GraphQL */ `query SyncReposts(
 ` as GeneratedQuery<
   APITypes.SyncRepostsQueryVariables,
   APITypes.SyncRepostsQuery
+>;
+export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRecentlyPlayedTrack($id: ID!) {
+  getSpotifyRecentlyPlayedTrack(id: $id) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userSpotifyRecentlyPlayedTrackId
+      __typename
+    }
+    trackId
+    trackName
+    artistName
+    albumName
+    albumImageUrl
+    playedAt
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyRecentlyPlayedTrackUserId
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetSpotifyRecentlyPlayedTrackQueryVariables,
+  APITypes.GetSpotifyRecentlyPlayedTrackQuery
+>;
+export const listSpotifyRecentlyPlayedTracks = /* GraphQL */ `query ListSpotifyRecentlyPlayedTracks(
+  $filter: ModelSpotifyRecentlyPlayedTrackFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listSpotifyRecentlyPlayedTracks(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      trackId
+      trackName
+      artistName
+      albumName
+      albumImageUrl
+      playedAt
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyRecentlyPlayedTrackUserId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListSpotifyRecentlyPlayedTracksQueryVariables,
+  APITypes.ListSpotifyRecentlyPlayedTracksQuery
+>;
+export const syncSpotifyRecentlyPlayedTracks = /* GraphQL */ `query SyncSpotifyRecentlyPlayedTracks(
+  $filter: ModelSpotifyRecentlyPlayedTrackFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncSpotifyRecentlyPlayedTracks(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      trackId
+      trackName
+      artistName
+      albumName
+      albumImageUrl
+      playedAt
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyRecentlyPlayedTrackUserId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncSpotifyRecentlyPlayedTracksQueryVariables,
+  APITypes.SyncSpotifyRecentlyPlayedTracksQuery
 >;
