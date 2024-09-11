@@ -37,6 +37,7 @@ import { Repost } from '../../models';
 import { listRepostsWithOriginalPost } from '../../utils/customQueries';
 import { useSpotify } from '../../context/SpotifyContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { selectionChange } from '../../utils/hapticFeedback';
 
 
 
@@ -216,6 +217,7 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleLikePress = async (itemId: string, isRepost: boolean = false) => {
+    selectionChange();
     try {
       const { userId } = await getCurrentUser();
       const client = generateClient();

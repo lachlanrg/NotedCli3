@@ -9442,6 +9442,11 @@ react-native-get-random-values@^1.11.0, react-native-get-random-values@>=1.9.0:
   dependencies:
     fast-base64-decode "^1.0.0"
 
+react-native-haptic-feedback@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.npmjs.org/react-native-haptic-feedback/-/react-native-haptic-feedback-2.3.1.tgz"
+  integrity sha512-dPfjV4iVHfhVyfG+nRd88ygjahbdup7KFZDM5L2aNIAzqbNtKxHZn5O1pHegwSj1t15VJliu0GyTX7XpBDeXUw==
+
 react-native-keychain@^8.2.0:
   version "8.2.0"
   resolved "https://registry.npmjs.org/react-native-keychain/-/react-native-keychain-8.2.0.tgz"
@@ -9539,7 +9544,7 @@ react-native-webview@^13.12.1:
     escape-string-regexp "^4.0.0"
     invariant "2.2.4"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@>= 0.67", react-native@>=0.56, react-native@>=0.59, react-native@>=0.60.0-rc.2, react-native@>=0.63.0, react-native@>=0.64.0, react-native@>=0.70, react-native@>=0.8.0, react-native@0.73.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.60 <1.0", "react-native@>= 0.67", react-native@>=0.56, react-native@>=0.59, react-native@>=0.60.0, react-native@>=0.60.0-rc.2, react-native@>=0.63.0, react-native@>=0.64.0, react-native@>=0.70, react-native@>=0.8.0, react-native@0.73.5:
   version "0.73.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.73.5.tgz"
   integrity sha512-iHgDArmF4CrhL0qTj+Rn+CBN5pZWUL9lUGl8ub+V9Hwu/vnzQQh8rTMVSwVd2sV6N76KjpE5a4TfIAHkpIHhKg==
