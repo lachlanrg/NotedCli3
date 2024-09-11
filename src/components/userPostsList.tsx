@@ -21,10 +21,11 @@ Amplify.configure(awsmobile);
 
 interface UserPostListProps {
   userId: string; 
-  onPostPress: (postId: string) => void;
+  onPostPress: (post: any) => void;
+  onPostsCountUpdate?: (count: number) => void; // Add this line
 }
 
-const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
+const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPostsCountUpdate }) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
@@ -73,8 +74,17 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
   }, [userId]);
 
   useEffect(() => {
-    fetchUserPosts();
-  }, [fetchUserPosts, userId]);
+    if (userId) {
+      fetchUserPosts();
+    }
+  }, [userId, fetchUserPosts]);
+
+  useEffect(() => {
+    // Update the parent component with the post count
+    if (onPostsCountUpdate) {
+      onPostsCountUpdate(posts.length);
+    }
+  }, [posts, onPostsCountUpdate]);
 
   const renderPostItem = (item: any) => {
     const isRepost = 'originalPost' in item;
@@ -172,7 +182,7 @@ const styles = StyleSheet.create({
   },
   mediaContainer: {
     flexDirection: 'row',
-    marginTop: 10,
+    marginTop: 5,
   },
   image: {
     width: 60,
@@ -218,7 +228,6 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 12,
     fontStyle: 'italic',
-    marginBottom: 5,
   },
   boldUsername: {
     fontWeight: 'bold',

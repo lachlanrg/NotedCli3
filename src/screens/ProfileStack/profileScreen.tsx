@@ -39,6 +39,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const { recentlyPlayed } = useSpotify();
   const client = generateClient();
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handlePresentPostModalPress = (item: any) => {
     setSelectedPost(item);
@@ -86,29 +87,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     fetchData();
   }, [currentAuthenticatedUser, fetchFollowCounts]);
 
-  useEffect(() => {
-    const fetchPostsCount = async () => {
-      if (userInfo?.userId) {
-        try {
-          const response = await client.graphql({
-            query: listPosts,
-            variables: {
-              filter: {
-                userPostsId: { eq: userInfo.userId },
-              },
-            },
-          });
-          const posts = response.data.listPosts.items.filter(post => !post._deleted);
-          setPostsCount(posts.length);
-        } catch (error) {
-          console.error('Error fetching posts count:', error);
-        }
-      }
-    };
-
-    fetchPostsCount();
-  }, [userInfo]);
-
   const handleNavigateToUserSearch = () => {
     navigation.navigate('UserSearch');
     console.log("Navigating to UserSearch Screen");
@@ -125,7 +103,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchFollowCounts(); // Await the promise
+    try {
+      await fetchFollowCounts();
+      // Increment the refreshKey to force UserPostList to re-render
+      setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setRefreshing(false);
+    }
   }, [fetchFollowCounts]);
 
   const handleFollowListNavigation = (initialTab: 'following' | 'followers') => {
@@ -134,6 +120,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const resetSelectedPost = () => {
     setSelectedPost(null);
+  };
+
+  const handlePostsCountUpdate = (count: number) => {
+    setPostsCount(count);
   };
 
   return (
@@ -201,7 +191,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </View>
               </View>
             )}
-            <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
+            <UserPostList 
+              key={refreshKey}
+              userId={userInfo?.userId} 
+              onPostPress={handlePresentPostModalPress} 
+              onPostsCountUpdate={handlePostsCountUpdate}
+            />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />
           <ProfilePostBottomSheetModal 

@@ -1,49 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView, TextInput, SafeAreaView,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import { SearchScreenStackParamList } from '../../components/types';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
-import { faX } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, gray, placeholder, lgray, dgray, error } from '../../components/colorModes';
+import { dark, light, placeholder, lgray, error } from '../../components/colorModes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Track } from '../../spotifyConfig/itemInterface';
 import { generateClient } from 'aws-amplify/api';
-import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+import { getCurrentUser } from 'aws-amplify/auth';
 import { createPost } from '../../graphql/mutations';
-import { NavigationHelpersContext } from '@react-navigation/native';
 import CustomError from '../../errorHandling/CustomError';
-
-
 
 type PostSpotifyTrackScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'PostSpotifyTrack'>;
 
 const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, navigation }) => {
   const { track } = route.params;
   const [postText, setPostText] = useState('');
-  const [userId, setUserId] = useState(''); // Store userId
-  const [userUsername, setUserUsername] = React.useState<any>(null);
-
-
-  // React.useEffect(() => {
-  //   currentAuthenticatedUser();
-  // }, []);
-
-  // async function currentAuthenticatedUser() {
-  //   try {
-  //     const { username  } = await getCurrentUser();
-  //     console.log(`The username: ${username}`);
-  //     } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
-
 
   const handleTrackPost = async () => {
     try {
       const client = generateClient();
-      const { userId } = await getCurrentUser();
-      const { username  } = await getCurrentUser();
-
+      const { userId, username } = await getCurrentUser();
     
       const PostDetails = {
         body: postText,
@@ -56,6 +30,7 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         spotifyTrackImageUrl: track.album.images[0]?.url,
         spotifyTrackPreviewUrl: track.preview_url,
         spotifyTrackExternalUrl: track.external_urls.spotify,
+        spotifyTrackReleaseDate: track.album.release_date,
         likesCount: 0,
       };
 
@@ -64,140 +39,138 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         variables: { input: PostDetails },
       });
       console.log('New Post created successfully!');
-      console.log('PreviewUrl: ', track.preview_url);
-      console.log('External url - spotify: ', track.external_urls.spotify);
       setPostText('');
       navigation.goBack()
     } catch (error) {
-        if (error instanceof CustomError) {
-          console.error('Custom error:', error.message, error.code, error.stack);
-        } else if (error instanceof Error) {
-          console.error('Error:', error.message, error.stack);
-        } else {
-          console.error('Unknown error:', error);
-        }
+      if (error instanceof CustomError) {
+        console.error('Custom error:', error.message, error.code, error.stack);
+      } else if (error instanceof Error) {
+        console.error('Error:', error.message, error.stack);
+      } else {
+        console.error('Unknown error:', error);
       }
-    };
+    }
+  };
 
-    return (
-      <SafeAreaView style={styles.safeAreaContainer}> 
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesomeIcon icon={faX} size={18} color={light} />
-            </TouchableOpacity>
-              <Text style={styles.headerTitle}> Share your music</Text> 
-            <TouchableOpacity onPress={handleTrackPost}>
-              <Text style={styles.postButtonText}>Post</Text>
-            </TouchableOpacity>
+  return (
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Share Spotify Track</Text>
+          <TouchableOpacity onPress={handleTrackPost} style={styles.postButton}>
+            <Text style={styles.postButtonText}>Post</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.content}>
+          <View style={styles.trackInfoContainer}>
+            <Image source={{ uri: track.album.images[0]?.url }} style={styles.trackImage} />
+            <View style={styles.trackDetails}>
+              <Text style={styles.trackTitle} numberOfLines={2}>{track.name}</Text>
+              <Text style={styles.trackArtist} numberOfLines={1}>{track.artists.map(artist => artist.name).join(', ')}</Text>
+              <Text style={styles.trackAlbum} numberOfLines={1}>{track.album.name}  •  {
+              new Date(track.album.release_date).getMonth() + 1}-{new Date(track.album.release_date).getFullYear()}</Text>
+            </View>
           </View>
 
-      {/* Text Input for the Post */}
-      <TextInput
-        style={styles.postInput}
-        placeholder="Write something about this track..."
-        placeholderTextColor={placeholder}
-        multiline={true}
-        value={postText}
-        onChangeText={setPostText}
-        maxLength={600}
-      />
-
-      {/* Track Information */}
-      <View style={styles.trackInfoContainer}>
-        <Image source={{ uri: track.album.images[0]?.url }} style={styles.trackImage} />
-        <View style={styles.trackDetails}>
-          <Text style={styles.trackTitle}>
-            {track.name} 
-          </Text>
-          <Text style={styles.trackArtist}>
-            {track.artists.map(artist => artist.name).join(', ')} 
-          </Text>
+          <TextInput
+            style={styles.postInput}
+            placeholder="Write something about this track..."
+            placeholderTextColor={placeholder}
+            multiline={true}
+            value={postText}
+            onChangeText={setPostText}
+            maxLength={600}
+          />
         </View>
-      </View> 
-    </View>
+      </View>
     </SafeAreaView>
-
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeAreaContainer: {
     flex: 1,
     backgroundColor: dark,
   },
+  container: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
-    backgroundColor: dark,
+    alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: lgray,
   },
-
-  headerTitle: {
+  closeButton: {
+    padding: 5,
+  },
+  cancelText: {
+    color: error, // Using the error color
     fontSize: 16,
-    fontWeight: 'bold',
-    paddingRight: 10,
-    color: light,
   },
-  postButtonText: {
-    color: 'lightblue',
-    fontWeight: 'bold',
-    justifyContent: 'flex-end',
-  },
-  trackName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 20,
-    color: light,
-    padding: 10,
-  },
-  heading: {
+  headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 60,
     color: light,
-    padding: 10,
   },
-  postInput: {
-    height: 150,
-    margin: 20,
-    padding: 10,
-    borderColor: lgray,
-    borderWidth: 1,
-    borderRadius: 8,
-    textAlignVertical: 'top',
-    color: light, 
+  postButton: {
+    padding: 5,
   },
-  // Track Information styles
+  postButtonText: {
+    color: '#1DB954', // Spotify green
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
   trackInfoContainer: {
     flexDirection: 'row',
-    padding: 20,
-    alignItems: 'center', 
+    alignItems: 'center',
+    marginBottom: 20,
   },
   trackImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8, 
-    marginRight: 15,
+    width: 100,
+    height: 100,
+    borderRadius: 8,
   },
   trackDetails: {
-    flex: 1, 
+    flex: 1,
+    marginLeft: 15,
   },
   trackTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: light, 
+    color: light,
+    marginBottom: 5,
   },
   trackArtist: {
-    color: lgray, 
+    fontSize: 16,
+    color: lgray,
   },
-  safeAreaContainer: {
+  trackAlbum: {
+    fontSize: 16,
+    color: lgray,
+  },
+  trackReleaseDate: {
+    fontSize: 16,
+    color: lgray,
+  },
+  postInput: {
     flex: 1,
-    backgroundColor: dark, // or your background color
+    color: light,
+    fontSize: 16,
+    textAlignVertical: 'top',
   },
-
 });
 
 export default PostSpotifyTrackScreen;

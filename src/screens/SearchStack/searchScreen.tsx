@@ -1,5 +1,5 @@
 // SearchScreen.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   View, 
   TextInput, 
@@ -43,7 +43,9 @@ import { searchSCTracks } from '../../soundcloudConfig/scTrackSearch';
 import { scTrack } from '../../soundcloudConfig/itemInterface';
 import useSpotifySearch from '../../spotifyConfig/spotifySearchAll';
 import { MenuItem } from '@aws-amplify/ui-react';
-import { useSpotify } from '../../context/SpotifyContext';
+import SearchPostBottomSheetModal from '../../components/BottomSheets/SearchPostBottomSheetModal';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+
 
 //Apparently including this is the only way for it to work in the albumDetailsScreen
 export interface Album {
@@ -74,25 +76,24 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const [artists, setArtists] = useState<Artist[]>([]);
-  const [albums, setAlbums] = useState<Album[]>([]); 
+  const [albums, setAlbums] = useState<Album[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [soundcloudTracks, setSoundcloudTracks] = useState<scTrack[]>([]);
 
 
-  const { recentSearches, saveRecentSearch, clearRecentSearch } = useRecentSearches();
+  const { recentSearches, saveRecentSearch, clearRecentSearch, clearAllRecentSearches } = useRecentSearches();
 
   const { searchAll } = useSpotifySearch(searchInput, saveRecentSearch, setArtists, setAlbums, setTracks, setLoading);
 
   const sortedTracks = tracks.sort((a, b) => b.popularity - a.popularity);
 
-  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
-  const [selectedSCTrack, setSelectedSCTrack] = useState<scTrack | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Track | scTrack | null>(null);
 
   const bottomSheetHeight = useRef(new Animated.Value(0)).current;
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false); 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const { spotifyUser } = useSpotify();
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
  
 // Get the Spotify Access Token, Also in the spotifySearchAll.tsx, 
@@ -100,7 +101,6 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
 // the function searchAll to be called to access the accessToken
 
   useEffect(() => {
-    // API Access Token
     var authParameters = {
       method: 'POST',
       headers: {
@@ -121,8 +121,8 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
       setArtists([]);
       setAlbums([]);
       setTracks([]);
-      toggleBottomSheet(null);
-      toggleSCBottomSheet(null);
+      setSoundcloudTracks([]);
+      setSelectedItem(null);
     }
   }, [searchInput]);
 
@@ -153,8 +153,7 @@ useEffect(() => {
     setAlbums([]);
     setTracks([]);
     setSoundcloudTracks([]);
-    toggleBottomSheet(null);
-    toggleSCBottomSheet(null);
+    setSelectedItem(null);
   // }
 }, [searchInput]);
 
@@ -194,26 +193,13 @@ const handleNavigateToAlbumDetail = (album: Album) => {
   console.log("Navigating to Album Details Screen with:", album.name,", ", album.id)
 };
 
-const navigateToPostScreen = (track: Track) => {
-  navigation.navigate('PostSpotifyTrack', { track }); 
-  console.log("Navigating to Post with:", track.name,", ", track.id)
-  closeBottomSheet();
-};
-
-const navigateToSCPostScreen = (sctrack: scTrack) => {
-  navigation.navigate('PostSCTrack', { sctrack }); 
-  console.log("Navigating to SC Post with:", sctrack.title,", ", sctrack.id)
-  closeSCBottomSheet();
-};
-
 const toggleSearchMode = () => {
   setSearchMode(prevMode => (prevMode === 'spotify' ? 'soundcloud' : 'spotify')); 
   setArtists([]);
   setAlbums([]);
   setTracks([]);
   setSoundcloudTracks([]);
-  toggleBottomSheet(null);
-  toggleSCBottomSheet(null);
+  setSelectedItem(null);
 };
 
 const handleSearch = async () => {
@@ -224,95 +210,44 @@ const handleSearch = async () => {
   }
 };
 
-const BOTTOM_SHEET_HEIGHT = 150; // Desired height of the open bottom sheet
+// const BOTTOM_SHEET_HEIGHT = 150; 
 
-const panResponder = useRef(
-  PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (event, gesture) => {
-      const newHeight = Math.max(0, BOTTOM_SHEET_HEIGHT - gesture.dy);
-      bottomSheetHeight.setValue(newHeight);
-    },
-    onPanResponderRelease: (event, gesture) => {
-      // Velocity-based closing for a more natural feel
-      const velocity = gesture.vy; 
-      if (velocity > 0.5 || (gesture.dy > 50 && isBottomSheetOpen)) {
-        closeBottomSheet();
-      } else {
-        openBottomSheet();
-      }
-    },
-  })
-).current;
+// const panResponder = useRef(
+//   PanResponder.create({
+//     onStartShouldSetPanResponder: () => true,
+//     onPanResponderMove: (event, gesture) => {
+//       const newHeight = Math.max(0, BOTTOM_SHEET_HEIGHT - gesture.dy);
+//       bottomSheetHeight.setValue(newHeight);
+//     },
+//     onPanResponderRelease: (event, gesture) => {
+//       // Velocity-based closing for a more natural feel
+//       const velocity = gesture.vy; 
+//       if (velocity > 0.5 || (gesture.dy > 50 && isBottomSheetOpen)) {
+//         closeBottomSheet();
+//       } else {
+//         openBottomSheet();
+//       }
+//     },
+//   })
+// ).current;
 
-const openBottomSheet = () => {
-  Animated.spring(bottomSheetHeight, {
-    toValue: BOTTOM_SHEET_HEIGHT,
-    useNativeDriver: false, 
-    bounciness: 8, 
-  }).start(() => setIsBottomSheetOpen(true)); 
-};
-
-const closeBottomSheet = () => {
-  Animated.timing(bottomSheetHeight, {
-    toValue: 0,
-    duration: 200,
-    easing: Easing.inOut(Easing.ease), 
-    useNativeDriver: false,
-  }).start(() => {
-    setIsBottomSheetOpen(false);
-    setSelectedTrack(null); 
-  });
-};
-
-const toggleBottomSheet = (track: Track | null ) => {
-  setSelectedTrack(track);
-
-  if (!isBottomSheetOpen) {
-    openBottomSheet();
-  } else {
-    closeBottomSheet();
-  }
-};
-
-
-// // Bottom sheet menu for spotofy tracks
-// const toggleBottomSheet = (track: Track | null) => {
-//   setSelectedTrack(track);
-
-//   Animated.timing(bottomSheetHeight, {
-//     toValue: track ? 150 : 0, 
-//     duration: 200, 
-//     easing: Easing.inOut(Easing.ease),
+// const openBottomSheet = () => {
+//   Animated.spring(bottomSheetHeight, {
+//     toValue: BOTTOM_SHEET_HEIGHT,
 //     useNativeDriver: false, 
-//   }).start(() => {
-//     setIsBottomSheetOpen(track !== null); 
-//   });
+//     bounciness: 8, 
+//   }).start(() => setIsBottomSheetOpen(true)); 
 // };
 
-// const closeBottomSheet = () => {
-//   toggleBottomSheet(null); 
-// };
+const closeBottomSheet = useCallback(() => {
+  bottomSheetModalRef.current?.close();
+  setSelectedItem(null);
+}, []);
 
-
-// Bottom sheet menu for SC tracks
-const toggleSCBottomSheet = (sctrack: scTrack | null) => {
-  setSelectedSCTrack(sctrack);
-
-  Animated.timing(bottomSheetHeight, {
-    toValue: sctrack ? 150 : 0, 
-    duration: 200, 
-    easing: Easing.inOut(Easing.ease),
-    useNativeDriver: false, 
-  }).start(() => {
-    setIsBottomSheetOpen(sctrack !== null); 
-  });
-};
-
-const closeSCBottomSheet = () => {
-  toggleSCBottomSheet(null); 
-};
-
+const handlePresentModalPress = useCallback((item: Track | scTrack) => {
+  bottomSheetModalRef.current?.present();
+  setSelectedItem(item);
+}, []);
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
@@ -336,7 +271,7 @@ const closeSCBottomSheet = () => {
                 handleSearch();
               }
             }}
-            onSubmitEditing={handleSearch} // Adds return keystroke on mac to enter/search,
+            onSubmitEditing={handleSearch}
           />
           {searchInput !== '' && (
             <TouchableOpacity style={styles.clearButton} onPress={() => setSearchInput('')}>
@@ -357,16 +292,14 @@ const closeSCBottomSheet = () => {
             />      
           </TouchableOpacity>
         </View>
-        {spotifyUser && (
-          <View style={styles.spotifySection}>
-            <Text style={styles.spotifyText}>
-              Spotify Account: {spotifyUser.id}
-            </Text>
-          </View>
-        )}
           {searchInput === '' && recentSearches.length > 0 && (
             <ScrollView style={styles.recentSearchesContainer}>
-              <Text style={styles.recentSearchesTitle}>Recently Searched</Text>
+              <View style={styles.recentSearchHeader}>
+                <Text style={styles.recentSearchesTitle}>Recently Searched</Text>
+                <TouchableOpacity onPress={clearAllRecentSearches}>
+                  <Text style={styles.clearAllButton}>Clear All</Text>
+                </TouchableOpacity>
+              </View>
               {recentSearches.map((search, index) => (
               <View key={index} style={styles.recentSearchItemContainer}>
                 <TouchableOpacity style={styles.recentSearchItemText} onPress={() => handleRecentSearchPress(search)}>
@@ -382,10 +315,14 @@ const closeSCBottomSheet = () => {
 
           <FlatList
               data={soundcloudTracks}
-              onScroll={closeSCBottomSheet}
+              onScroll={closeBottomSheet}
               showsVerticalScrollIndicator={false}
               renderItem={({ item }: {item: scTrack}) => (
-              <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => toggleSCBottomSheet(item)} >
+              <TouchableOpacity 
+                key={item.id} 
+                style={styles.itemContainer} 
+                onPress={() => handlePresentModalPress(item)}
+              >
                 <Image source={{ uri: item.artwork_url }} style={styles.albumImage} />
                 <View style={styles.itemDetails}>
                   <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
@@ -448,64 +385,40 @@ const closeSCBottomSheet = () => {
           ))}
 
           {tracks.slice(0, 10).map(track => (
-            <TouchableOpacity key={track.id} style={styles.itemContainer} onPress={() => toggleBottomSheet(track)}>
+            <TouchableOpacity 
+              key={track.id} 
+              style={styles.itemContainer} 
+              onPress={() => handlePresentModalPress(track)}
+            >
               <Image
-              source={{ uri: track.album.images[0]?.url }}
-              style={styles.albumImage}
+                source={{ uri: track.album.images[0]?.url }}
+                style={styles.albumImage}
               />
               <View style={styles.itemDetails}>
                 <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{track.name}</Text>
                 <View style={styles.itemLowerDetails}>
-                <Text style={styles.itemType}>{track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}</Text>
+                  <Text style={styles.itemType}>
+                    {track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}
+                  </Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {track.artists.map(artist => artist.name).join(', ')}
+                    <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                      • {track.artists.map(artist => artist.name).join(', ')}
                     </Text>
                   </View>
                 </View>
               </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
           ))}
       </ScrollView>
 
       </View>
     </TouchableWithoutFeedback>
 
-    <Animated.View 
-        style={[styles.bottomSheet, { height: bottomSheetHeight }]}
-        {...panResponder.panHandlers} // Apply PanResponder to Animated.View
-      > 
-        <TouchableOpacity activeOpacity={1} style={{ flex: 1 }}>
-          {
-          selectedTrack && (
-            <View style={styles.bottomSheetContent}>
-              <TouchableOpacity onPress={closeBottomSheet} style={styles.pullBar} />
-              <Text style={styles.bottomSheetTitle} numberOfLines={1} ellipsizeMode="tail">{selectedTrack.name}</Text>
-
-              <TouchableOpacity 
-                  style={styles.postButton}
-                  onPress={() => selectedTrack && navigateToPostScreen(selectedTrack)}
-                >
-                  <Text style={styles.postButtonText}>Post</Text>
-                </TouchableOpacity>
-            </View>
-          )}
-          {
-          selectedSCTrack && (
-            <View style={styles.bottomSheetContent}>
-              <TouchableOpacity onPress={closeSCBottomSheet} style={styles.pullBar} />
-              <Text style={styles.bottomSheetTitle} numberOfLines={1} ellipsizeMode="tail">{selectedSCTrack.title}</Text>
-
-              <TouchableOpacity 
-                  style={styles.postButton}
-                  onPress={() => selectedSCTrack && navigateToSCPostScreen(selectedSCTrack)}
-                >
-                  <Text style={styles.postButtonText}>Post</Text>
-                </TouchableOpacity>
-            </View>
-          )}
-
-        </TouchableOpacity>
-      </Animated.View>
+    <SearchPostBottomSheetModal
+      ref={bottomSheetModalRef}
+      item={selectedItem}
+      onClose={closeBottomSheet}
+    />
 
     </View>
     </SafeAreaView>
@@ -634,11 +547,20 @@ const styles = StyleSheet.create({
   recentSearchesContainer: {
     marginBottom: 20,
   },
+  recentSearchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
   recentSearchesTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: lgray,
+  },
+  clearAllButton: {
+    color: error,
+    fontWeight: 'bold',
   },
   recentSearchItemContainer: {
     flexDirection: 'row',

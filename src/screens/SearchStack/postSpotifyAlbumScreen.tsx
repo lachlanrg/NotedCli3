@@ -1,50 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ScrollView, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import { SearchScreenStackParamList } from '../../components/types';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
-import { faX } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, gray, placeholder, lgray, dgray, error } from '../../components/colorModes';
+import { dark, light, placeholder, lgray, error } from '../../components/colorModes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Track } from '../../spotifyConfig/itemInterface';
 import { generateClient } from 'aws-amplify/api';
-import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+import { getCurrentUser } from 'aws-amplify/auth';
 import { createPost } from '../../graphql/mutations';
-import { NavigationHelpersContext } from '@react-navigation/native';
 import CustomError from '../../errorHandling/CustomError';
-import { Album } from '../../spotifyConfig/itemInterface';
-
-
 
 type PostSpotifyAlbumScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'PostSpotifyAlbum'>;
 
 const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, navigation }) => {
   const { album } = route.params;
   const [postText, setPostText] = useState('');
-  const [userId, setUserId] = useState(''); // Store userId
-  const [userUsername, setUserUsername] = React.useState<any>(null);
-
-
-  // React.useEffect(() => {
-  //   currentAuthenticatedUser();
-  // }, []);
-
-  // async function currentAuthenticatedUser() {
-  //   try {
-  //     const { username  } = await getCurrentUser();
-  //     console.log(`The username: ${username}`);
-  
-  //     setUserUsername({ username });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
 
   const handleAlbumPost = async () => {
     try {
       const client = generateClient();
-      const { userId } = await getCurrentUser();
-      const { username  } = await getCurrentUser();
-
+      const { userId, username } = await getCurrentUser();
     
       const PostDetails = {
         body: postText,
@@ -65,8 +38,6 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
         variables: { input: PostDetails },
       });
       console.log('New Post created successfully!');
-      console.log('External url - spotify: ', album.external_urls.spotify);
-
       setPostText('');
       navigation.goBack()
     } catch (error) {
@@ -80,125 +51,122 @@ const PostSpotifyAlbumScreen: React.FC<PostSpotifyAlbumScreenProps> = ({ route, 
       }
     };
 
-    return (
-      <SafeAreaView style={styles.safeAreaContainer}> 
+  return (
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Share Spotify Album</Text>
+          <TouchableOpacity onPress={handleAlbumPost} style={styles.postButton}>
+            <Text style={styles.postButtonText}>Post</Text>
+          </TouchableOpacity>
+        </View>
 
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <FontAwesomeIcon icon={faX} size={18} color={light} />
-            </TouchableOpacity>
-              <Text style={styles.headerTitle}> Share your music</Text> 
-            <TouchableOpacity onPress={handleAlbumPost}>
-              <Text style={styles.postButtonText}>Post</Text>
-            </TouchableOpacity>
+        <View style={styles.content}>
+          <View style={styles.albumInfoContainer}>
+            <Image source={{ uri: album.images[0]?.url }} style={styles.albumImage} />
+            <View style={styles.albumDetails}>
+              <Text style={styles.albumTitle} numberOfLines={2}>{album.name}</Text>
+              <Text style={styles.albumArtist} numberOfLines={1}>{album.artists.map(artist => artist.name).join(', ')}</Text>
+              <Text style={styles.albumReleaseDate} numberOfLines={1}>
+                {new Date(album.release_date).getMonth() + 1}-{new Date(album.release_date).getFullYear()}  •  {album.total_tracks} tracks
+              </Text>
+            </View>
           </View>
 
-      {/* Text Input for the Post */}
-      <TextInput
-        style={styles.postInput}
-        placeholder="Write something about this album..."
-        placeholderTextColor={placeholder}
-        multiline={true}
-        value={postText}
-        onChangeText={setPostText}
-        maxLength={600}
-      />
-
-      {/* Track Information */}
-      <View style={styles.trackInfoContainer}>
-        <Image source={{ uri: album.images[0]?.url }} style={styles.trackImage} />
-        <View style={styles.trackDetails}>
-          <Text style={styles.trackTitle}>
-            {album.name} 
-          </Text>
-          <Text style={styles.trackArtist}>
-            {album.artists.map(artist => artist.name).join(', ')} 
-          </Text>
+          <TextInput
+            style={styles.postInput}
+            placeholder="Write something about this album..."
+            placeholderTextColor={placeholder}
+            multiline={true}
+            value={postText}
+            onChangeText={setPostText}
+            maxLength={600}
+          />
         </View>
-      </View> 
-    </View>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeAreaContainer: {
     flex: 1,
     backgroundColor: dark,
+  },
+  container: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 15,
-    backgroundColor: dark,
+    alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: lgray,
   },
-
-  headerTitle: {
+  closeButton: {
+    padding: 5,
+  },
+  cancelText: {
+    color: error, // Using the error color
     fontSize: 16,
+  },
+  headerTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    paddingRight: 10,
     color: light,
+  },
+  postButton: {
+    padding: 5,
   },
   postButtonText: {
-    color: 'lightblue',
+    color: '#1DB954', // Spotify green
     fontWeight: 'bold',
-    justifyContent: 'flex-end',
+    fontSize: 16,
   },
-  trackName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 20,
-    color: light,
-    padding: 10,
+  content: {
+    flex: 1,
+    padding: 20,
   },
-  heading: {
+  albumInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  albumImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  albumDetails: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  albumTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 60,
     color: light,
-    padding: 10,
+    marginBottom: 5,
+  },
+  albumArtist: {
+    fontSize: 16,
+    color: lgray,
+  },
+  albumReleaseDate: {
+    fontSize: 16,
+    color: lgray,
   },
   postInput: {
-    height: 150,
-    margin: 20,
-    padding: 10,
-    borderColor: lgray,
-    borderWidth: 1,
-    borderRadius: 8,
-    textAlignVertical: 'top',
-    color: light, 
-  },
-  // Track Information styles
-  trackInfoContainer: {
-    flexDirection: 'row',
-    padding: 20,
-    alignItems: 'center', 
-  },
-  trackImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8, 
-    marginRight: 15,
-  },
-  trackDetails: {
-    flex: 1, 
-  },
-  trackTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: light, 
-  },
-  trackArtist: {
-    color: lgray, 
-  },
-  safeAreaContainer: {
     flex: 1,
-    backgroundColor: dark, // or your background color
+    color: light,
+    fontSize: 16,
+    textAlignVertical: 'top',
   },
-
 });
 
 export default PostSpotifyAlbumScreen;

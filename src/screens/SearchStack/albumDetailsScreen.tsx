@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    paddingTop: 30,
+    // paddingTop: 30,
     paddingBottom: 15,
     backgroundColor: dark,
   },
@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
   albumNameContainer: {
     flex: 1,
     alignItems: 'center',
+    paddingLeft: 30,
   },
   albumName: {
     fontSize: 20,

@@ -31,8 +31,6 @@ export const useSpotifySearch = (
     saveRecentSearch(searchInput);
     // setLoading(true);
 
-      console.log("Spotify Search input: " + searchInput);
-
       var searchParameters = {
         method: 'GET',
         headers: {

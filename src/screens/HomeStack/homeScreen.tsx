@@ -93,8 +93,6 @@ const HomeScreen: React.FC = () => {
   async function currentAuthenticatedUser() {
     try {
       const { userId } = await getCurrentUser();
-      console.log(`The User Id: ${userId}`);
-
       setUserId({ userId });
     } catch (err) {
       console.log(err);
@@ -237,7 +235,7 @@ const HomeScreen: React.FC = () => {
   
       let updatedLikedBy = Array.isArray(itemToUpdate.likedBy)
         ? itemToUpdate.likedBy
-        : []; // Start with an empty array if null or not an array
+        : []; 
   
       if (!isLiked) {
         updatedLikedBy = [...updatedLikedBy, userId];
@@ -255,7 +253,7 @@ const HomeScreen: React.FC = () => {
               id: itemId,
               likedBy: updatedLikedBy,
               likesCount: updatedLikesCount,
-              _version: itemToUpdate._version, // Important for optimistic locking
+              _version: itemToUpdate._version, 
             },
           },
         });
@@ -267,7 +265,7 @@ const HomeScreen: React.FC = () => {
               id: itemId,
               likedBy: updatedLikedBy,
               likesCount: updatedLikesCount,
-              _version: itemToUpdate._version, // Important for optimistic locking
+              _version: itemToUpdate._version, 
             },
           },
         });
@@ -297,8 +295,8 @@ const HomeScreen: React.FC = () => {
           query: queries.listFriendRequests,
           variables: {
             filter: {
-              userSentFriendRequestsId: { eq: userInfo.userId }, // Current user is the sender
-              status: { eq: 'Following' }  // Make sure the request is approved/following
+              userSentFriendRequestsId: { eq: userInfo.userId },
+              status: { eq: 'Following' } 
             },
           },
         });
@@ -307,7 +305,7 @@ const HomeScreen: React.FC = () => {
         const followingIds = friendRequests.map((request: any) => request.userReceivedFriendRequestsId);
 
         setFollowing(followingIds);
-        console.log("Following IDs:", followingIds); // Check if you are getting the correct IDs
+        // console.log("Following IDs:", followingIds);
       } catch (error) {
         console.error('Error fetching following:', error);
       }
@@ -315,8 +313,8 @@ const HomeScreen: React.FC = () => {
   }, [userInfo?.userId]);
 
   useEffect(() => {
-    fetchFollowing(); // Call fetchFollowing when the component mounts
-  }, [userInfo?.userId]);  // Run when userInfo?.userId changes
+    fetchFollowing(); 
+  }, [userInfo?.userId]); 
 
   useEffect(() => {
     if (following.length > 0) {
@@ -614,20 +612,16 @@ const HomeScreen: React.FC = () => {
         <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
           <View style={styles.topButtonArea} />
         </TouchableOpacity>
-        <View style={styles.buttonContainer}>
-        {spotifyUser && (
-          <View style={styles.spotifySection}>
-            <Text style={styles.spotifyText}>
-              Spotify Account: {spotifyUser.id}
-            </Text>
+        <View style={styles.headerContainer}>
+          <Text style={styles.title}>SoundCred</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button}>
+              <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.refreshButton}>
+              <FontAwesomeIcon icon={faSync} size={20} color="#fff" />
+            </TouchableOpacity>
           </View>
-        )}
-          <TouchableOpacity style={styles.button}>
-            <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.refreshButton}>
-            <FontAwesomeIcon icon={faSync} size={20} color="#fff" />
-          </TouchableOpacity>
         </View>
 
         <FlatList
@@ -671,6 +665,19 @@ const styles = StyleSheet.create({
   topButtonArea: {
     flex: 1,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // paddingHorizontal: 10,
+    paddingLeft: 12,
+    paddingBottom: 12,
+  },
+  title: {
+    color: '#fff',
+    fontSize: 26,
+    fontWeight: 'bold',
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -678,7 +685,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 10,
-    marginRight: 10,
+    // marginRight: 10,
   },
   refreshButton: {
     padding: 10,
@@ -875,6 +882,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 10,
   },
+
 });
 
 export default HomeScreen;
