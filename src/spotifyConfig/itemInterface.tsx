@@ -36,7 +36,7 @@ export interface Album {
     name: string, 
     id: string, 
     type: string, 
-    album: { name: string, images: { url: string }[] }, 
+    album: { name: string, release_date: string, images: { url: string }[] }, 
     artists: { name: string }[],
     popularity: number; 
     preview_url: string,
