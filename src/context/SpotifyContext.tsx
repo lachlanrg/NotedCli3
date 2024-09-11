@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshAccessToken } from '../utils/spotifyAuth'; 
 import { generateClient } from 'aws-amplify/api';
 import * as mutations from '../graphql/mutations';
+import * as queries from '../graphql/queries';
+import { getCurrentUser } from 'aws-amplify/auth';
 
 type SpotifyUser = {
   id: string;
@@ -39,13 +41,29 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
   const [spotifyUser, setSpotifyUser] = useState<SpotifyUser | null>(null);
   const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
   const [recentlyPlayed, setRecentlyPlayed] = useState<any[]>([]);
+  const [lastUpdateTime, setLastUpdateTime] = useState<number>(0);
 
   const client = generateClient();
 
-  const updateSpotifyRecentlyPlayedTrack = async (userId: string, track: any) => {
+  const updateSpotifyRecentlyPlayedTrack = async (track: any) => {
+    const now = Date.now();
+    if (now - lastUpdateTime < 5 * 60 * 1000) {
+      console.log('Skipping update: too soon since last update');
+      return;
+    }
+
     try {
+      // Get the current authenticated user's ID
+      const { userId: currentUserId } = await getCurrentUser();
+
+      if (!currentUserId) {
+        console.error('No authenticated user found');
+        return;
+      }
+
       const input = {
-        spotifyRecentlyPlayedTrackUserId: userId,
+        userSpotifyRecentlyPlayedTrackId: currentUserId,
+        spotifyId: spotifyUser?.id,
         trackId: track.id,
         trackName: track.name,
         artistName: track.artists[0].name,
@@ -54,23 +72,40 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         playedAt: new Date().toISOString(),
       };
 
-      await client.graphql({
-        query: mutations.createSpotifyRecentlyPlayedTrack,
-        variables: { input },
-      });
-
-      // Update the User's recentlyPlayedTrack field
-      await client.graphql({
-        query: mutations.updateUser,
-        variables: {
-          input: {
-            id: userId,
-            userSpotifyRecentlyPlayedTrackId: input.id,
-          },
+      // Check if an entry already exists for this spotify  user
+      const existingTrackResponse = await client.graphql({
+        query: queries.listSpotifyRecentlyPlayedTracks,
+        variables: { 
+          filter: { 
+            userSpotifyRecentlyPlayedTrackId: { eq: currentUserId } 
+          } 
         },
       });
 
-      console.log('Recently played track updated');
+      const existingTrack = existingTrackResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
+
+      if (existingTrack) {
+        // Update existing entry
+        await client.graphql({
+          query: mutations.updateSpotifyRecentlyPlayedTrack,
+          variables: {
+            input: {
+              id: existingTrack.id,
+              ...input,
+              _version: existingTrack._version, // Include the version for optimistic locking
+            },
+          },
+        });
+      } else {
+        // Create new entry
+        await client.graphql({
+          query: mutations.createSpotifyRecentlyPlayedTrack,
+          variables: { input },
+        });
+      }
+
+      console.log('Recently played track updated with: ', input.trackName);
+      setLastUpdateTime(now);
     } catch (error) {
       console.error('Error updating recently played track:', error);
     }
@@ -164,23 +199,23 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
 
       const data = await response.json();
 
-      // if (data.items && data.items.length > 0) {
-      //   const track = data.items[0].track;
-      //   setRecentlyPlayed(data.items || []);
+      // **** Comment Out When Stop RecentlyPlayed ****/
+
+      if (data.items && data.items.length > 0) {
+        const track = data.items[0].track;
+        setRecentlyPlayed(data.items || []);
         
-      //   // Update the recently played track in the database
-      //   const userId = spotifyUser?.id; // Make sure you have the user's ID
-      //   if (userId) {
-      //     await updateSpotifyRecentlyPlayedTrack(userId, track);
-      //   }
-      // }
+        // Update the recently played track in the database
+        await updateSpotifyRecentlyPlayedTrack(track);
+      }
+
     } catch (error) {
       console.error('Error fetching recently played tracks:', error);
     }
   };
 
   useEffect(() => {
-    const RATE = 1 * 60 * 1000; // every 1 minute
+    const RATE = 2 * 60 * 1000; // every 1 minute
     const intervalId = setInterval(fetchRecentlyPlayed, RATE);
 
     return () => clearInterval(intervalId);

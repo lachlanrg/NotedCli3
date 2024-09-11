@@ -45,19 +45,8 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -65,7 +54,6 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -86,7 +74,6 @@ export const listUsers = /* GraphQL */ `query ListUsers(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     nextToken
@@ -117,7 +104,6 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     nextToken
@@ -139,7 +125,6 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -152,7 +137,6 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -237,7 +221,6 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -250,7 +233,6 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -347,7 +329,6 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -570,7 +551,6 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -716,7 +696,6 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -820,9 +799,10 @@ export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRece
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -834,7 +814,6 @@ export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRece
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }
@@ -854,6 +833,8 @@ export const listSpotifyRecentlyPlayedTracks = /* GraphQL */ `query ListSpotifyR
   ) {
     items {
       id
+      userSpotifyRecentlyPlayedTrackId
+      spotifyId
       trackId
       trackName
       artistName
@@ -865,7 +846,6 @@ export const listSpotifyRecentlyPlayedTracks = /* GraphQL */ `query ListSpotifyR
       _version
       _deleted
       _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
       __typename
     }
     nextToken
@@ -891,6 +871,8 @@ export const syncSpotifyRecentlyPlayedTracks = /* GraphQL */ `query SyncSpotifyR
   ) {
     items {
       id
+      userSpotifyRecentlyPlayedTrackId
+      spotifyId
       trackId
       trackName
       artistName
@@ -902,7 +884,6 @@ export const syncSpotifyRecentlyPlayedTracks = /* GraphQL */ `query SyncSpotifyR
       _version
       _deleted
       _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
       __typename
     }
     nextToken

@@ -9,7 +9,7 @@ type User @model @auth(rules: [{allow: public}]) {
   comments: [Comment] @hasMany
   publicProfile: Boolean
   reposts: [Repost] @hasMany 
-  spotifyRecentlyPlayedTrack: SpotifyRecentlyPlayedTrack @hasOne
+  spotifyRecentlyPlayedTrack: [SpotifyRecentlyPlayedTrack] @hasMany
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {
@@ -96,6 +96,8 @@ type Repost @model @auth(rules: [{allow: public}]) {
 type SpotifyRecentlyPlayedTrack @model @auth(rules: [{allow: public}]) {
   id: ID!
   user: User @belongsTo
+  userSpotifyRecentlyPlayedTrackId: ID
+  spotifyId: ID
   trackId: String!
   trackName: String!
   artistName: String!

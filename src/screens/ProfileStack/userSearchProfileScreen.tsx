@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Alert, SafeAreaView, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, lgray, dgray, gray, placeholder, error } from '../../components/colorModes';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ProfileStackParamList } from '../../components/types';
 
 import * as queries from '../../graphql/queries';
@@ -19,7 +21,13 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import { SpotifyRecentlyPlayedTrack } from '../../API'; // Update the import path as needed
 
 import { formatRelativeTime } from '../../components/formatComponents';
+import UserPostList from '../../components/userPostsList';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import UserSearchPostBottomSheetModal from '../../components/BottomSheets/UserSearchPostBottomSheetModal';
+import { formatNumber } from '../../utils/numberFormatter'; // Import the formatNumber function
+import LiveWaveform from '../../components/LiveWaveform';
 
+const spotifyIcon = faSpotify as IconProp;
 
 Amplify.configure(awsconfig);
 
@@ -36,6 +44,11 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'cancel' | 'unfollow' | null>(null); // State to store the type of modal
   const [recentlyPlayedTrack, setRecentlyPlayedTrack] = useState<SpotifyRecentlyPlayedTrack | null>(null);
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const postBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [postsCount, setPostsCount] = useState(0);
 
   const client = generateClient();
 
@@ -71,10 +84,56 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           const fetchedUser = response.data.getUser;
           setUser(fetchedUser); 
   
+          // Fetch following and followers counts
+          const followingResponse = await client.graphql({
+            query: queries.listFriendRequests,
+            variables: {
+              filter: {
+                userSentFriendRequestsId: { eq: userId },
+                status: { eq: 'Following' },
+              },
+            },
+          });
+          setFollowingCount(followingResponse.data.listFriendRequests.items.length);
+
+          const followersResponse = await client.graphql({
+            query: queries.listFriendRequests,
+            variables: {
+              filter: {
+                userReceivedFriendRequestsId: { eq: userId },
+                status: { eq: 'Following' },
+              },
+            },
+          });
+          setFollowersCount(followersResponse.data.listFriendRequests.items.length);
+
+          // Fetch posts count
+          const postsResponse = await client.graphql({
+            query: queries.listPosts,
+            variables: {
+              filter: {
+                userPostsId: { eq: userId },
+              },
+            },
+          });
+          const posts = postsResponse.data.listPosts.items.filter(post => !post._deleted);
+          setPostsCount(posts.length);
+
           // Fetch the recently played track
-          if (fetchedUser.spotifyRecentlyPlayedTrack) {
-            setRecentlyPlayedTrack(fetchedUser.spotifyRecentlyPlayedTrack);
+          const recentlyPlayedResponse = await client.graphql({
+            query: queries.listSpotifyRecentlyPlayedTracks,
+            variables: { 
+              filter: { 
+                userSpotifyRecentlyPlayedTrackId: { eq: userId } 
+              } 
+            },
+          });
+
+          const recentlyPlayedTrack = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
+          if (recentlyPlayedTrack) {
+            setRecentlyPlayedTrack(recentlyPlayedTrack);
           }
+
   
           // Now it's safe to use fetchedUser.publicProfile:
           if (fetchedUser.publicProfile || friendRequestStatus === 'Following') {
@@ -335,6 +394,12 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
     }
   };
 
+  const handlePresentPostModalPress = (post: any) => {
+    setSelectedPost(post);
+    postBottomSheetRef.current?.present();
+    console.log('Selecting Post:', post.body);
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
 
@@ -349,40 +414,52 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
 
       <ScrollView>
         <View style={styles.profileContainer}>
-          <Text style={styles.email}>{user.email}</Text>
-          <Text style={styles.email}>{user.id}</Text>
-          {/* Add more user details here */}
-
-          {recentlyPlayedTrack && (
-            <View>
-              <Text>Recently Played:</Text>
-              <Text>{recentlyPlayedTrack.trackName} by {recentlyPlayedTrack.artistName}</Text>
-              {recentlyPlayedTrack.albumImageUrl && (
-                <Image 
-                  source={{ uri: recentlyPlayedTrack.albumImageUrl }} 
-                  style={{ width: 50, height: 50 }} 
-                />
-              )}
+          {/* Add following/followers count */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{formatNumber(followingCount)}</Text>
+              <Text style={styles.statLabel}>Following</Text>
             </View>
-          )}
-
-        <View style={styles.followRequestContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{formatNumber(followersCount)}</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
+              <Text style={styles.statLabel}>Posts</Text>
+            </View>
+          </View>
+          <View style={styles.followRequestContainer}>
             <TouchableOpacity onPress={handleButtonPress} style={styles.followButton}>
                 <Text style={styles.followButtonText}>{friendRequestStatus}</Text>
             </TouchableOpacity>
-        </View>
+          </View>
+
+           {recentlyPlayedTrack && ( 
+              <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
+                <View style={styles.spotifyIcon}>
+                  <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                </View>
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.recentlyPlayedContent}>
+                  <View>
+                    <Text style={styles.rpTitle}>{user.username}'s Recently Played</Text>
+                    <Text style={styles.recentlyPlayedText}>
+                      {recentlyPlayedTrack.trackName} -{' '}
+                      {recentlyPlayedTrack.artistName} 
+                    </Text>
+                  </View>
+                </ScrollView>
+                <View style={styles.waveformContainer}>
+                  <LiveWaveform />
+                </View>
+              </View>
+            )}
+
         </View>
          {/* Show posts only if following the user */}
-         {(friendRequestStatus === 'Following' || user.publicProfile) && ( 
-          <ScrollView> 
-            {posts.map((post) => (
-              <View key={post.id} style={styles.postContainer}>
-                <Text style={styles.postBody}>{post.body}</Text>
-                <Text style={styles.postDate}>{formatRelativeTime(post.createdAt)}</Text>
-              </View>
-            ))}
-          </ScrollView>
-         )}
+         {(friendRequestStatus === 'Following' || user.publicProfile) && (
+            <UserPostList userId={userId} onPostPress={handlePresentPostModalPress} />
+          )}
 
         {/* Show "no posts" message if needed */}
         {!(friendRequestStatus === 'Following' || user.publicProfile) && (
@@ -432,6 +509,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
         </View>
         </View>
       </Modal>
+      <UserSearchPostBottomSheetModal ref={postBottomSheetRef} post={selectedPost}/>
     </View>
     </SafeAreaView>
   );
@@ -458,8 +536,7 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    padding: 10,
-    marginBottom: 10,
+    // padding: 10,
   },
   username: {
     flex: 1,
@@ -505,6 +582,7 @@ const styles = StyleSheet.create({
   },
   followRequestContainer: {
     flexDirection: 'row',
+    marginBottom: 15,
   },
    noPostsContainer: {
     alignItems: 'center',
@@ -576,6 +654,60 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark, // or your background color
+  },
+  refreshIconContainer: {
+    position: 'absolute',
+    top: 70, 
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  recentlyPlayedBox: {
+    backgroundColor: gray,
+    padding: 15,
+    borderRadius: 8,
+    alignSelf: 'flex-start', // Align to the left
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  rpTitle: {
+    color: dgray,
+    fontSize: 10,
+    fontStyle: 'italic',
+  },
+  recentlyPlayedText: {
+    color: light,
+    fontSize: 16,
+  },
+  spotifyIcon: {
+    paddingRight: 10,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginVertical: 10,
+    paddingRight: 25, ///This is only a temp fix for the spacing issue
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: light,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: lgray,
+  },
+  recentlyPlayedContent: {
+    flex: 1,
+  },
+  waveformContainer: {
+    marginLeft: 10,
+    marginRight: 5,
   },
 });
 

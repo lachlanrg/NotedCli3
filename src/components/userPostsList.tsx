@@ -14,7 +14,7 @@ import { generateClient } from 'aws-amplify/api';
 import { listPosts } from '../graphql/queries';
 import awsmobile from '../aws-exports';
 import { formatRelativeTime } from './formatComponents';
-import { dark, light } from './colorModes'; 
+import { dark, light, lgray } from './colorModes'; 
 import { getCurrentUser } from '@aws-amplify/auth';
 
 Amplify.configure(awsmobile);
@@ -31,7 +31,6 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
 
   const fetchUserPosts = useCallback(async () => {
     setIsLoading(true);
-    const { userId  } = await getCurrentUser();
     try {
       const response = await client.graphql({ 
         query: listPosts,
@@ -84,7 +83,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
                 style={styles.image}
               />
               <View style={styles.mediaInfo}>
-                <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {item.spotifyAlbumName}</Text>
+                <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumName}</Text>
                 <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumArtists}</Text>
                 <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
                 <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
@@ -100,7 +99,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
                 style={styles.image}
               />
               <View style={styles.mediaInfo}>
-                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {item.spotifyTrackName}</Text>
+                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackName}</Text>
                 <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
                 <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
               </View>
@@ -113,6 +112,14 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#fff" style={styles.loader} />;
+  }
+
+  if (posts.length === 0) {
+    return (
+      <View style={styles.noPostsContainer}>
+        <Text style={styles.noPostsText}>No posts made yet</Text>
+      </View>
+    );
   }
 
   return (
@@ -131,6 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 50,
   },
   postContainer: {
     marginBottom: 20,
@@ -170,6 +178,17 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 12,
     marginTop: 2,
+  },
+  noPostsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 100,
+  },
+  noPostsText: {
+    fontSize: 16,
+    color: lgray,
+    textAlign: 'center',
   },
 });
 

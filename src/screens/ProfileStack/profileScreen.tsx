@@ -5,7 +5,7 @@ import { ProfileStackParamList } from '../../components/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCog, faEdit, faUserPlus, faBell } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, gray, placeholder, dgray } from '../../components/colorModes';
+import { dark, light, gray, placeholder, dgray, lgray } from '../../components/colorModes';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
@@ -19,6 +19,10 @@ import ProfilePostBottomSheetModal from '../../components/BottomSheets/ProfilePo
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSpotify } from '../../context/SpotifyContext';
 
+import { formatNumber } from '../../utils/numberFormatter'; // Add this import
+import { listPosts } from '../../graphql/queries'; // Add this import
+import { generateClient } from 'aws-amplify/api';
+import LiveWaveform from '../../components/LiveWaveform'; // Add this import
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -29,10 +33,13 @@ const spotifyIcon = faSpotify as IconProp;
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [followCounts, setFollowCounts] = useState({ following: 0, followers: 0 });
+  const [postsCount, setPostsCount] = useState(0);
   const settingsBottomSheetRef = useRef<BottomSheetModal>(null);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const { recentlyPlayed } = useSpotify();
+  const client = generateClient();
+
 
   const handlePresentPostModalPress = (post: any) => {
     setSelectedPost(post);
@@ -61,7 +68,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         const { userId, username } = user;
         console.log(`The User Id: ${userId}, Username: ${username}`);
         setUserInfo({ userId, username });
-
+      
       } else {
         console.log('No user found');
       }
@@ -79,6 +86,29 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     };
     fetchData();
   }, [currentAuthenticatedUser, fetchFollowCounts]);
+
+  useEffect(() => {
+    const fetchPostsCount = async () => {
+      if (userInfo?.userId) {
+        try {
+          const response = await client.graphql({
+            query: listPosts,
+            variables: {
+              filter: {
+                userPostsId: { eq: userInfo.userId },
+              },
+            },
+          });
+          const posts = response.data.listPosts.items.filter(post => !post._deleted);
+          setPostsCount(posts.length);
+        } catch (error) {
+          console.error('Error fetching posts count:', error);
+        }
+      }
+    };
+
+    fetchPostsCount();
+  }, [userInfo]);
 
   const handleNavigateToUserSearch = () => {
     navigation.navigate('UserSearch');
@@ -123,44 +153,44 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
               scrollEventThrottle={16}
             >
-            <View style={styles.statsContainer}>
-              <View style={styles.stat}>
-              
-                <Text style={styles.statText}>Followers: {followCounts.followers}</Text>
+            <View style={styles.profileContainer}>
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{formatNumber(followCounts.following)}</Text>
+                  <Text style={styles.statLabel}>Following</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{formatNumber(followCounts.followers)}</Text>
+                  <Text style={styles.statLabel}>Followers</Text>
+                </View>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
+                  <Text style={styles.statLabel}>Posts</Text>
+                </View>
+                <TouchableOpacity onPress={handleNavigateToUserSearch}>
+                  <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
+                </TouchableOpacity>
               </View>
-              <View style={styles.stat}>
-              
-                <Text style={styles.statText}>Following: {followCounts.following}</Text>
-              </View>
-              <TouchableOpacity onPress={handleNavigateToUserSearch}>
-                <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
-              </TouchableOpacity>
             </View>
             {recentlyPlayed.length > 0 && ( 
               <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
                 <View style={styles.spotifyIcon}>
                   <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
                 </View>
-                <View style={{ marginLeft: 10 }}>
-                  <Text style={styles.rpTitle}>Recently Played</Text>
-                  <Text style={styles.recentlyPlayedText}>
-                    {recentlyPlayed[0].track.name} -{' '}
-                    {recentlyPlayed[0].track.artists[0].name} 
-                  </Text>
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.recentlyPlayedContent}>
+                  <View>
+                    <Text style={styles.rpTitle}>My Recently Played</Text>
+                    <Text style={styles.recentlyPlayedText}>
+                      {recentlyPlayed[0].track.name} -{' '}
+                      {recentlyPlayed[0].track.artists[0].name} 
+                    </Text>
+                  </View>
+                </ScrollView>
+                <View style={styles.waveformContainer}>
+                  <LiveWaveform />
                 </View>
               </View>
             )}
-            {/* {recentlyPlayed.length > 0 && ( 
-              <View style={styles.recentlyPlayedBox}>
-                <View style={styles.spotifyIcon}>
-                  <FontAwesomeIcon icon={spotifyIcon} size={20} color={light}/>
-                </View>
-                <Text style={styles.recentlyPlayedText} numberOfLines={1} ellipsizeMode="tail">
-                  {recentlyPlayed[0].track.name} -{' '}
-                  {recentlyPlayed[0].track.artists[0].name} 
-                </Text>
-              </View>
-            )} */}
             <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />
@@ -207,11 +237,6 @@ const styles = StyleSheet.create({
   bellIconButton: {
     padding: 10,
     borderRadius: 50,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 20,
   },
   stat: {
     flexDirection: 'row',
@@ -272,11 +297,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   spotifyIcon: {
-    paddingRight: 2,
+    paddingRight: 10,
   },
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark, // or your background color
+  },
+  profileContainer: {
+    alignItems: 'center',
+    padding: 10,
+    marginBottom: 10,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginVertical: 10,
+    alignItems: 'center', // Add this to align items vertically
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: light,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: lgray,
+  },
+  addUserButton: {
+    padding: 10,
+    backgroundColor: gray,
+    borderRadius: 20,
+  },
+  recentlyPlayedContent: {
+    flex: 1,
+  },
+  waveformContainer: {
+    marginLeft: 10,
+    marginRight: 5,
   },
 });
 

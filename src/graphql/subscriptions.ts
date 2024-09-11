@@ -45,19 +45,8 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -65,7 +54,6 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -110,19 +98,8 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -130,7 +107,6 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -175,19 +151,8 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -195,7 +160,6 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -218,7 +182,6 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -231,7 +194,6 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -262,7 +224,6 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -275,7 +236,6 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -306,7 +266,6 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -319,7 +278,6 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -350,7 +308,6 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -363,7 +320,6 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -396,7 +352,6 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -409,7 +364,6 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -442,7 +396,6 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -455,7 +408,6 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -492,7 +444,6 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -559,7 +510,6 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -626,7 +576,6 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -746,7 +695,6 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -838,7 +786,6 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -930,7 +877,6 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -1002,7 +948,6 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -1080,7 +1025,6 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -1158,7 +1102,6 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -1199,9 +1142,10 @@ export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -1213,7 +1157,6 @@ export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }
@@ -1236,9 +1179,10 @@ export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -1250,7 +1194,6 @@ export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }
@@ -1273,9 +1216,10 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -1287,7 +1231,6 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }
