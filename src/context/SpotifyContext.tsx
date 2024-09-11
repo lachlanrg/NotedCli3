@@ -45,72 +45,6 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
 
   const client = generateClient();
 
-  const updateSpotifyRecentlyPlayedTrack = async (track: any) => {
-    const now = Date.now();
-    if (now - lastUpdateTime < 5 * 60 * 1000) {
-      console.log('Skipping update: too soon since last update');
-      return;
-    }
-
-    try {
-      // Get the current authenticated user's ID
-      const { userId: currentUserId } = await getCurrentUser();
-
-      if (!currentUserId) {
-        console.error('No authenticated user found');
-        return;
-      }
-
-      const input = {
-        userSpotifyRecentlyPlayedTrackId: currentUserId,
-        spotifyId: spotifyUser?.id,
-        trackId: track.id,
-        trackName: track.name,
-        artistName: track.artists[0].name,
-        albumName: track.album.name,
-        albumImageUrl: track.album.images[0]?.url,
-        playedAt: new Date().toISOString(),
-      };
-
-      // Check if an entry already exists for this spotify  user
-      const existingTrackResponse = await client.graphql({
-        query: queries.listSpotifyRecentlyPlayedTracks,
-        variables: { 
-          filter: { 
-            userSpotifyRecentlyPlayedTrackId: { eq: currentUserId } 
-          } 
-        },
-      });
-
-      const existingTrack = existingTrackResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
-
-      if (existingTrack) {
-        // Update existing entry
-        await client.graphql({
-          query: mutations.updateSpotifyRecentlyPlayedTrack,
-          variables: {
-            input: {
-              id: existingTrack.id,
-              ...input,
-              _version: existingTrack._version, // Include the version for optimistic locking
-            },
-          },
-        });
-      } else {
-        // Create new entry
-        await client.graphql({
-          query: mutations.createSpotifyRecentlyPlayedTrack,
-          variables: { input },
-        });
-      }
-
-      console.log('Recently played track updated with: ', input.trackName);
-      setLastUpdateTime(now);
-    } catch (error) {
-      console.error('Error updating recently played track:', error);
-    }
-  };
-
   useEffect(() => {
     const loadTokenAndUser = async () => {
       const token = await AsyncStorage.getItem('spotifyAccessToken');
@@ -215,11 +149,83 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
   };
 
   useEffect(() => {
-    const RATE = 2 * 60 * 1000; // every 1 minute
-    const intervalId = setInterval(fetchRecentlyPlayed, RATE);
+    const fetchAndSchedule = async () => {
+      await fetchRecentlyPlayed(); // Fetch immediately
+      const RATE = 5 * 60 * 1000; // 5 minutes
+      const intervalId = setInterval(fetchRecentlyPlayed, RATE);
+      return () => clearInterval(intervalId);
+    };
 
-    return () => clearInterval(intervalId);
+    if (spotifyUser) {
+      fetchAndSchedule();
+    }
   }, [spotifyUser]);
+
+  const updateSpotifyRecentlyPlayedTrack = async (track: any) => {
+    const now = Date.now();
+    if (now - lastUpdateTime < 3 * 60 * 1000) {
+      console.log('Skipping update: too soon since last update');
+      return;
+    }
+
+    try {
+      // Get the current authenticated user's ID
+      const { userId: currentUserId } = await getCurrentUser();
+
+      if (!currentUserId) {
+        console.error('No authenticated user found');
+        return;
+      }
+
+      const input = {
+        userSpotifyRecentlyPlayedTrackId: currentUserId,
+        spotifyId: spotifyUser?.id,
+        trackId: track.id,
+        trackName: track.name,
+        artistName: track.artists[0].name,
+        albumName: track.album.name,
+        albumImageUrl: track.album.images[0]?.url,
+        playedAt: new Date().toISOString(),
+      };
+
+      // Check if an entry already exists for this spotify  user
+      const existingTrackResponse = await client.graphql({
+        query: queries.listSpotifyRecentlyPlayedTracks,
+        variables: { 
+          filter: { 
+            userSpotifyRecentlyPlayedTrackId: { eq: currentUserId } 
+          } 
+        },
+      });
+
+      const existingTrack = existingTrackResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
+
+      if (existingTrack) {
+        // Update existing entry
+        await client.graphql({
+          query: mutations.updateSpotifyRecentlyPlayedTrack,
+          variables: {
+            input: {
+              id: existingTrack.id,
+              ...input,
+              _version: existingTrack._version, // Include the version for optimistic locking
+            },
+          },
+        });
+      } else {
+        // Create new entry
+        await client.graphql({
+          query: mutations.createSpotifyRecentlyPlayedTrack,
+          variables: { input },
+        });
+      }
+
+      console.log('Recently played track updated with: ', input.trackName);
+      setLastUpdateTime(now);
+    } catch (error) {
+      console.error('Error updating recently played track:', error);
+    }
+  };
 
   return (
     <SpotifyContext.Provider 
