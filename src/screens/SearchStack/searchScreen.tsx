@@ -45,7 +45,8 @@ import useSpotifySearch from '../../spotifyConfig/spotifySearchAll';
 import { MenuItem } from '@aws-amplify/ui-react';
 import SearchPostBottomSheetModal from '../../components/BottomSheets/SearchPostBottomSheetModal';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-
+import ReactNativeHapticFeedback from "react-native-haptic-feedback";
+import { heavyImpact, mediumImpact, selectionChange } from '../../utils/hapticFeedback';
 
 //Apparently including this is the only way for it to work in the albumDetailsScreen
 export interface Album {
@@ -194,6 +195,7 @@ const handleNavigateToAlbumDetail = (album: Album) => {
 };
 
 const toggleSearchMode = () => {
+  mediumImpact();
   setSearchMode(prevMode => (prevMode === 'spotify' ? 'soundcloud' : 'spotify')); 
   setArtists([]);
   setAlbums([]);

@@ -53,7 +53,6 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
       if (userJson) setSpotifyUser(JSON.parse(userJson));
     //   console.log("Spotify user:", userJson)
     };
-
     loadTokenAndUser();
     let loggedRecently = false;
 
@@ -162,11 +161,6 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
   }, [spotifyUser]);
 
   const updateSpotifyRecentlyPlayedTrack = async (track: any) => {
-    const now = Date.now();
-    if (now - lastUpdateTime < 3 * 60 * 1000) {
-      console.log('Skipping update: too soon since last update');
-      return;
-    }
 
     try {
       // Get the current authenticated user's ID
@@ -221,7 +215,6 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
       }
 
       console.log('Recently played track updated with: ', input.trackName);
-      setLastUpdateTime(now);
     } catch (error) {
       console.error('Error updating recently played track:', error);
     }
@@ -233,8 +226,8 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         spotifyUser, setSpotifyUser, 
         spotifyToken, setSpotifyToken, 
         refreshSpotifyToken,
-        fetchRecentlyPlayed, // Add this line
-        recentlyPlayed,      // Add this line
+        fetchRecentlyPlayed,
+        recentlyPlayed, 
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Dimensions, Animated, Easing, PanResponder } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Dimensions, Animated, Easing, PanResponder, TouchableWithoutFeedback, Vibration } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
@@ -23,6 +23,9 @@ import { formatNumber } from '../../utils/numberFormatter'; // Add this import
 import { listPosts } from '../../graphql/queries'; // Add this import
 import { generateClient } from 'aws-amplify/api';
 import LiveWaveform from '../../components/LiveWaveform'; // Add this import
+import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal';
+import { GestureHandlerRootView, LongPressGestureHandler, State } from 'react-native-gesture-handler';
+import { mediumImpact } from '../../utils/hapticFeedback';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -40,6 +43,28 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const { recentlyPlayed } = useSpotify();
   const client = generateClient();
   const [refreshKey, setRefreshKey] = useState(0);
+  const rpBottomSheetRef = useRef<BottomSheetModal>(null);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handleLongPress = () => {
+    mediumImpact()
+
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  
+    rpBottomSheetRef.current?.present();
+  };
 
   const handlePresentPostModalPress = (item: any) => {
     setSelectedPost(item);
@@ -69,6 +94,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         console.log(`The User Id: ${userId}, Username: ${username}`);
         setUserInfo({ userId, username });
       
+
       } else {
         console.log('No user found');
       }
@@ -148,6 +174,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               style={styles.scrollViewContent}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
               scrollEventThrottle={16}
+              showsVerticalScrollIndicator={false}
             >
               <View style={styles.statsContainer}>
                 <TouchableOpacity 
@@ -172,25 +199,48 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
                 </TouchableOpacity>
               </View>
-            {recentlyPlayed.length > 0 && ( 
-              <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
-                <View style={styles.spotifyIcon}>
-                  <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
-                </View>
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.recentlyPlayedContent}>
-                  <View>
-                    <Text style={styles.rpTitle}>My Recently Played</Text>
-                    <Text style={styles.recentlyPlayedText}>
-                      {recentlyPlayed[0].track.name} -{' '}
-                      {recentlyPlayed[0].track.artists[0].name} 
-                    </Text>
-                  </View>
-                </ScrollView>
-                <View style={styles.waveformContainer}>
-                  <LiveWaveform />
-                </View>
-              </View>
-            )}
+              {recentlyPlayed.length > 0 && ( 
+                <GestureHandlerRootView>
+                  <LongPressGestureHandler
+                    onHandlerStateChange={({ nativeEvent }) => {
+                      if (nativeEvent.state === State.ACTIVE) {
+                        handleLongPress();
+                      }
+                    }}
+                    minDurationMs={800}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.recentlyPlayedBox,
+                        { transform: [{ scale: scaleAnim }] },
+                        { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }
+                      ]}
+                    >
+                      <View style={styles.spotifyIcon}>
+                        <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                      </View>
+                      <View style={styles.recentlyPlayedContent}>
+                      <Text style={styles.rpTitle}>My Recently Played</Text>
+                        <ScrollView 
+                          horizontal={true} 
+                          showsHorizontalScrollIndicator={false} 
+                          style={styles.recentlyPlayedContent}
+                          contentContainerStyle={styles.recentlyPlayedContentContainer}
+                        >
+                          <View>
+                            <Text style={styles.recentlyPlayedText}>
+                              {recentlyPlayed[0].track.name} - {recentlyPlayed[0].track.artists[0].name} 
+                            </Text>
+                          </View>
+                        </ScrollView>
+                      </View>
+                      <View style={styles.waveformContainer}>
+                        <LiveWaveform />
+                      </View>
+                    </Animated.View>
+                  </LongPressGestureHandler>
+                </GestureHandlerRootView>
+              )}
             <UserPostList 
               key={refreshKey}
               userId={userInfo?.userId} 
@@ -206,6 +256,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             onClose={resetSelectedPost}
           />
         </View>
+        <RPBottomSheetModal ref={rpBottomSheetRef} />
       </SafeAreaView>
     );
   };
@@ -290,11 +341,17 @@ const styles = StyleSheet.create({
     backgroundColor: gray,
     padding: 15,
     borderRadius: 8,
-    // marginBottom: 20,
-    alignSelf: 'flex-start', // Align to the left
-    // marginHorizontal: 20, 
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     marginLeft: 10,
+    // marginBottom: 10,
+  },
+  recentlyPlayedContent: {
+    flex: 1,
+  },
+  recentlyPlayedContentContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   rpTitle: {
     color: dgray,
@@ -338,9 +395,6 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: gray,
     borderRadius: 20,
-  },
-  recentlyPlayedContent: {
-    flex: 1,
   },
   waveformContainer: {
     marginLeft: 10,
