@@ -129,18 +129,16 @@ export const schema = {
                 },
                 "spotifyRecentlyPlayedTrack": {
                     "name": "spotifyRecentlyPlayedTrack",
-                    "isArray": false,
+                    "isArray": true,
                     "type": {
                         "model": "SpotifyRecentlyPlayedTrack"
                     },
                     "isRequired": false,
                     "attributes": [],
+                    "isArrayNullable": true,
                     "association": {
-                        "connectionType": "HAS_ONE",
+                        "connectionType": "HAS_MANY",
                         "associatedWith": [
-                            "id"
-                        ],
-                        "targetNames": [
                             "userSpotifyRecentlyPlayedTrackId"
                         ]
                     }
@@ -160,13 +158,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "userSpotifyRecentlyPlayedTrackId": {
-                    "name": "userSpotifyRecentlyPlayedTrackId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 }
             },
             "syncable": true,
@@ -1026,9 +1017,23 @@ export const schema = {
                     "association": {
                         "connectionType": "BELONGS_TO",
                         "targetNames": [
-                            "spotifyRecentlyPlayedTrackUserId"
+                            "userSpotifyRecentlyPlayedTrackId"
                         ]
                     }
+                },
+                "userSpotifyRecentlyPlayedTrackId": {
+                    "name": "userSpotifyRecentlyPlayedTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyId": {
+                    "name": "spotifyId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
                 },
                 "trackId": {
                     "name": "trackId",
@@ -1087,13 +1092,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "spotifyRecentlyPlayedTrackUserId": {
-                    "name": "spotifyRecentlyPlayedTrackUserId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 }
             },
             "syncable": true,
@@ -1125,5 +1123,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "86f8e60702c9c333a084281a5381f74e"
+    "version": "31463a3ac96e15f89bee62f3d7af3c12"
 };

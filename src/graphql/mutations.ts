@@ -48,19 +48,8 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -68,7 +57,6 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -116,19 +104,8 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -136,7 +113,6 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -184,19 +160,8 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       __typename
     }
     spotifyRecentlyPlayedTrack {
-      id
-      trackId
-      trackName
-      artistName
-      albumName
-      albumImageUrl
-      playedAt
-      createdAt
-      updatedAt
-      _version
-      _deleted
-      _lastChangedAt
-      spotifyRecentlyPlayedTrackUserId
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -204,7 +169,6 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
     _version
     _deleted
     _lastChangedAt
-    userSpotifyRecentlyPlayedTrackId
     __typename
   }
 }
@@ -228,7 +192,6 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -241,7 +204,6 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -273,7 +235,6 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -286,7 +247,6 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -318,7 +278,6 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     friend {
@@ -331,7 +290,6 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     createdAt
@@ -363,7 +321,6 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -376,7 +333,6 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -410,7 +366,6 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -423,7 +378,6 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -457,7 +411,6 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     recipient {
@@ -470,7 +423,6 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     status
@@ -510,7 +462,6 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -580,7 +531,6 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -650,7 +600,6 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -773,7 +722,6 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -868,7 +816,6 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -963,7 +910,6 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userPostsId
@@ -1038,7 +984,6 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -1119,7 +1064,6 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -1200,7 +1144,6 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
     userRepostsId
@@ -1242,9 +1185,10 @@ export const createSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation CreateSp
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -1256,7 +1200,6 @@ export const createSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation CreateSp
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }
@@ -1280,9 +1223,10 @@ export const updateSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation UpdateSp
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -1294,7 +1238,6 @@ export const updateSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation UpdateSp
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }
@@ -1318,9 +1261,10 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
       _version
       _deleted
       _lastChangedAt
-      userSpotifyRecentlyPlayedTrackId
       __typename
     }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
     trackId
     trackName
     artistName
@@ -1332,7 +1276,6 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
     _version
     _deleted
     _lastChangedAt
-    spotifyRecentlyPlayedTrackUserId
     __typename
   }
 }

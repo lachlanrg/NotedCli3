@@ -21,10 +21,9 @@ type EagerUser = {
   readonly comments?: (Comment | null)[] | null;
   readonly publicProfile?: boolean | null;
   readonly reposts?: (Repost | null)[] | null;
-  readonly spotifyRecentlyPlayedTrack?: SpotifyRecentlyPlayedTrack | null;
+  readonly spotifyRecentlyPlayedTrack?: (SpotifyRecentlyPlayedTrack | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly userSpotifyRecentlyPlayedTrackId?: string | null;
 }
 
 type LazyUser = {
@@ -42,10 +41,9 @@ type LazyUser = {
   readonly comments: AsyncCollection<Comment>;
   readonly publicProfile?: boolean | null;
   readonly reposts: AsyncCollection<Repost>;
-  readonly spotifyRecentlyPlayedTrack: AsyncItem<SpotifyRecentlyPlayedTrack | undefined>;
+  readonly spotifyRecentlyPlayedTrack: AsyncCollection<SpotifyRecentlyPlayedTrack>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly userSpotifyRecentlyPlayedTrackId?: string | null;
 }
 
 export declare type User = LazyLoading extends LazyLoadingDisabled ? EagerUser : LazyUser
@@ -317,6 +315,8 @@ type EagerSpotifyRecentlyPlayedTrack = {
   };
   readonly id: string;
   readonly user?: User | null;
+  readonly userSpotifyRecentlyPlayedTrackId?: string | null;
+  readonly spotifyId?: string | null;
   readonly trackId: string;
   readonly trackName: string;
   readonly artistName: string;
@@ -325,7 +325,6 @@ type EagerSpotifyRecentlyPlayedTrack = {
   readonly playedAt: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly spotifyRecentlyPlayedTrackUserId?: string | null;
 }
 
 type LazySpotifyRecentlyPlayedTrack = {
@@ -335,6 +334,8 @@ type LazySpotifyRecentlyPlayedTrack = {
   };
   readonly id: string;
   readonly user: AsyncItem<User | undefined>;
+  readonly userSpotifyRecentlyPlayedTrackId?: string | null;
+  readonly spotifyId?: string | null;
   readonly trackId: string;
   readonly trackName: string;
   readonly artistName: string;
@@ -343,7 +344,6 @@ type LazySpotifyRecentlyPlayedTrack = {
   readonly playedAt: string;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
-  readonly spotifyRecentlyPlayedTrackUserId?: string | null;
 }
 
 export declare type SpotifyRecentlyPlayedTrack = LazyLoading extends LazyLoadingDisabled ? EagerSpotifyRecentlyPlayedTrack : LazySpotifyRecentlyPlayedTrack
