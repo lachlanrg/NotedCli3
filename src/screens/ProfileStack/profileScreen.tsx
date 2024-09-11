@@ -40,9 +40,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const { recentlyPlayed } = useSpotify();
   const client = generateClient();
 
-
-  const handlePresentPostModalPress = (post: any) => {
-    setSelectedPost(post);
+  const handlePresentPostModalPress = (item: any) => {
+    setSelectedPost(item);
     postBottomSheetRef.current?.present();
   };
 
@@ -129,6 +128,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     await fetchFollowCounts(); // Await the promise
   }, [fetchFollowCounts]);
 
+  const handleFollowListNavigation = (initialTab: 'following' | 'followers') => {
+    navigation.navigate('FollowList', { userId: userInfo?.userId, initialTab });
+  };
+
+  const resetSelectedPost = () => {
+    setSelectedPost(null);
+  };
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
@@ -153,16 +159,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
               scrollEventThrottle={16}
             >
-            <View style={styles.profileContainer}>
               <View style={styles.statsContainer}>
-                <View style={styles.statItem}>
+                <TouchableOpacity 
+                  style={styles.statItem}
+                  onPress={() => handleFollowListNavigation('following')}
+                >
                   <Text style={styles.statNumber}>{formatNumber(followCounts.following)}</Text>
                   <Text style={styles.statLabel}>Following</Text>
-                </View>
-                <View style={styles.statItem}>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.statItem}
+                  onPress={() => handleFollowListNavigation('followers')}
+                >
                   <Text style={styles.statNumber}>{formatNumber(followCounts.followers)}</Text>
                   <Text style={styles.statLabel}>Followers</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={styles.statItem}>
                   <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
                   <Text style={styles.statLabel}>Posts</Text>
@@ -171,7 +182,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
                 </TouchableOpacity>
               </View>
-            </View>
             {recentlyPlayed.length > 0 && ( 
               <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
                 <View style={styles.spotifyIcon}>
@@ -194,8 +204,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             <UserPostList userId={userInfo?.userId} onPostPress={handlePresentPostModalPress} />
           </ScrollView>
           <SettingsBottomSheet ref={settingsBottomSheetRef} />
-          <ProfilePostBottomSheetModal ref={postBottomSheetRef} post={selectedPost} onPostDelete={handlePostDeleted}/>
-
+          <ProfilePostBottomSheetModal 
+            ref={postBottomSheetRef} 
+            item={selectedPost} 
+            onPostDelete={handlePostDeleted}
+            onClose={resetSelectedPost}
+          />
         </View>
       </SafeAreaView>
     );
@@ -303,11 +317,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: dark, // or your background color
   },
-  profileContainer: {
-    alignItems: 'center',
-    padding: 10,
-    marginBottom: 10,
-  },
+  // profileContainer: {
+  //   padding: 10,
+  // },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',

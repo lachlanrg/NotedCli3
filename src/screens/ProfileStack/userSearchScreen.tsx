@@ -1,5 +1,5 @@
 // userSearchScreen.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet, Text, FlatList, SafeAreaView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -8,7 +8,7 @@ import { dark, light, gray, lgray, placeholder, dgray, error } from '../../compo
 import { ProfileStackParamList} from '../../components/types';
 
 import { User } from '../../API';
-
+import { getCurrentUser } from 'aws-amplify/auth';
 
 import useSearchUsers from '../../components/userSearch';
 
@@ -18,6 +18,20 @@ type UserSearchProfileScreenProps = {
 
 const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }) => {
   const { searchUsers, searchTerm, setSearchTerm, searchResults, clearSearchResults } = useSearchUsers();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const { userId } = await getCurrentUser();
+      setCurrentUserId(userId);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  };
 
   const handleUserSearch = async () => {
     if (searchTerm.trim() === '') {
@@ -31,6 +45,7 @@ const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }
   const handleInputChange = (text: string) => {
     setSearchTerm(text);
   };
+
   useEffect(() => {
     if (searchTerm.trim() === '') {
       clearSearchResults(); // Clear search results if the input is empty
@@ -40,7 +55,11 @@ const UserSearchScreen: React.FC<UserSearchProfileScreenProps> = ({ navigation }
   }, [searchTerm]);
 
   const handleUserPress = (user: User) => {
-    navigation.navigate('UserSearchProfile', { userId: user.id });
+    if (user.id === currentUserId) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('UserSearchProfile', { userId: user.id });
+    }
   };
 
   return (

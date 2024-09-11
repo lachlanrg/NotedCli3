@@ -83,9 +83,11 @@ const HomeScreen: React.FC = () => {
   const [following, setFollowing] = useState<string[]>([]);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const { spotifyUser } = useSpotify();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     currentAuthenticatedUser();
+    fetchCurrentUser();
   }, []);
 
   async function currentAuthenticatedUser() {
@@ -98,6 +100,15 @@ const HomeScreen: React.FC = () => {
       console.log(err);
     }
   }
+
+  const fetchCurrentUser = async () => {
+    try {
+      const { userId } = await getCurrentUser();
+      setCurrentUserId(userId);
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+    }
+  };
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
@@ -344,11 +355,19 @@ const HomeScreen: React.FC = () => {
     const isSpotifyAlbum = item.spotifyAlbumId;
     const isSpotifyTrack = item.spotifyTrackId;
 
+    const handleUsernamePress = (postUserId: string) => {
+      if (postUserId === currentUserId) {
+        navigation.navigate('Profile');
+      } else {
+        navigation.navigate('HomeUserProfile', { userId: postUserId });
+      }
+    };
+
     return (
       <View style={styles.postContainer}>
         <View style={styles.post}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('HomeUserProfile', { userId: ('originalPost' in item) ? item.userRepostsId : item.userPostsId })}
+            onPress={() => handleUsernamePress(('originalPost' in item) ? item.userRepostsId : item.userPostsId)}
           >
             <Text style={styles.repostUserUsername}>{('originalPost' in item) ? item.username : item.username}</Text>
           </TouchableOpacity>
@@ -360,11 +379,11 @@ const HomeScreen: React.FC = () => {
 
               <View style={styles.repostedPostContainer}>
                 <TouchableOpacity onPress={() => navigation.navigate('RepostOriginalPost', { post: item.originalPost })} >
-                  {/* <TouchableOpacity
-                    onPress={() => navigation.navigate('HomeUserProfile', { userId: item.originalPost.userPostsId })}
-                  > */}
+                  <TouchableOpacity
+                    onPress={() => handleUsernamePress(item.originalPost.userPostsId)}
+                  >
                     <Text style={styles.originalPostUsername}>{item.originalPost.username}</Text>
-                  {/* </TouchableOpacity> */}
+                  </TouchableOpacity>
 
                   {item.originalPost.scTrackId && (
                     <View style={styles.soundCloudPost}>

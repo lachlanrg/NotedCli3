@@ -1,53 +1,64 @@
 // HomeUserProfileScreen.tsx
-import React, { useEffect, useState } from 'react';
+// ** Almost identical copy of userSearchProfileScreen.tsx
+
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, SafeAreaView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { dark, light, lgray, dgray, gray, placeholder, error } from '../../components/colorModes';
-import { HomeStackParamList } from '../../components/types'; // Make sure this import is correct
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { HomeStackParamList } from '../../components/types';
 
 import * as queries from '../../graphql/queries';
 import * as mutations from '../../graphql/mutations';
 
-import { createFriendRequest, updateFriendRequest } from '../../graphql/mutations'; 
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
+
+import { SpotifyRecentlyPlayedTrack } from '../../API';
+
 import { formatRelativeTime } from '../../components/formatComponents';
+import UserPostList from '../../components/userPostsList';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import UserSearchPostBottomSheetModal from '../../components/BottomSheets/UserSearchPostBottomSheetModal';
+import { formatNumber } from '../../utils/numberFormatter';
+import LiveWaveform from '../../components/LiveWaveform';
+
+const spotifyIcon = faSpotify as IconProp;
 
 Amplify.configure(awsconfig);
 
-type HomeUserProfileScreenProps = NativeStackScreenProps<HomeStackParamList, 'HomeUserProfile'>; 
+type HomeUserProfileScreenProps = NativeStackScreenProps<HomeStackParamList, 'HomeUserProfile'>;
 
 const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, navigation }) => {
   const { userId } = route.params;
-
-  const [currentAuthUserInfo, setCurrentAuthUserInfo] = React.useState<any>(null);
+  const [currentAuthUserInfo, setCurrentAuthUserInfo] = useState<any>(null);
 
   const [user, setUser] = useState<any | null>(null);
-  const [posts, setPosts] = useState<any[]>([]);
   const [friendRequestStatus, setFriendRequestStatus] = useState<'Follow' | 'Requested' | 'Following'>('Follow');
-  const [existingFriendRequest, setExistingFriendRequest] = useState<any | null>(null); // State to store existing friend request
+  const [existingFriendRequest, setExistingFriendRequest] = useState<any | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalType, setModalType] = useState<'cancel' | 'unfollow' | null>(null); // State to store the type of modal
+  const [modalType, setModalType] = useState<'cancel' | 'unfollow' | null>(null);
+  const [recentlyPlayedTrack, setRecentlyPlayedTrack] = useState<SpotifyRecentlyPlayedTrack | null>(null);
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const postBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [postsCount, setPostsCount] = useState(0);
 
   const client = generateClient();
 
-  React.useEffect(() => {
+  useEffect(() => {
     currentAuthenticatedUser();
-    
   }, []);
 
   async function currentAuthenticatedUser() {
     try {
       const { username, userId } = await getCurrentUser();
-      console.log('___________________________________')
-      console.log(`Current Authenticated User Info:`);
-      console.log(`The Username: ${username}`);
-      console.log(`The userId: ${userId}`);
-      console.log('___________________________________')
       setCurrentAuthUserInfo({ username, userId });
     } catch (err) {
       console.log(err);
@@ -61,26 +72,71 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
           query: queries.getUser,
           variables: { id: userId },
         });
-        setUser(response.data.getUser);
 
-        const postsResponse = await client.graphql({
-          query: queries.listPosts,
-          variables: {
-            filter: {
-              userPostsId: { eq: userId },
+        if (response.data && response.data.getUser) {
+          const fetchedUser = response.data.getUser;
+          setUser(fetchedUser);
+
+          // Fetch following and followers counts
+          const followingResponse = await client.graphql({
+            query: queries.listFriendRequests,
+            variables: {
+              filter: {
+                userSentFriendRequestsId: { eq: userId },
+                status: { eq: 'Following' },
+              },
             },
-          },
-        });
-        setPosts(postsResponse.data.listPosts.items);
+          });
+          setFollowingCount(followingResponse.data.listFriendRequests.items.length);
+
+          const followersResponse = await client.graphql({
+            query: queries.listFriendRequests,
+            variables: {
+              filter: {
+                userReceivedFriendRequestsId: { eq: userId },
+                status: { eq: 'Following' },
+              },
+            },
+          });
+          setFollowersCount(followersResponse.data.listFriendRequests.items.length);
+
+          // Fetch posts count
+          const postsResponse = await client.graphql({
+            query: queries.listPosts,
+            variables: {
+              filter: {
+                userPostsId: { eq: userId },
+              },
+            },
+          });
+          const posts = postsResponse.data.listPosts.items.filter(post => !post._deleted);
+          setPostsCount(posts.length);
+
+          // Fetch the recently played track
+          const recentlyPlayedResponse = await client.graphql({
+            query: queries.listSpotifyRecentlyPlayedTracks,
+            variables: { 
+              filter: { 
+                userSpotifyRecentlyPlayedTrackId: { eq: userId } 
+              } 
+            },
+          });
+
+          const recentlyPlayedTrack = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
+          if (recentlyPlayedTrack) {
+            setRecentlyPlayedTrack(recentlyPlayedTrack);
+          }
+        } else {
+          console.error('User not found');
+        }
       } catch (error) {
         console.error('Error fetching user or posts:', error);
       }
     };
 
     fetchUser();
-  }, [userId]);
+  }, [userId, friendRequestStatus]);
 
-  // Check for existing friend request
   useEffect(() => {
     const checkExistingFriendRequest = async () => {
       if (currentAuthUserInfo && user) {
@@ -94,42 +150,31 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
               }
             }
           });
-  
+
           if (response.data.listFriendRequests.items.length > 0) {
             const friendRequest = response.data.listFriendRequests.items[0];
             setExistingFriendRequest(friendRequest);
-            // Update friendRequestStatus based on the actual status from the database
             if (friendRequest.status === 'Pending') {
               setFriendRequestStatus('Requested');
             } else if (friendRequest.status === 'Following') {
               setFriendRequestStatus('Following');
-            } else if (friendRequest.status === 'Cancelled') { // Handle Cancelled status
-              setFriendRequestStatus('Follow'); 
-            } 
-            console.log('Existing Friend Request:', friendRequest);
+            } else if (friendRequest.status === 'Cancelled') {
+              setFriendRequestStatus('Follow');
+            }
           } else {
             setExistingFriendRequest(null);
             setFriendRequestStatus('Follow');
-            console.log('No existing friend requests sent')
           }
         } catch (error) {
           console.error('Error checking existing friend request:', error);
         }
       }
     };
-  
+
     if (currentAuthUserInfo && user) {
       checkExistingFriendRequest();
     }
   }, [currentAuthUserInfo, user]);
-
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
 
   const handleFollowRequest = async () => {
     try {
@@ -265,8 +310,30 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
     }
   };
 
+  const handlePresentPostModalPress = (post: any) => {
+    setSelectedPost(post);
+    postBottomSheetRef.current?.present();
+  };
+
+  const canViewFollowList = user?.publicProfile || friendRequestStatus === 'Following';
+
+  const handleFollowListNavigation = (initialTab: 'following' | 'followers') => {
+    if (canViewFollowList) {
+      navigation.navigate('FollowList', { userId: userId, initialTab });
+    }
+  };
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
+
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -278,34 +345,73 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
 
       <ScrollView>
         <View style={styles.profileContainer}>
-          <Text style={styles.email}>{user.email}</Text>
-          <Text style={styles.email}>{user.id}</Text>
-          {/* Add more user details here */}
-
-        <View style={styles.followRequestContainer}>
+          {/* Add following/followers count */}
+          <View style={styles.statsContainer}>
+            <TouchableOpacity 
+              style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
+              onPress={() => handleFollowListNavigation('following')}
+              disabled={!canViewFollowList}
+            >
+              <Text style={styles.statNumber}>{formatNumber(followingCount)}</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
+              onPress={() => handleFollowListNavigation('followers')}
+              disabled={!canViewFollowList}
+            >
+              <Text style={styles.statNumber}>{formatNumber(followersCount)}</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </TouchableOpacity>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
+              <Text style={styles.statLabel}>Posts</Text>
+            </View>
+          </View>
+          <View style={styles.followRequestContainer}>
             <TouchableOpacity onPress={handleButtonPress} style={styles.followButton}>
                 <Text style={styles.followButtonText}>{friendRequestStatus}</Text>
             </TouchableOpacity>
-        </View>
+          </View>
+
+           {recentlyPlayedTrack && ( 
+              <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
+                <View style={styles.spotifyIcon}>
+                  <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                </View>
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.recentlyPlayedContent}>
+                  <View>
+                    <Text style={styles.rpTitle}>{user.username}'s Recently Played</Text>
+                    <Text style={styles.recentlyPlayedText}>
+                      {recentlyPlayedTrack.trackName} -{' '}
+                      {recentlyPlayedTrack.artistName} 
+                    </Text>
+                  </View>
+                </ScrollView>
+                <View style={styles.waveformContainer}>
+                  <LiveWaveform />
+                </View>
+              </View>
+            )}
+
         </View>
          {/* Show posts only if following the user */}
-         {friendRequestStatus === 'Following' && (
-          <ScrollView>
-            {posts.map((post) => (
-              <View key={post.id} style={styles.postContainer}>
-                <Text style={styles.postBody}>{post.body}</Text>
-                <Text style={styles.postDate}>{formatRelativeTime(post.createdAt)}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        )}
-        {/* If not following, show a message */}
-        {friendRequestStatus !== 'Following' && (
+         {(friendRequestStatus === 'Following' || user.publicProfile) && (
+            <UserPostList userId={userId} onPostPress={handlePresentPostModalPress} />
+          )}
+
+        {/* Show "no posts" message if needed */}
+        {!(friendRequestStatus === 'Following' || user.publicProfile) && (
           <View style={styles.noPostsContainer}>
-            <Text style={styles.noPostsText}>Follow this user to see their posts.</Text>
+            <Text style={styles.noPostsText}>
+              {user.publicProfile
+                ? "This user hasn't posted yet."
+                : "Follow this user to see their posts."}
+            </Text>
           </View>
         )}
-      </ScrollView>
+        
+        </ScrollView>
 
       {/* Modal to confirm cancellation/unfollow */}
       <Modal 
@@ -342,6 +448,8 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
         </View>
         </View>
       </Modal>
+      <UserSearchPostBottomSheetModal ref={postBottomSheetRef} post={selectedPost}/>
+
     </View>
     </SafeAreaView>
   );
@@ -368,8 +476,7 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    padding: 10,
-    marginBottom: 10,
+    // padding: 10,
   },
   username: {
     flex: 1,
@@ -404,7 +511,6 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 5,
     marginHorizontal: 10,
-    marginTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -415,6 +521,7 @@ const styles = StyleSheet.create({
   },
   followRequestContainer: {
     flexDirection: 'row',
+    marginBottom: 15,
   },
    noPostsContainer: {
     alignItems: 'center',
@@ -486,6 +593,63 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark, // or your background color
+  },
+  refreshIconContainer: {
+    position: 'absolute',
+    top: 70, 
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  recentlyPlayedBox: {
+    backgroundColor: gray,
+    padding: 15,
+    borderRadius: 8,
+    alignSelf: 'flex-start', // Align to the left
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  rpTitle: {
+    color: dgray,
+    fontSize: 10,
+    fontStyle: 'italic',
+  },
+  recentlyPlayedText: {
+    color: light,
+    fontSize: 16,
+  },
+  spotifyIcon: {
+    paddingRight: 10,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginVertical: 10,
+    paddingRight: 25, ///This is only a temp fix for the spacing issue
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: light,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: lgray,
+  },
+  recentlyPlayedContent: {
+    flex: 1,
+  },
+  waveformContainer: {
+    marginLeft: 10,
+    marginRight: 5,
+  },
+  disabledStatItem: {
+    opacity: 0.5,
   },
 });
 

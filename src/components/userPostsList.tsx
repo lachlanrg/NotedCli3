@@ -6,15 +6,15 @@ import {
   StyleSheet, 
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
   Image,
 } from 'react-native';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import { listPosts } from '../graphql/queries';
+import { listRepostsWithOriginalPost } from '../utils/customQueries';
 import awsmobile from '../aws-exports';
 import { formatRelativeTime } from './formatComponents';
-import { dark, light, lgray } from './colorModes'; 
+import { dark, light, lgray, gray } from './colorModes'; 
 import { getCurrentUser } from '@aws-amplify/auth';
 
 Amplify.configure(awsmobile);
@@ -30,22 +30,43 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
   const client = generateClient();
 
   const fetchUserPosts = useCallback(async () => {
+    if (!userId) return;
     setIsLoading(true);
     try {
-      const response = await client.graphql({ 
+      // Fetch posts
+      const postsResponse = await client.graphql({ 
         query: listPosts,
         variables: { 
           filter: {
-            userPostsId: { eq: userId } ,
+            userPostsId: { eq: userId },
           }
         }
       });
-      const sortedPosts = response.data.listPosts.items
-        .filter(post => !post._deleted)
+
+      // Fetch reposts
+      const repostsResponse = await client.graphql({
+        query: listRepostsWithOriginalPost,
+        variables: {
+          filter: {
+            userRepostsId: { eq: userId },
+          }
+        }
+      });
+
+      const posts = postsResponse.data.listPosts.items;
+      const reposts = repostsResponse.data.listReposts.items;
+
+      // Combine posts and reposts
+      const allContent = [...posts, ...reposts];
+
+      // Sort by createdAt and filter out deleted items
+      const sortedContent = allContent
+        .filter(item => !item._deleted)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setPosts(sortedPosts);
+
+      setPosts(sortedContent);
     } catch (error) {
-      console.error('Error fetching user posts:', error);
+      console.error('Error fetching user posts and reposts:', error);
     } finally {
       setIsLoading(false);
     }
@@ -53,25 +74,33 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
 
   useEffect(() => {
     fetchUserPosts();
-  }, [fetchUserPosts]);
+  }, [fetchUserPosts, userId]);
 
   const renderPostItem = (item: any) => {
-    const isSoundCloud = item.scTrackId;
-    const isSpotifyAlbum = item.spotifyAlbumId;
-    const isSpotifyTrack = item.spotifyTrackId;
+    const isRepost = 'originalPost' in item;
+    const postToRender = isRepost ? item.originalPost : item;
+
+    const isSoundCloud = postToRender.scTrackId;
+    const isSpotifyAlbum = postToRender.spotifyAlbumId;
+    const isSpotifyTrack = postToRender.spotifyTrackId;
 
     return (
       <TouchableOpacity key={item.id} onPress={() => onPostPress(item)}>
         <View style={styles.postContainer}>
+          {isRepost && (
+            <Text style={styles.repostText}>
+              Reposted from <Text style={styles.boldUsername}>{postToRender.username || 'Unknown User'}</Text>
+            </Text>
+          )}
           {isSoundCloud && (
             <View style={styles.mediaContainer}>
               <Image
-                source={{ uri: item.scTrackArtworkUrl }}
+                source={{ uri: postToRender.scTrackArtworkUrl }}
                 style={styles.image}
               />
               <View style={styles.mediaInfo}>
-                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.scTrackTitle}</Text>
-                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.scTrackTitle}</Text>
+                <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>
             </View>
           )}
@@ -79,15 +108,15 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
           {isSpotifyAlbum && (
             <View style={styles.mediaContainer}>
               <Image
-                source={{ uri: item.spotifyAlbumImageUrl }}
+                source={{ uri: postToRender.spotifyAlbumImageUrl }}
                 style={styles.image}
               />
               <View style={styles.mediaInfo}>
-                <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumName}</Text>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyAlbumArtists}</Text>
-                <Text style={styles.date}>Total Tracks: {item.spotifyAlbumTotalTracks}</Text>
-                <Text style={styles.date}>Release Date: {item.spotifyAlbumReleaseDate}</Text>
-                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+                <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyAlbumName}</Text>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyAlbumArtists}</Text>
+                <Text style={styles.date}>Total Tracks: {postToRender.spotifyAlbumTotalTracks}</Text>
+                <Text style={styles.date}>Release Date: {postToRender.spotifyAlbumReleaseDate}</Text>
+                <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>
             </View>
           )}
@@ -95,15 +124,19 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
           {isSpotifyTrack && (
             <View style={styles.mediaContainer}>
               <Image
-                source={{ uri: item.spotifyTrackImageUrl }}
+                source={{ uri: postToRender.spotifyTrackImageUrl }}
                 style={styles.image}
               />
               <View style={styles.mediaInfo}>
-                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackName}</Text>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{item.spotifyTrackArtists}</Text>
-                <Text style={styles.date}>{formatRelativeTime(item.createdAt)}</Text>
+                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyTrackName}</Text>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyTrackArtists}</Text>
+                <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>
             </View>
+          )}
+
+          {!isSoundCloud && !isSpotifyAlbum && !isSpotifyTrack && (
+            <Text style={styles.bodyText}>{postToRender.body}</Text>
           )}
         </View>
       </TouchableOpacity>
@@ -111,10 +144,10 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress }) => {
   };
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color="#fff" style={styles.loader} />;
+    return null; // Return nothing while loading
   }
 
-  if (posts.length === 0) {
+  if (posts.length === 0 && !isLoading) {
     return (
       <View style={styles.noPostsContainer}>
         <Text style={styles.noPostsText}>No posts made yet</Text>
@@ -134,17 +167,8 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: dark,
   },
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 50,
-  },
   postContainer: {
     marginBottom: 20,
-  },
-  bodytext: {
-    // This style can be removed if it's not used elsewhere
   },
   mediaContainer: {
     flexDirection: 'row',
@@ -189,6 +213,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: lgray,
     textAlign: 'center',
+  },
+  repostText: {
+    color: '#888',
+    fontSize: 12,
+    fontStyle: 'italic',
+    marginBottom: 5,
+  },
+  boldUsername: {
+    fontWeight: 'bold',
+    color: '#888',
+  },
+  bodyText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 200,
   },
 });
 
