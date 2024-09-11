@@ -400,6 +400,29 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
     console.log('Selecting Post:', post.body);
   };
 
+  const canViewFollowList = user?.publicProfile || friendRequestStatus === 'Following';
+
+  const handleFollowListNavigation = (initialTab: 'following' | 'followers') => {
+    if (canViewFollowList) {
+      navigation.navigate('FollowList', { userId: userId, initialTab });
+    }
+  };
+
+  const getButtonStyle = () => {
+    switch (friendRequestStatus) {
+      case 'Following':
+        return styles.followingButton;
+      case 'Requested':
+        return styles.requestedButton;
+      default:
+        return styles.followButton;
+    }
+  };
+
+  const getButtonTextStyle = () => {
+    return friendRequestStatus === 'Following' ? styles.followingButtonText : styles.followButtonText;
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
 
@@ -416,22 +439,33 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
         <View style={styles.profileContainer}>
           {/* Add following/followers count */}
           <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
+            <TouchableOpacity 
+              style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
+              onPress={() => handleFollowListNavigation('following')}
+              disabled={!canViewFollowList}
+            >
               <Text style={styles.statNumber}>{formatNumber(followingCount)}</Text>
               <Text style={styles.statLabel}>Following</Text>
-            </View>
-            <View style={styles.statItem}>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
+              onPress={() => handleFollowListNavigation('followers')}
+              disabled={!canViewFollowList}
+            >
               <Text style={styles.statNumber}>{formatNumber(followersCount)}</Text>
               <Text style={styles.statLabel}>Followers</Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
               <Text style={styles.statLabel}>Posts</Text>
             </View>
           </View>
           <View style={styles.followRequestContainer}>
-            <TouchableOpacity onPress={handleButtonPress} style={styles.followButton}>
-                <Text style={styles.followButtonText}>{friendRequestStatus}</Text>
+            <TouchableOpacity 
+              onPress={handleButtonPress} 
+              style={[styles.followButtonBase, getButtonStyle()]}
+            >
+              <Text style={getButtonTextStyle()}>{friendRequestStatus}</Text>
             </TouchableOpacity>
           </View>
 
@@ -566,23 +600,41 @@ const styles = StyleSheet.create({
     color: lgray,
     marginTop: 5,
   },
-  followButton: {
-    backgroundColor: '#007AFF',
-    padding: 8,
-    borderRadius: 5,
-    marginHorizontal: 10,
-    marginTop: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  followButtonText: {
-    color: light,
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
   followRequestContainer: {
     flexDirection: 'row',
-    marginBottom: 15,
+    // marginVertical: 15,
+    marginBottom: 10,
+    justifyContent: 'center',
+  },
+  followButtonBase: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 100,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  followButton: {
+    backgroundColor: light,
+  },
+  followingButton: {
+    backgroundColor: 'transparent',
+    borderColor: light,
+  },
+  requestedButton: {
+    backgroundColor: dgray,
+  },
+  followButtonText: {
+    color: dark,
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  followingButtonText: {
+    color: light,
+    fontWeight: '600',
+    fontSize: 14,
   },
    noPostsContainer: {
     alignItems: 'center',
@@ -708,6 +760,9 @@ const styles = StyleSheet.create({
   waveformContainer: {
     marginLeft: 10,
     marginRight: 5,
+  },
+  disabledStatItem: {
+    opacity: 0.5,
   },
 });
 

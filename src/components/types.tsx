@@ -5,9 +5,6 @@ import { User } from '../models';
 import { Track } from '../spotifyConfig/itemInterface';
 import { scTrack } from '../soundcloudConfig/itemInterface';
 import { Post } from '../API';
-import { RankedTrack } from './exploreAPIs/spotifyTopTracks';
-import { RankedSoundCloudTrack } from './exploreAPIs/scTopTracks';
-import { RankedTopTrending } from './exploreAPIs/topTrendingItems';
 
 export type HomeStackParamList = {
   Home: undefined;
@@ -15,6 +12,8 @@ export type HomeStackParamList = {
   CreatePostTab: undefined
   PostRepost: {post: Post};
   RepostOriginalPost: {post: Post};
+  FollowList: { userId: string; initialTab: 'following' | 'followers' };
+  Profile: undefined
 };
 
 export type SearchScreenStackParamList = {
@@ -41,10 +40,10 @@ export type ProfileStackParamList = {
   SpotifyAccountSettings: undefined;
   AccessibilitySettings: undefined;
   PrivacySettings: undefined;
+  FollowList: { userId: string; initialTab: 'following' | 'followers' };
 };
 
 export type ExploreStackParamList ={
   Explore: undefined;
   ItemDetailsExplore: undefined;
 };
-

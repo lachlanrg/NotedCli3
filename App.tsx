@@ -41,6 +41,7 @@ import SpotifyAccountSettingsScreen from './src/screens/ProfileStack/spotifyAcco
 import AccessibilitySettingsScreen from './src/screens/ProfileStack/accessibilitySettingsScreen';
 import PrivacySettingsScreen from './src/screens/ProfileStack/privacySettingsScreen';
 import AppLoadingScreen from './src/screens/AppLoadingScreen';
+import FollowListScreen from './src/screens/ProfileStack/FollowListScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -124,7 +125,7 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="SpotifyAccountSettings" component={SpotifyAccountSettingsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />
-
+      <ProfileStack.Screen name="FollowList" component={FollowListScreen} options={{ headerShown: false }} />
     </ProfileStack.Navigator>
   );
 };
