@@ -760,6 +760,22 @@ export type ModelSpotifyRecentlyPlayedTrackFilterInput = {
   _deleted?: ModelBooleanInput | null,
 };
 
+export type ModelStringKeyConditionInput = {
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+};
+
+export enum ModelSortDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
+
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
@@ -3027,6 +3043,40 @@ export type SyncSpotifyRecentlyPlayedTracksQueryVariables = {
 
 export type SyncSpotifyRecentlyPlayedTracksQuery = {
   syncSpotifyRecentlyPlayedTracks?:  {
+    __typename: "ModelSpotifyRecentlyPlayedTrackConnection",
+    items:  Array< {
+      __typename: "SpotifyRecentlyPlayedTrack",
+      id: string,
+      userSpotifyRecentlyPlayedTrackId?: string | null,
+      spotifyId?: string | null,
+      trackId: string,
+      trackName: string,
+      artistName: string,
+      albumName?: string | null,
+      albumImageUrl?: string | null,
+      playedAt: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAtQueryVariables = {
+  userSpotifyRecentlyPlayedTrackId: string,
+  playedAt?: ModelStringKeyConditionInput | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelSpotifyRecentlyPlayedTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAtQuery = {
+  spotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAt?:  {
     __typename: "ModelSpotifyRecentlyPlayedTrackConnection",
     items:  Array< {
       __typename: "SpotifyRecentlyPlayedTrack",

@@ -30,7 +30,7 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         spotifyTrackImageUrl: track.album.images[0]?.url,
         spotifyTrackPreviewUrl: track.preview_url,
         spotifyTrackExternalUrl: track.external_urls.spotify,
-        spotifyTrackReleaseDate: track.album.release_date,
+        // spotifyTrackReleaseDate: track.album.release_date,
         likesCount: 0,
       };
 
