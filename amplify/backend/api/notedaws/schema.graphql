@@ -96,7 +96,7 @@ type Repost @model @auth(rules: [{allow: public}]) {
 type SpotifyRecentlyPlayedTrack @model @auth(rules: [{allow: public}]) {
   id: ID!
   user: User @belongsTo
-  userSpotifyRecentlyPlayedTrackId: ID
+  userSpotifyRecentlyPlayedTrackId: ID @index(name: "byUser", sortKeyFields: ["playedAt"])
   spotifyId: ID
   trackId: String!
   trackName: String!

@@ -895,3 +895,45 @@ export const syncSpotifyRecentlyPlayedTracks = /* GraphQL */ `query SyncSpotifyR
   APITypes.SyncSpotifyRecentlyPlayedTracksQueryVariables,
   APITypes.SyncSpotifyRecentlyPlayedTracksQuery
 >;
+export const spotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAt = /* GraphQL */ `query SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAt(
+  $userSpotifyRecentlyPlayedTrackId: ID!
+  $playedAt: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelSpotifyRecentlyPlayedTrackFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  spotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAt(
+    userSpotifyRecentlyPlayedTrackId: $userSpotifyRecentlyPlayedTrackId
+    playedAt: $playedAt
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userSpotifyRecentlyPlayedTrackId
+      spotifyId
+      trackId
+      trackName
+      artistName
+      albumName
+      albumImageUrl
+      playedAt
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAtQueryVariables,
+  APITypes.SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAtQuery
+>;

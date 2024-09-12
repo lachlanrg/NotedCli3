@@ -11,7 +11,6 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 import { getCurrentUser } from 'aws-amplify/auth';
 import { getFollowCounts } from '../../components/currentUserFollowerFollowingCount';
-import { refreshing, setRefreshing } from '../../components/scrollRefresh';
 
 import UserPostList from '../../components/userPostsList';
 import SettingsBottomSheet from '../../components/BottomSheets/SettingsBottomSheetModal';
@@ -20,8 +19,6 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { useSpotify } from '../../context/SpotifyContext';
 
 import { formatNumber } from '../../utils/numberFormatter'; // Add this import
-import { listPosts } from '../../graphql/queries'; // Add this import
-import { generateClient } from 'aws-amplify/api';
 import LiveWaveform from '../../components/LiveWaveform'; // Add this import
 import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal';
 import { GestureHandlerRootView, LongPressGestureHandler, State } from 'react-native-gesture-handler';
@@ -41,10 +38,90 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const { recentlyPlayed } = useSpotify();
-  const client = generateClient();
   const [refreshKey, setRefreshKey] = useState(0);
   const rpBottomSheetRef = useRef<BottomSheetModal>(null);
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchUserDataAndCounts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const userResponse = await getCurrentUser();
+      if (userResponse) {
+        const { userId, username } = userResponse;
+        setUserInfo({ userId, username });
+      }
+
+      const counts = await getFollowCounts();
+      if (counts) {
+        setFollowCounts(counts);
+      }
+    } catch (error) {
+      console.error('Error fetching user data and counts:', error);
+      setError('Failed to load user data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const refreshPostsAndFollowCounts = useCallback(async () => {
+    try {
+      const counts = await getFollowCounts();
+      if (counts) {
+        setFollowCounts(counts);
+      }
+      // Increment the refreshKey to force UserPostList to re-render
+      setRefreshKey(prevKey => prevKey + 1);
+    } catch (error) {
+      console.error('Error refreshing posts and follow counts:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUserDataAndCounts();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refreshPostsAndFollowCounts().finally(() => setRefreshing(false));
+  }, [refreshPostsAndFollowCounts]);
+
+  if (isLoading) {
+    return <View style={styles.container}><Text>Loading...</Text></View>;
+  }
+
+  if (error) {
+    return <View style={styles.container}><Text>{error}</Text></View>;
+  }
+
+  const handleNavigateToUserSearch = () => {
+    navigation.navigate('UserSearch');
+    console.log("Navigating to UserSearch Screen");
+  };
+
+  const handleNotificationPress = () => {
+    console.log("Notification button pressed");
+    navigation.navigate('Notifications');
+  };
+
+  const handlePostDeleted = () => {
+    console.log("Post deleted from ProfileScreen");
+  };
+
+  const handleFollowListNavigation = (initialTab: 'following' | 'followers') => {
+    navigation.navigate('FollowList', { userId: userInfo?.userId, initialTab });
+  };
+
+  const resetSelectedPost = () => {
+    setSelectedPost(null);
+  };
+
+  const handlePostsCountUpdate = (count: number) => {
+    setPostsCount(count);
+  };
 
   const handleLongPress = () => {
     mediumImpact()
@@ -73,83 +150,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const handlePresentSettingsModalPress = () => { 
     settingsBottomSheetRef.current?.present();
-  };
-
-  const fetchFollowCounts = useCallback(async () => {
-    try {
-      const counts = await getFollowCounts();
-      setFollowCounts(counts);
-    } catch (error) {
-      console.error('Error fetching follow counts:', error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
-
-  const currentAuthenticatedUser = useCallback(async () => {
-    try {
-      const user = await getCurrentUser();
-      if (user) {
-        const { userId, username } = user;
-        console.log(`The User Id: ${userId}, Username: ${username}`);
-        setUserInfo({ userId, username });
-      
-
-      } else {
-        console.log('No user found');
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([
-        currentAuthenticatedUser(),
-        fetchFollowCounts()
-      ]);
-    };
-    fetchData();
-  }, [currentAuthenticatedUser, fetchFollowCounts]);
-
-  const handleNavigateToUserSearch = () => {
-    navigation.navigate('UserSearch');
-    console.log("Navigating to UserSearch Screen");
-  };
-
-  const handleNotificationPress = () => {
-    console.log("Notification button pressed");
-    navigation.navigate('Notifications');
-  };
-
-  const handlePostDeleted = () => {
-    console.log("Post deleted from ProfileScreen");
-  };
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await fetchFollowCounts();
-      // Increment the refreshKey to force UserPostList to re-render
-      setRefreshKey(prevKey => prevKey + 1);
-    } catch (error) {
-      console.error('Error refreshing data:', error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [fetchFollowCounts]);
-
-  const handleFollowListNavigation = (initialTab: 'following' | 'followers') => {
-    navigation.navigate('FollowList', { userId: userInfo?.userId, initialTab });
-  };
-
-  const resetSelectedPost = () => {
-    setSelectedPost(null);
-  };
-
-  const handlePostsCountUpdate = (count: number) => {
-    setPostsCount(count);
   };
 
   return (
@@ -199,6 +199,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
                 </TouchableOpacity>
               </View>
+
               {recentlyPlayed.length > 0 && ( 
                 <GestureHandlerRootView>
                   <LongPressGestureHandler
@@ -241,6 +242,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   </LongPressGestureHandler>
                 </GestureHandlerRootView>
               )}
+
             <UserPostList 
               key={refreshKey}
               userId={userInfo?.userId} 
@@ -256,7 +258,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             onClose={resetSelectedPost}
           />
         </View>
-        <RPBottomSheetModal ref={rpBottomSheetRef} />
+        <RPBottomSheetModal ref={rpBottomSheetRef} userId={userInfo?.userId} />
       </SafeAreaView>
     );
   };
@@ -351,7 +353,7 @@ const styles = StyleSheet.create({
   },
   recentlyPlayedContentContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   rpTitle: {
     color: dgray,
