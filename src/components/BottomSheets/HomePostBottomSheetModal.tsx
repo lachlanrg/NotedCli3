@@ -3,7 +3,7 @@ import React, { useMemo, forwardRef, useCallback, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { dark, light, error } from "../colorModes";
+import { dark, light, error, modalBackground } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
@@ -80,6 +80,7 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
+      backgroundStyle={{ backgroundColor: modalBackground }}
     >
         <View style={styles.contentContainer}>
         {item && ( // Conditionally render content if 'item' exists

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-nat
 import { BottomSheetModal, BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
-import { dark, light, gray } from '../colorModes';
+import { dark, light, gray, modalBackground } from '../colorModes';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { generateClient } from 'aws-amplify/api';
 import * as queries from '../../graphql/queries';
@@ -64,7 +64,7 @@ const RPBottomSheetModal = forwardRef<BottomSheetModal, RPBottomSheetModalProps>
       index={0}
       snapPoints={['50%']}
       backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: "#e2e2e2" }}
+      backgroundStyle={{ backgroundColor: modalBackground }}
     >
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Recently Played</Text>

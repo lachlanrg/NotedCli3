@@ -54,6 +54,8 @@ type Post @model @auth(rules: [{allow: public}]) {
   spotifyTrackArtists: String
   spotifyTrackPreviewUrl: String
   spotifyTrackExternalUrl: String
+  spotifyTrackReleaseDate: String
+  spotifyTrackDurationMs: Int
 
   scTrackId: ID
   scTrackTitle: String

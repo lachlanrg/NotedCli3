@@ -41,6 +41,7 @@ export interface Album {
     popularity: number; 
     preview_url: string,
     external_urls: { spotify: string },
+    duration_ms: number,
   }
   
   export interface SearchResult {

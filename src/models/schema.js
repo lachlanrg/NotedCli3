@@ -575,6 +575,20 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "spotifyTrackReleaseDate": {
+                    "name": "spotifyTrackReleaseDate",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackDurationMs": {
+                    "name": "spotifyTrackDurationMs",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "scTrackId": {
                     "name": "scTrackId",
                     "isArray": false,
@@ -1133,5 +1147,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "31463a3ac96e15f89bee62f3d7af3c12"
+    "version": "518280d585f1a7e1bed5d82cfdb91b79"
 };
