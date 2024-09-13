@@ -149,6 +149,8 @@ type EagerPost = {
   readonly spotifyTrackArtists?: string | null;
   readonly spotifyTrackPreviewUrl?: string | null;
   readonly spotifyTrackExternalUrl?: string | null;
+  readonly spotifyTrackReleaseDate?: string | null;
+  readonly spotifyTrackDurationMs?: number | null;
   readonly scTrackId?: string | null;
   readonly scTrackTitle?: string | null;
   readonly scTrackArtworkUrl?: string | null;
@@ -191,6 +193,8 @@ type LazyPost = {
   readonly spotifyTrackArtists?: string | null;
   readonly spotifyTrackPreviewUrl?: string | null;
   readonly spotifyTrackExternalUrl?: string | null;
+  readonly spotifyTrackReleaseDate?: string | null;
+  readonly spotifyTrackDurationMs?: number | null;
   readonly scTrackId?: string | null;
   readonly scTrackTitle?: string | null;
   readonly scTrackArtworkUrl?: string | null;

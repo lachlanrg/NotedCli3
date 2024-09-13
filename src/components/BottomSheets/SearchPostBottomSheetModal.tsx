@@ -1,7 +1,7 @@
 import React, { useMemo, forwardRef, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, light } from "../colorModes";
+import { dark, light, modalBackground } from "../colorModes";
 import { Track } from "../../spotifyConfig/itemInterface";
 import { scTrack } from "../../soundcloudConfig/itemInterface";
 import { useNavigation } from '@react-navigation/native';
@@ -61,6 +61,7 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
             snapPoints={snapPoints}
             enablePanDownToClose={true}
             backdropComponent={renderBackDrop}
+            backgroundStyle={{ backgroundColor: modalBackground }}
         >
             <View style={styles.contentContainer}>
                 {item && (
@@ -89,7 +90,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         padding: 16,
-        backgroundColor: light,
     },
     trackTitle: {
         fontSize: 18,

@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faGear, faUser, faBell, faEye, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { dark, light } from "../colorModes";
+import { dark, gray, lgray, light, modalBackground } from "../colorModes";
 
 export type Ref = BottomSheetModal;
 
@@ -78,6 +78,8 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
+      backgroundStyle={{ backgroundColor: modalBackground }}
+
     >
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.containerHeadline}>Settings</Text>
@@ -124,7 +126,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: lgray,
     borderBottomWidth: 1,
   },
   optionText: {

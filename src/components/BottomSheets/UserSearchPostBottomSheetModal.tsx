@@ -2,7 +2,7 @@
 import React, { useMemo, forwardRef, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, light } from "../colorModes";
+import { dark, light, modalBackground } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -32,6 +32,7 @@ const UserSearchPostBottomSheetModal = forwardRef<BottomSheetModal, UserSearchPo
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
+      backgroundStyle={{ backgroundColor: modalBackground }}
     >
         <View style={styles.contentContainer}>
           {post && (

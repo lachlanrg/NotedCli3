@@ -1,7 +1,7 @@
 import React, { useMemo, forwardRef, useCallback, useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { dark, gray, light } from "../colorModes";
+import { dark, gray, lgray, light, modalBackground } from "../colorModes";
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import * as queries from '../../graphql/queries';
@@ -260,6 +260,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
       keyboardBehavior="extend"
+      backgroundStyle={{ backgroundColor: modalBackground }}
+
       // handleIndicatorStyle={{ backgroundColor: 'white '}}
     >
       <View style={styles.contentContainer}>
@@ -280,6 +282,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             style={styles.input}
             onChangeText={handleCommentChange}
             placeholder="Add a comment ..."
+            placeholderTextColor={gray}
             maxLength={600}
           />
           <TouchableOpacity onPress={createComment} style={styles.postButton}>

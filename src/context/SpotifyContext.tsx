@@ -172,7 +172,6 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
             filter: { 
               userSpotifyRecentlyPlayedTrackId: { eq: currentUserId }
             },
-            limit: 10
           },
         });
 

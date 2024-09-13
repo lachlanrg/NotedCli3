@@ -355,6 +355,8 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     spotifyTrackArtists
     spotifyTrackPreviewUrl
     spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -401,6 +403,8 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -457,6 +461,8 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -504,6 +510,8 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -670,6 +678,8 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl

@@ -488,6 +488,8 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
     spotifyTrackArtists
     spotifyTrackPreviewUrl
     spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -557,6 +559,8 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
     spotifyTrackArtists
     spotifyTrackPreviewUrl
     spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -626,6 +630,8 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
     spotifyTrackArtists
     spotifyTrackPreviewUrl
     spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -675,6 +681,8 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -769,6 +777,8 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -863,6 +873,8 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -958,6 +970,8 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -1038,6 +1052,8 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -1118,6 +1134,8 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       spotifyTrackArtists
       spotifyTrackPreviewUrl
       spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
       scTrackId
       scTrackTitle
       scTrackArtworkUrl

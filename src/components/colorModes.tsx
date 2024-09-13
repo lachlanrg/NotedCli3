@@ -11,3 +11,5 @@ export const dgray = '#CECECE'
 export const error = '#CF6679'
 
 export const placeholder = '#868686'
+
+export const modalBackground = '#e2e2e2'
