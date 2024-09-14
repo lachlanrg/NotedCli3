@@ -143,6 +143,13 @@ export const schema = {
                         ]
                     }
                 },
+                "recentlyPlayedDisabled": {
+                    "name": "recentlyPlayedDisabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1147,5 +1154,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "518280d585f1a7e1bed5d82cfdb91b79"
+    "version": "44747229c2cc2dd262ca4672a5679516"
 };

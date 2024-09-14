@@ -49,6 +49,7 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -102,6 +103,7 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -155,6 +157,7 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -177,6 +180,7 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -189,6 +193,7 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -219,6 +224,7 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -231,6 +237,7 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -261,6 +268,7 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -273,6 +281,7 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -303,6 +312,7 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -315,6 +325,7 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -347,6 +358,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -359,6 +371,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -391,6 +404,7 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -403,6 +417,7 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -439,6 +454,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -507,6 +523,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -575,6 +592,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -698,6 +716,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -791,6 +810,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -884,6 +904,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -957,6 +978,7 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1036,6 +1058,7 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1115,6 +1138,7 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1155,6 +1179,7 @@ export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1192,6 +1217,7 @@ export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1229,6 +1255,7 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version

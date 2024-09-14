@@ -52,6 +52,7 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -108,6 +109,7 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -164,6 +166,7 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -187,6 +190,7 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -199,6 +203,7 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -230,6 +235,7 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -242,6 +248,7 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -273,6 +280,7 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -285,6 +293,7 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -316,6 +325,7 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -328,6 +338,7 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -361,6 +372,7 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -373,6 +385,7 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -406,6 +419,7 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -418,6 +432,7 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -457,6 +472,7 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -528,6 +544,7 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -599,6 +616,7 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -725,6 +743,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -821,6 +840,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -917,6 +937,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -993,6 +1014,7 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1075,6 +1097,7 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1157,6 +1180,7 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1198,6 +1222,7 @@ export const createSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation CreateSp
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1236,6 +1261,7 @@ export const updateSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation UpdateSp
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -1274,6 +1300,7 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version

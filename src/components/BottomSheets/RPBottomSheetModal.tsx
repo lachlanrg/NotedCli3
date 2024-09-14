@@ -27,9 +27,9 @@ const RPBottomSheetModal = forwardRef<BottomSheetModal, RPBottomSheetModalProps>
         query: queries.listSpotifyRecentlyPlayedTracks,
         variables: { 
           filter: { 
-            userSpotifyRecentlyPlayedTrackId: { eq: userId }
+            userSpotifyRecentlyPlayedTrackId: { eq: userId },
+            _deleted: { ne: true }
           },
-          limit: 10
         },
       });
 

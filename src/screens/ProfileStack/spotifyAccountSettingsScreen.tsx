@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Image, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { dark, gray, light } from '../../components/colorModes';
-import { convertMillisecondsToMinutes } from '../../utils/timeUtils';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { dark, gray, lgray, light } from '../../components/colorModes';
+import { useSpotify } from '../../context/SpotifyContext';
+import { getCurrentUser } from 'aws-amplify/auth';
+import { generateClient } from 'aws-amplify/api';
+import * as queries from '../../graphql/queries';
+import * as mutations from '../../graphql/mutations';
+import { updateUser } from '../../graphql/mutations';
 
 const SpotifyAccountSettingsScreen: React.FC = () => {
     const navigation = useNavigation<any>();
     const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
-    const [expirationDate, setExpirationDate] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [displayName, setDisplayName] = useState<string | null>(null);
     const [email, setEmail] = useState<string | null>(null);
+    const [profileImage, setProfileImage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchSpotifyData = async () => {
             const accessToken = await AsyncStorage.getItem('spotifyAccessToken');
-            const refreshToken = await AsyncStorage.getItem('spotifyRefreshToken');
-            const expirationDate = await AsyncStorage.getItem('spotifyTokenExpiration');
             const user = await AsyncStorage.getItem('spotifyUser');
 
             if (user) {
@@ -30,11 +30,10 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
                 setUserId(userObj.id);
                 setDisplayName(userObj.display_name);
                 setEmail(userObj.email);
+                setProfileImage(userObj.images?.[0]?.url || null);
             }
 
             setAccessToken(accessToken);
-            setRefreshToken(refreshToken);
-            setExpirationDate(expirationDate);
         };
 
         fetchSpotifyData();
@@ -47,9 +46,76 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
             await AsyncStorage.removeItem('spotifyTokenExpiration');
             await AsyncStorage.removeItem('spotifyUser');
             console.log('Spotify user signed out');
-            Alert.alert("Success", "Signed out of Spotify Account.");
+            navigation.goBack();
         } catch (error) {
             console.log('Error signing out Spotify user: ', error);
+        }
+    };
+
+    const [RPDStatus, setRPDstatus] = useState(false);
+
+    const fetchRPDStatus = async () => {
+        const client = generateClient();
+        try {
+            const { userId } = await getCurrentUser();
+            const response = await client.graphql({
+                query: queries.getUser,
+                variables: {
+                    id: userId,
+                },
+            });
+            const fetchedRPD = response.data?.getUser?.recentlyPlayedDisabled;
+            const booleanRPD = fetchedRPD === true;
+            setRPDstatus(booleanRPD);
+        } catch (error) {
+            console.error('Error fetching public profile status:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchRPDStatus();
+    }, []);
+
+
+    const toggleDisableRecentlyPlayed = async () => {
+        const client = generateClient();
+        try {
+            const { userId } = await getCurrentUser();
+            const newRPDStatus = !RPDStatus;
+            
+            console.log('Attempting to update RPD to:', newRPDStatus);
+
+            const getUserResponse = await client.graphql({
+                query: queries.getUser,
+                variables: { id: userId },
+            });
+
+            const currentUser = getUserResponse.data.getUser;
+            if (!currentUser) {
+                throw new Error('User data not found');
+            }
+
+            const response = await client.graphql({
+                query: updateUser,
+                variables: {
+                    input: {
+                        id: userId,
+                        recentlyPlayedDisabled: newRPDStatus,
+                        _version: currentUser._version,
+                    },
+                },
+            });
+            
+            const updateRPD = response.data.updateUser.recentlyPlayedDisabled;
+            
+            console.log('Server returned publicProfile:', updateRPD);
+
+            setRPDstatus(updateRPD === true);
+            console.log('Profile visibility updated to:', updateRPD);
+        } catch (error) {
+            console.error('Error updating profile visibility:', error);
+            // Revert the UI state if the update failed
+            setRPDstatus(!RPDStatus);
         }
     };
 
@@ -60,41 +126,50 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                         <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Spotify Account Settings</Text>
+                    <Text style={styles.headerTitle}>Spotify Account</Text>
                 </View>
 
-                {!accessToken ? ( 
-                    <TouchableOpacity 
-                    onPress={() => navigation.navigate('SignUpSpotifyLogin')}
-                    style={styles.loginButton} 
-                    >
-                    <Text style={styles.loginButtonText}>Login</Text>
-                    </TouchableOpacity>
+                {!accessToken ? (
+                    <View style={styles.content}>
+                        <Text style={styles.noAccountText}>No Spotify account connected</Text>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('SignUpSpotifyLogin')}
+                            style={styles.loginButton}
+                        >
+                            <Text style={styles.loginButtonText}>Connect Spotify</Text>
+                        </TouchableOpacity>
+                    </View>
                 ) : (
-                <View style={styles.content}>
-                    <Text style={styles.label}><Text style={styles.boldText}>User ID:</Text> {userId}</Text>
-                    <Text style={styles.label}><Text style={styles.boldText}>Display Name:</Text> {displayName}</Text>
-                    <Text style={styles.label}><Text style={styles.boldText}>Email:</Text> {email}</Text>
-                    <Text style={styles.label}><Text style={styles.boldText}>Access Token:</Text> {accessToken}</Text>
-                    <Text style={styles.label}><Text style={styles.boldText}>Refresh Token:</Text> {refreshToken}</Text>
-                     {/* {expirationDate && (
-                        <Text>Token expires in: {convertMillisecondsToMinutes(parseInt(expirationDate))} minutes</Text>
-                    )} */}
-                    <Text style={styles.label}><Text style={styles.boldText}>Token Expiry:</Text> {expirationDate}</Text>
-                </View>
-                 )}
-
-                </View>
-                {accessToken && (
-                <View style={styles.logoutContainer}>
-                    <TouchableOpacity 
-                    onPress={handleSpotifySignOut} 
-                    style={styles.logoutButton}
-                    >
-                    <Text style={styles.logoutButtonText}>Logout</Text>
-                    </TouchableOpacity>
-                </View>
+                    <View style={styles.content}>
+                        {profileImage && (
+                            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+                        )}
+                        <Text style={styles.displayName}>{displayName}</Text>
+                        <Text style={styles.infoText}>{userId}</Text>
+                        <Text style={styles.infoText}>{email}</Text>
+                        <View style={styles.settingItem}>
+                            <View>
+                                <Text style={styles.settingLabel}>Disable Recently Played</Text>
+                                <Text style={{color: lgray, fontSize: 12, fontStyle: 'italic'}}>
+                                    {RPDStatus ? 'Not displaying' : 'Currently displaying by default'}
+                                </Text>
+                            </View>
+                            <Switch
+                                value={RPDStatus}
+                                onValueChange={toggleDisableRecentlyPlayed}
+                                trackColor={{ false: gray, true: lgray }}
+                                thumbColor={RPDStatus ? light : dark}
+                            />
+                        </View>
+                        <TouchableOpacity
+                            onPress={handleSpotifySignOut}
+                            style={styles.logoutButton}
+                        >
+                            <Text style={styles.logoutButtonText}>Disconnect Spotify</Text>
+                        </TouchableOpacity>
+                    </View>
                 )}
+            </View>
         </SafeAreaView>
     );
 };
@@ -111,65 +186,88 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
-        backgroundColor: dark,
-        borderBottomWidth: 2,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        borderBottomWidth: 1,
         borderBottomColor: gray,
-        paddingBottom: 10,
     },
     backButton: {
-        padding: 10,
+        padding: 5,
     },
     headerTitle: {
         flex: 1,
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
         color: light,
         textAlign: 'center',
-        marginRight: 34, // To center the title with the back button
+        marginRight: 30,
     },
     content: {
         flex: 1,
-        // justifyContent: 'center',
-        // alignItems: 'center',
-        paddingTop: 30,
-        padding: 10,
+        alignItems: 'center',
+        paddingTop: 40,
+        paddingHorizontal: 20,
     },
-    label: {
+    profileImage: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        marginBottom: 20,
+    },
+    displayName: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: light,
+        marginBottom: 10,
+    },
+    infoText: {
+        fontSize: 16,
+        color: light,
+        marginBottom: 5,
+        textAlign: 'center',
+    },
+    noAccountText: {
+        fontSize: 18,
         color: light,
         marginBottom: 30,
     },
-    boldText: {
-        fontWeight: 'bold',
+    loginButton: {
+        backgroundColor: '#1DB954',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 25,
     },
-    logoutContainer: {
-        alignItems: 'center',
-        paddingBottom: 10,
+    loginButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
     logoutButton: {
-        backgroundColor: 'red',
-        padding: 15,
-        borderRadius: 8,
-        margin: 20,
-        alignItems: 'center',
-        width: 200,
+        backgroundColor: '#FF4136',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 25,
+        marginTop: 40,
     },
     logoutButtonText: {
         color: 'white',
         fontWeight: 'bold',
+        fontSize: 16,
     },
-    loginButton: { // Style this similar to your logoutButton if needed
-        backgroundColor: 'green', 
-        padding: 15,
-        borderRadius: 8,
-        margin: 20,
+    settingItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        width: 200, 
-      },
-      loginButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-      },
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: gray,
+        width: '100%',
+        paddingTop: 30,
+    },
+    settingLabel: {
+        fontSize: 16,
+        color: light,
+    },
 });
 
 export default SpotifyAccountSettingsScreen;

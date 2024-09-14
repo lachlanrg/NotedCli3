@@ -59,6 +59,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    settingItem: {
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: gray,
+        width: '100%',
+        alignItems: 'center',
+    },
+    settingText: {
+        color: light,
+        fontSize: 16,
+    },
 });
 
 export default GeneralSettingsScreen;
