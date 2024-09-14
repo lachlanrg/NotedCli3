@@ -31,11 +31,8 @@ import { RouteProp, ParamListBase } from '@react-navigation/native';
 
 // Importing item button log functions
 import { logArtistInfo } from '../../utils/itemButtonLog'
-import { logAlbumInfo } from '../../utils/itemButtonLog'
-import { logTrackInfo } from '../../utils/itemButtonLog'
 import { SearchScreenStackParamList } from '../../components/types';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRecentSearches } from '../../components/recentSearchItems';
 
 import { Artist, Track } from '../../spotifyConfig/itemInterface';
@@ -45,7 +42,6 @@ import useSpotifySearch from '../../spotifyConfig/spotifySearchAll';
 import { MenuItem } from '@aws-amplify/ui-react';
 import SearchPostBottomSheetModal from '../../components/BottomSheets/SearchPostBottomSheetModal';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import { heavyImpact, mediumImpact, selectionChange } from '../../utils/hapticFeedback';
 
 //Apparently including this is the only way for it to work in the albumDetailsScreen
@@ -211,35 +207,6 @@ const handleSearch = async () => {
     await handleSearchSCTracks();
   }
 };
-
-// const BOTTOM_SHEET_HEIGHT = 150; 
-
-// const panResponder = useRef(
-//   PanResponder.create({
-//     onStartShouldSetPanResponder: () => true,
-//     onPanResponderMove: (event, gesture) => {
-//       const newHeight = Math.max(0, BOTTOM_SHEET_HEIGHT - gesture.dy);
-//       bottomSheetHeight.setValue(newHeight);
-//     },
-//     onPanResponderRelease: (event, gesture) => {
-//       // Velocity-based closing for a more natural feel
-//       const velocity = gesture.vy; 
-//       if (velocity > 0.5 || (gesture.dy > 50 && isBottomSheetOpen)) {
-//         closeBottomSheet();
-//       } else {
-//         openBottomSheet();
-//       }
-//     },
-//   })
-// ).current;
-
-// const openBottomSheet = () => {
-//   Animated.spring(bottomSheetHeight, {
-//     toValue: BOTTOM_SHEET_HEIGHT,
-//     useNativeDriver: false, 
-//     bounciness: 8, 
-//   }).start(() => setIsBottomSheetOpen(true)); 
-// };
 
 const closeBottomSheet = useCallback(() => {
   bottomSheetModalRef.current?.close();
@@ -447,7 +414,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: lgray,
-    borderRadius: 12,
+    borderRadius: 18,
     paddingHorizontal: 10,
     width: '80%',
     marginRight: 20,

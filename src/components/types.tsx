@@ -38,7 +38,8 @@ export type ProfileStackParamList = {
   FollowList: { userId: string; initialTab: 'following' | 'followers' };
 };
 
-export type ExploreStackParamList ={
+export type ExploreStackParamList = {
   Explore: undefined;
   ItemDetailsExplore: undefined;
+  ExplorePost: { id: string, type: string };
 };

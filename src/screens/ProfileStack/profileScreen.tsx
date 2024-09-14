@@ -220,9 +220,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <View style={styles.header}>
             <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
             <View style={styles.icons}>
-              <TouchableOpacity style={styles.createPostButton} onPress={() => navigation.navigate('CreatePostTab')}>
-                <FontAwesomeIcon icon={faEdit} size={25} color={light} />
-              </TouchableOpacity>
               <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
                 <FontAwesomeIcon icon={faBell} size={25} color={light} />
               </TouchableOpacity>

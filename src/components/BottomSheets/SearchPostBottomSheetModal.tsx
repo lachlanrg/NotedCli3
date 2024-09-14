@@ -1,18 +1,23 @@
 import React, { useMemo, forwardRef, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, light, modalBackground } from "../colorModes";
+import { dark, gray, lgray, light, modalBackground } from "../colorModes";
 import { Track } from "../../spotifyConfig/itemInterface";
 import { scTrack } from "../../soundcloudConfig/itemInterface";
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faMusic, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+
+const musicIcon = faMusic as IconProp;
+const searchIcon = faMagnifyingGlass as IconProp;
 
 type RootStackParamList = {
   PostSpotifyTrack: { track: Track };
   PostSCTrack: { sctrack: scTrack };
   // ... other routes
 };
-
 
 export type Ref = BottomSheetModal;
 
@@ -77,9 +82,14 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                         </Text>
                     </>
                 )}
-                <TouchableOpacity style={styles.postButton} onPress={handlePostPress}>
-                    <Text style={styles.postButtonText}>Post</Text>
-                </TouchableOpacity>
+                <View style={styles.iconRow}>
+                    <TouchableOpacity style={styles.searchButton}>
+                        <FontAwesomeIcon icon={searchIcon} size={24} color={dark} /> 
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.postButton} onPress={handlePostPress}>
+                        <Text style={styles.postButtonText}>Post</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </BottomSheetModal>
     );
@@ -90,6 +100,19 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         padding: 16,
+    },
+    iconRow: {
+        flexDirection: 'row',        
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
+    searchButton: {
+        borderWidth: 1,
+        borderColor: lgray,
+        paddingVertical: 10,
+        paddingHorizontal: 28,
+        borderRadius: 20,
+        marginRight: 40,
     },
     trackTitle: {
         fontSize: 18,
@@ -109,7 +132,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 20,
-        marginTop: 16,
+        marginLeft: 40,
     },
     postButtonText: {
         color: light,

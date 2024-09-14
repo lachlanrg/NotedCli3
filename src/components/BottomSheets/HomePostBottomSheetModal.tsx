@@ -24,7 +24,7 @@ interface HomePostBottomSheetProps {
     item: any | null; 
   }
 
-const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomSheetProps>(({ item }, ref) => { 
+const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomSheetProps>(({ item }, ref) => {
   const snapPoints = useMemo(() => ['20%'], []);
   const [userInfo, setUserId] = useState<any>(null);
   const navigation = useNavigation<any>();
@@ -63,11 +63,29 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
   };
 
   const handleDetailsPress = () => {
-    if (item) { // Access 'item' from the props
-        console.log('Details pressed for:', item);
-    } else {
-        console.warn('No external URL found for the selected item');
+    if (item) {
+      let id: string;
+      let type: string;
+
+      if (item.spotifyTrackId) {
+        id = item.spotifyTrackId;
+        type = 'spotifyTrack';
+      } else if (item.spotifyAlbumId) {
+        id = item.spotifyAlbumId;
+        type = 'spotifyAlbum';
+      } else if (item.scTrackId) {
+        id = item.scTrackId;
+        type = 'scTrack';
+      } else {
+        console.warn('No valid ID found for the selected item');
+        return;
       }
+
+      navigation.navigate('ExploreTab', { screen: 'ExplorePost', params: { id, type } });
+      dismiss(); // Close the bottom sheet after navigation
+    } else {
+      console.warn('No item selected');
+    }
   };
 
   const { dismiss } = useBottomSheetModal();
