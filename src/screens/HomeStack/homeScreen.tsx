@@ -83,6 +83,8 @@ const HomeScreen: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
 
   const togglePostExpansion = (postId: string) => {
     setExpandedPosts(prev => {
@@ -485,7 +487,7 @@ const HomeScreen: React.FC = () => {
         )}
 
         {isRepost ? (
-          <TouchableOpacity activeOpacity={0.8} onPress={handlePostPress}>
+          <TouchableOpacity activeOpacity={0.8}onPress={handlePostPress}>
             {renderPostContent()}
           </TouchableOpacity>
         ) : (

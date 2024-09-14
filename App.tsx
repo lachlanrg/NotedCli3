@@ -18,7 +18,6 @@ import HomeScreen from './src/screens/HomeStack/homeScreen';
 import ProfileScreen from './src/screens/ProfileStack/profileScreen';
 import LoginScreen from './src/screens/loginScreen'; 
 import SignUpScreen from './src/screens/signupScreen'
-import CreatePostScreen from './src/screens/createPostScreen'; 
 import SearchScreen from './src/screens/SearchStack/searchScreen';
 import AlbumDetailsScreen from './src/screens/SearchStack/albumDetailsScreen';
 import UserSearchScreen from './src/screens/ProfileStack/userSearchScreen';
@@ -42,21 +41,17 @@ import AccessibilitySettingsScreen from './src/screens/ProfileStack/accessibilit
 import PrivacySettingsScreen from './src/screens/ProfileStack/privacySettingsScreen';
 import AppLoadingScreen from './src/screens/AppLoadingScreen';
 import FollowListScreen from './src/screens/ProfileStack/FollowListScreen';
+import ExplorePostScreen from './src/screens/ExploreStack/ExplorePostScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
-import { fetchAuthSession, getCurrentUser } from '@aws-amplify/auth';
-import { withAuthenticator } from '@aws-amplify/ui-react';
 import awsconfig from './src/aws-exports';
 import { generateClient } from 'aws-amplify/api';
-import config from './src/amplifyconfiguration.json';
 
 import { useColorScheme } from 'react-native'; 
 import { ThemeProvider } from './src/utils/ThemeContext';
 
 import { SpotifyProvider } from './src/context/SpotifyContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 
 // Import Stack ParamLists
 import { SearchScreenStackParamList } from './src/components/types';
@@ -125,6 +120,7 @@ const ExploreStackNavigator = () => {
     <ExploreStack.Navigator>
       <ExploreStack.Screen name="Explore" component={ExploreScreen} options={{ headerShown: false }} />
       <ExploreStack.Screen name="ItemDetailsExplore" component={ItemDetailsExploreScreen} options={{ headerShown: false }} />
+      <ExploreStack.Screen name="ExplorePost" component={ExplorePostScreen} options={{ headerShown: false }} />
     </ExploreStack.Navigator>
   )
 }
@@ -176,24 +172,6 @@ const App = () => {
   const colorScheme = useColorScheme();
   const navigationRef = useRef(null);
 
-  // useEffect(() => {
-  //   const checkUserSession = async () => {
-  //     try {
-  //       const session = await fetchAuthSession();
-  //       const { accessToken, idToken } = session.tokens ?? {};
-  //       if (accessToken && idToken) {
-  //         // Navigate to Main stack if tokens are valid
-  //         (navigationRef.current as any)?.navigate('Main');
-  //       }
-  //     } catch (err) {
-  //       console.log('No valid session found:', err);
-  //     }
-  //   };
-
-  //   checkUserSession();
-  // }, []);
-
-
   return (
     <SpotifyProvider>
       <SafeAreaProvider>
@@ -202,10 +180,30 @@ const App = () => {
             <ThemeProvider>
               <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} ref={navigationRef}>
                 <Stack.Navigator initialRouteName="AppLoading">
-                  <Stack.Screen name="AppLoading" component={AppLoadingScreen} options={{ headerShown: false }} />
-
-                  <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-                  <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
+                  <Stack.Screen 
+                    name="AppLoading" 
+                    component={AppLoadingScreen} 
+                    options={{ 
+                      headerShown: false,
+                      gestureEnabled: false, // Disable swipe gesture
+                    }} 
+                  />
+                  <Stack.Screen 
+                    name="Login" 
+                    component={LoginScreen} 
+                    options={{ 
+                      headerShown: false,
+                      gestureEnabled: false, // Disable swipe gesture
+                    }} 
+                  />
+                  <Stack.Screen 
+                    name="Main" 
+                    component={MainTabNavigator} 
+                    options={{ 
+                      headerShown: false,
+                      gestureEnabled: false, // Disable swipe gesture
+                    }} 
+                  />
                   <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
                   <Stack.Screen name="SignUpSpotifyLogin" component={SignUpSpotifyLoginScreen} options={{ headerShown: false }} />
                 </Stack.Navigator>
@@ -218,6 +216,5 @@ const App = () => {
   );
 };
 
-// export default withAuthenticator(App);
 export default App;
 
