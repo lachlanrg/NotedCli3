@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Dimensions, Animated, Easing, PanResponder, TouchableWithoutFeedback, Vibration } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Animated } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
@@ -23,6 +23,9 @@ import LiveWaveform from '../../components/LiveWaveform'; // Add this import
 import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal';
 import { GestureHandlerRootView, LongPressGestureHandler, State } from 'react-native-gesture-handler';
 import { mediumImpact } from '../../utils/hapticFeedback';
+import { getUser, listSpotifyRecentlyPlayedTracks } from '../../graphql/queries';
+import { generateClient } from 'aws-amplify/api';
+import { SpotifyRecentlyPlayedTrack } from '../../models';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -37,7 +40,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const settingsBottomSheetRef = useRef<BottomSheetModal>(null);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
-  const { recentlyPlayed } = useSpotify();
   const [refreshKey, setRefreshKey] = useState(0);
   const rpBottomSheetRef = useRef<BottomSheetModal>(null);
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -45,9 +47,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [recentlyPlayedDisabled, setRecentlyPlayedDisabled] = useState(false);
+  const [recentlyPlayedTrack, setRecentlyPlayedTrack] = useState<SpotifyRecentlyPlayedTrack | null>(null);
+  const { recentlyPlayed } = useSpotify();
+
+
   const fetchUserDataAndCounts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    const client = generateClient();
     try {
       const userResponse = await getCurrentUser();
       if (userResponse) {
@@ -59,6 +67,32 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       if (counts) {
         setFollowCounts(counts);
       }
+
+      const recentlyPlayedDisabledResponse = await client.graphql({
+        query: getUser,
+        variables: { id: userResponse.userId },
+      });
+
+      const recentlyPlayedDisabled = recentlyPlayedDisabledResponse.data.getUser?.recentlyPlayedDisabled ?? false;
+      setRecentlyPlayedDisabled(recentlyPlayedDisabled);
+
+      const recentlyPlayedResponse = await client.graphql({
+        query: listSpotifyRecentlyPlayedTracks,
+        variables: { 
+          filter: { 
+            userSpotifyRecentlyPlayedTrackId: { eq: userResponse.userId } 
+          } 
+        },
+      });
+
+      const recentlyPlayedItems = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items;
+      if (recentlyPlayedItems && recentlyPlayedItems.length > 0) {
+        const mostRecentTrack = recentlyPlayedItems.reduce((latest, current) => {
+          return new Date(current._lastChangedAt) > new Date(latest._lastChangedAt) ? current : latest;
+        });
+        setRecentlyPlayedTrack(mostRecentTrack as any);
+      }
+
     } catch (error) {
       console.error('Error fetching user data and counts:', error);
       setError('Failed to load user data. Please try again.');
@@ -68,13 +102,41 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   }, []);
 
   const refreshPostsAndFollowCounts = useCallback(async () => {
+    const client = generateClient();
     try {
       const counts = await getFollowCounts();
+      const { userId } = await getCurrentUser();
       if (counts) {
         setFollowCounts(counts);
       }
       // Increment the refreshKey to force UserPostList to re-render
       setRefreshKey(prevKey => prevKey + 1);
+
+      // const recentlyPlayedDisabledResponse = await client.graphql({
+      //   query: getUser,
+      //   variables: { id: userId },
+      // });
+
+      // const recentlyPlayedDisabled = recentlyPlayedDisabledResponse.data.getUser?.recentlyPlayedDisabled ?? false;
+      // setRecentlyPlayedDisabled(recentlyPlayedDisabled);
+
+      // const recentlyPlayedResponse = await client.graphql({
+      //   query: listSpotifyRecentlyPlayedTracks,
+      //   variables: { 
+      //     filter: { 
+      //       userSpotifyRecentlyPlayedTrackId: { eq: userId } 
+      //     } 
+      //   },
+      // });
+
+      // const recentlyPlayedItems = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items;
+      // if (recentlyPlayedItems && recentlyPlayedItems.length > 0) {
+      //   const mostRecentTrack = recentlyPlayedItems.reduce((latest, current) => {
+      //     return new Date(current._lastChangedAt) > new Date(latest._lastChangedAt) ? current : latest;
+      //   });
+      //   setRecentlyPlayedTrack(mostRecentTrack as any);
+      // }
+      
     } catch (error) {
       console.error('Error refreshing posts and follow counts:', error);
     }
@@ -82,7 +144,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     fetchUserDataAndCounts();
-  }, []);
+  }, [recentlyPlayedDisabled]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -200,7 +262,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              {recentlyPlayed.length > 0 && ( 
+              {recentlyPlayed.length > 0 && !recentlyPlayedDisabled && recentlyPlayedTrack && ( 
                 <GestureHandlerRootView>
                   <LongPressGestureHandler
                     onHandlerStateChange={({ nativeEvent }) => {
@@ -208,7 +270,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                         handleLongPress();
                       }
                     }}
-                    minDurationMs={800}
+                    minDurationMs={500}
                   >
                     <Animated.View
                       style={[
@@ -230,7 +292,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                         >
                           <View>
                             <Text style={styles.recentlyPlayedText}>
-                              {recentlyPlayed[0].track.name} - {recentlyPlayed[0].track.artists[0].name} 
+                              {recentlyPlayed[0].track.name} - {recentlyPlayed[0].track.artists[0].name}
                             </Text>
                           </View>
                         </ScrollView>

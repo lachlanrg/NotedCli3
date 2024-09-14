@@ -11,6 +11,9 @@ type SpotifyUser = {
   display_name: string;
   uri: string;
   email: string;
+  images: { url: string }[];
+  country: string;
+  product: string;
   // Add other relevant Spotify user data fields 
 };
 
@@ -29,6 +32,8 @@ type SpotifyContextType = {
   refreshSpotifyToken: () => Promise<string | null>;
   fetchAndUpdateRecentlyPlayed: () => Promise<void>; 
   recentlyPlayed: TrackObjectFull[]; 
+  // recentlyPlayedDisabled: boolean;
+  // setRecentlyPlayedDisabled: (disabled: boolean) => void;
 };
 
 const SpotifyContext = createContext<SpotifyContextType | undefined>(undefined);
@@ -43,7 +48,6 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
   const [recentlyPlayed, setRecentlyPlayed] = useState<any[]>([]);
   const lastFetchTime = useRef<number>(0);
   const fetchingRef = useRef<boolean>(false);
-
   const client = generateClient();
 
   useEffect(() => {
@@ -170,7 +174,8 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
           query: queries.listSpotifyRecentlyPlayedTracks,
           variables: { 
             filter: { 
-              userSpotifyRecentlyPlayedTrackId: { eq: currentUserId }
+              userSpotifyRecentlyPlayedTrackId: { eq: currentUserId },
+              _deleted: { ne: true }
             },
           },
         });
@@ -250,6 +255,8 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         refreshSpotifyToken,
         fetchAndUpdateRecentlyPlayed,
         recentlyPlayed, 
+        // recentlyPlayedDisabled,
+        // setRecentlyPlayedDisabled: setRecentlyPlayedDisabledAndSave,
       }}
     >
       {children}

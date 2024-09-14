@@ -2,31 +2,38 @@
 // ** Almost identical copy of userSearchProfileScreen.tsx
 
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, SafeAreaView, Animated } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { dark, light, lgray, dgray, gray, placeholder, error } from '../../components/colorModes';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { HomeStackParamList } from '../../components/types';
 
 import * as queries from '../../graphql/queries';
 import * as mutations from '../../graphql/mutations';
 
+import { createFriendRequest, updateFriendRequest } from '../../graphql/mutations'; // Import updateFriendRequest mutation
+
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
 
-import { SpotifyRecentlyPlayedTrack } from '../../API';
+import { SpotifyRecentlyPlayedTrack } from '../../API'; // Update the import path as needed
 
 import { formatRelativeTime } from '../../components/formatComponents';
 import UserPostList from '../../components/userPostsList';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import UserSearchPostBottomSheetModal from '../../components/BottomSheets/UserSearchPostBottomSheetModal';
-import { formatNumber } from '../../utils/numberFormatter';
+import { formatNumber } from '../../utils/numberFormatter'; // Import the formatNumber function
 import LiveWaveform from '../../components/LiveWaveform';
+import { useSpotify } from '../../context/SpotifyContext';
+import { GestureHandlerRootView, LongPressGestureHandler, State } from 'react-native-gesture-handler';
+import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal';
+import { mediumImpact } from '../../utils/hapticFeedback';
+
 
 const spotifyIcon = faSpotify as IconProp;
 
@@ -50,10 +57,19 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
   const [followingCount, setFollowingCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [postsCount, setPostsCount] = useState(0);
+  
+  const rpBottomSheetRef = useRef<BottomSheetModal>(null);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [recentlyPlayedDisabled, setRecentlyPlayedDisabled] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [userFetched, setUserFetched] = useState(false);
+
+
 
   const client = generateClient();
 
-  React.useEffect(() => {
+  useEffect(() => {
     currentAuthenticatedUser();
     
   }, []);
@@ -61,11 +77,11 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
   async function currentAuthenticatedUser() {
     try {
       const { username, userId } = await getCurrentUser();
-      console.log('___________________________________')
-      console.log(`Current Authenticated User Info:`);
-      console.log(`The Username: ${username}`);
-      console.log(`The userId: ${userId}`);
-      console.log('___________________________________')
+      // console.log('___________________________________')
+      // console.log(`Current Authenticated User Info:`);
+      // console.log(`The Username: ${username}`);
+      // console.log(`The userId: ${userId}`);
+      // console.log('___________________________________')
       setCurrentAuthUserInfo({ username, userId });
     } catch (err) {
       console.log(err);
@@ -74,6 +90,7 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoading(true);
       try {
         const response = await client.graphql({
           query: queries.getUser,
@@ -83,7 +100,8 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
         // Check if getUser exists in the response:
         if (response.data && response.data.getUser) { 
           const fetchedUser = response.data.getUser;
-          setUser(fetchedUser); 
+          setUser(fetchedUser);
+          setUserFetched(true);
   
           // Fetch following and followers counts
           const followingResponse = await client.graphql({
@@ -120,7 +138,7 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
           const posts = postsResponse.data.listPosts.items.filter(post => !post._deleted);
           setPostsCount(posts.length);
 
-          // Fetch the recently played track
+          // Fetch the recently played track and recentlyPlayedDisabled status
           const recentlyPlayedResponse = await client.graphql({
             query: queries.listSpotifyRecentlyPlayedTracks,
             variables: { 
@@ -130,12 +148,20 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             },
           });
 
-          const recentlyPlayedTrack = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
-          if (recentlyPlayedTrack) {
-            setRecentlyPlayedTrack(recentlyPlayedTrack);
+          const recentlyPlayed = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
+          if (recentlyPlayed) {
+            setRecentlyPlayedTrack(recentlyPlayed);
           }
 
-  
+          // Fetch recentlyPlayedDisabled status
+          const recentlyPlayedDisabledResponse = await client.graphql({
+            query: queries.getUser,
+            variables: { id: userId },
+          });
+
+          const recentlyPlayedDisabled = recentlyPlayedDisabledResponse.data.getUser?.recentlyPlayedDisabled ?? false;
+          setRecentlyPlayedDisabled(recentlyPlayedDisabled);
+          
           // Now it's safe to use fetchedUser.publicProfile:
           if (fetchedUser.publicProfile || friendRequestStatus === 'Following') {
             const postsResponse = await client.graphql({
@@ -157,11 +183,13 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
       } catch (error) {
         console.error('Error fetching user or posts:', error);
         // Handle other potential errors (network issues, etc.)
+      } finally {
+        setIsLoading(false);
       }
     };
   
     fetchUser();
-  }, [userId, friendRequestStatus]);
+  }, [userId, friendRequestStatus, recentlyPlayedDisabled]);
 
   // Check for existing friend request
   useEffect(() => {
@@ -189,11 +217,11 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             } else if (friendRequest.status === 'Cancelled') { // Handle Cancelled status
               setFriendRequestStatus('Follow'); 
             } 
-            console.log('Existing Friend Request:', friendRequest);
+            // console.log('Existing Friend Request:', friendRequest);
           } else {
             setExistingFriendRequest(null);
             setFriendRequestStatus('Follow');
-            console.log('No existing friend requests sent')
+            // console.log('No existing friend requests sent')
           }
         } catch (error) {
           console.error('Error checking existing friend request:', error);
@@ -206,10 +234,10 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
     }
   }, [currentAuthUserInfo, user]);
 
-  if (!user) {
+  if (isLoading || !userFetched) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -424,6 +452,26 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
     return friendRequestStatus === 'Following' ? styles.followingButtonText : styles.followButtonText;
   };
 
+  const handleLongPress = () => {
+    mediumImpact()
+
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  
+    rpBottomSheetRef.current?.present();
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
 
@@ -470,25 +518,48 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             </TouchableOpacity>
           </View>
 
-           {recentlyPlayedTrack && ( 
-              <View style={[styles.recentlyPlayedBox, { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }]}>
-                <View style={styles.spotifyIcon}>
-                  <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
-                </View>
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.recentlyPlayedContent}>
-                  <View>
-                    <Text style={styles.rpTitle}>{user.username}'s Recently Played</Text>
-                    <Text style={styles.recentlyPlayedText}>
-                      {recentlyPlayedTrack.trackName} -{' '}
-                      {recentlyPlayedTrack.artistName} 
-                    </Text>
-                  </View>
-                </ScrollView>
-                <View style={styles.waveformContainer}>
-                  <LiveWaveform />
-                </View>
-              </View>
-            )}
+           {!isLoading && recentlyPlayedTrack && !recentlyPlayedDisabled && ( 
+              <GestureHandlerRootView>
+                  <LongPressGestureHandler
+                    onHandlerStateChange={({ nativeEvent }) => {
+                      if (nativeEvent.state === State.ACTIVE) {
+                        handleLongPress();
+                      }
+                    }}
+                    minDurationMs={800}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.recentlyPlayedBox,
+                        { transform: [{ scale: scaleAnim }] },
+                        { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }
+                      ]}
+                    >
+                      <View style={styles.spotifyIcon}>
+                        <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                      </View>
+                      <View style={styles.recentlyPlayedContent}>
+                      <Text style={styles.rpTitle}>{user.username}'s Recently Played</Text>
+                        <ScrollView 
+                          horizontal={true} 
+                          showsHorizontalScrollIndicator={false} 
+                          style={styles.recentlyPlayedContent}
+                          contentContainerStyle={styles.recentlyPlayedContentContainer}
+                        >
+                          <View>
+                            <Text style={styles.recentlyPlayedText}>
+                              {recentlyPlayedTrack.trackName} - {recentlyPlayedTrack.artistName} 
+                            </Text>
+                          </View>
+                        </ScrollView>
+                      </View>
+                      <View style={styles.waveformContainer}>
+                        <LiveWaveform />
+                      </View>
+                    </Animated.View>
+                  </LongPressGestureHandler>
+                </GestureHandlerRootView>
+              )}
 
         </View>
          {/* Show posts only if following the user */}
@@ -545,6 +616,8 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
         </View>
       </Modal>
       <UserSearchPostBottomSheetModal ref={postBottomSheetRef} post={selectedPost}/>
+      <RPBottomSheetModal ref={rpBottomSheetRef} userId={userId} />
+
     </View>
     </SafeAreaView>
   );
@@ -720,9 +793,17 @@ const styles = StyleSheet.create({
     backgroundColor: gray,
     padding: 15,
     borderRadius: 8,
-    alignSelf: 'flex-start', // Align to the left
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     marginLeft: 10,
+    // marginBottom: 10,
+  },
+  recentlyPlayedContent: {
+    flex: 1,
+  },
+  recentlyPlayedContentContainer: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
   },
   rpTitle: {
     color: dgray,
@@ -755,15 +836,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: lgray,
   },
-  recentlyPlayedContent: {
-    flex: 1,
-  },
   waveformContainer: {
     marginLeft: 10,
     marginRight: 5,
   },
   disabledStatItem: {
     opacity: 0.5,
+  },
+  loadingText: {
+    color: light,
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

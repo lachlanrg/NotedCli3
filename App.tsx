@@ -61,7 +61,6 @@ import { useNavigation } from '@react-navigation/native';
 // Import Stack ParamLists
 import { SearchScreenStackParamList } from './src/components/types';
 import { ProfileStackParamList } from './src/components/types';
-import { CreatePostStackParamList } from './src/components/types';
 import { HomeStackParamList } from './src/components/types';
 import { ExploreStackParamList } from './src/components/types';
 
@@ -74,7 +73,6 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>(); // Stack for Search screens
-const CreatePostStack = createNativeStackNavigator<CreatePostStackParamList>(); // Stack for Create Post screens
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>(); // Stack for Profile screens
 const ExploreStack = createNativeStackNavigator<ExploreStackParamList>();
 
@@ -100,14 +98,6 @@ const SearchStackNavigator = () => {
       <SearchStack.Screen name="PostSCTrack" component={PostSCTrackScreen} options={{ headerShown: false }} />
 
     </SearchStack.Navigator>
-  );
-};
-
-const CreatePostStackNavigator = () => {
-  return (
-    <CreatePostStack.Navigator>
-      <CreatePostStack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: false }} />
-    </CreatePostStack.Navigator>
   );
 };
 
@@ -152,8 +142,6 @@ const MainTabNavigator = () => {
             iconName = focused ? faHome : faHome;
           } else if (route.name === 'ProfileTab') {
             iconName = focused ? faUser : faUser;
-          } else if (route.name === 'CreatePostTab') { 
-          iconName = focused ? faPlus : faPlus;
           } else if (route.name === 'ExploreTab') { 
           iconName = focused ? faCompass : faCompass;
           } else if (route.name === 'SearchTab') {
@@ -171,7 +159,6 @@ const MainTabNavigator = () => {
     >
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ headerShown: false }} />
-      <Tab.Screen name="CreatePostTab" component={CreatePostStackNavigator} options={{ headerShown: false }} /> 
       <Tab.Screen name="ExploreTab" component={ExploreStackNavigator} options={{ headerShown: false }} /> 
       <Tab.Screen name="ProfileTab" component={ProfileStackNavigator} options={{ headerShown: false }} />
     </Tab.Navigator>

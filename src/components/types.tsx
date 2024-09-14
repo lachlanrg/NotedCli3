@@ -9,7 +9,6 @@ import { Post } from '../API';
 export type HomeStackParamList = {
   Home: undefined;
   HomeUserProfile: { userId: string }; 
-  CreatePostTab: undefined
   PostRepost: {post: Post};
   RepostOriginalPost: {post: Post};
   FollowList: { userId: string; initialTab: 'following' | 'followers' };
@@ -22,10 +21,6 @@ export type SearchScreenStackParamList = {
   PostSpotifyTrack: { track: Track };
   PostSpotifyAlbum: { album: Album };
   PostSCTrack: { sctrack: scTrack };
-};
-
-export type CreatePostStackParamList = {
-  CreatePost: undefined;
 };
 
 export type ProfileStackParamList = {

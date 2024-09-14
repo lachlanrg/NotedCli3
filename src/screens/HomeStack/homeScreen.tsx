@@ -681,8 +681,8 @@ const styles = StyleSheet.create({
     position: 'relative', // Add this to allow absolute positioning of the icon
   },
   mediaImage: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
   },
   mediaInfo: {
     flex: 1,

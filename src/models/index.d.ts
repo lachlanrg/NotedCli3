@@ -22,6 +22,7 @@ type EagerUser = {
   readonly publicProfile?: boolean | null;
   readonly reposts?: (Repost | null)[] | null;
   readonly spotifyRecentlyPlayedTrack?: (SpotifyRecentlyPlayedTrack | null)[] | null;
+  readonly recentlyPlayedDisabled?: boolean | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -42,6 +43,7 @@ type LazyUser = {
   readonly publicProfile?: boolean | null;
   readonly reposts: AsyncCollection<Repost>;
   readonly spotifyRecentlyPlayedTrack: AsyncCollection<SpotifyRecentlyPlayedTrack>;
+  readonly recentlyPlayedDisabled?: boolean | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

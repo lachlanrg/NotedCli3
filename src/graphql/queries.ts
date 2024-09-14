@@ -49,6 +49,7 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       startedAt
       __typename
     }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -69,6 +70,7 @@ export const listUsers = /* GraphQL */ `query ListUsers(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -99,6 +101,7 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -120,6 +123,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -132,6 +136,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -216,6 +221,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -228,6 +234,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -324,6 +331,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -554,6 +562,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -701,6 +710,7 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -804,6 +814,7 @@ export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRece
       username
       email
       publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
