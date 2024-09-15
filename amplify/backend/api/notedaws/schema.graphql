@@ -1,50 +1,110 @@
-# This "input" configures a global authorization rule to enable public access to
-# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
-
-type User @model {
+type User @model @auth(rules: [{allow: public}]) {
   id: ID!
   username: String!
   email: String!
-  likes: [Like] @hasMany
   posts: [Post] @hasMany
   friends: [Friendship] @hasMany
   sentFriendRequests: [FriendRequest] @hasMany
   receivedFriendRequests: [FriendRequest] @hasMany
+  comments: [Comment] @hasMany
+  publicProfile: Boolean
+  reposts: [Repost] @hasMany 
+  spotifyRecentlyPlayedTrack: [SpotifyRecentlyPlayedTrack] @hasMany
+  recentlyPlayedDisabled: Boolean
 }
 
-type Friendship @model {
+type Friendship @model @auth(rules: [{allow: public}]) {
   id: ID!
   user: User @belongsTo
   friend: User @belongsTo
 }
 
-type FriendRequest @model {
+type FriendRequest @model @auth(rules: [{allow: public}]) {
   id: ID!
   sender: User! @belongsTo
   recipient: User! @belongsTo
   status: String!
 }
 
-type Post @model {
+type Post @model @auth(rules: [{allow: public}]) {
   id: ID!
-  body: String!  # Add a body field to the Post type
-  likes: [Like] @hasMany
+  body: String
   comments: [Comment] @hasMany
-  user: User @belongsTo  # Modify the user field to associate it with the username field
-
-}
-
-type Comment @model {
-  id: ID!
-  post: Post @belongsTo
-  content: String!
-  likes: [Like] @hasMany
-}
-
-type Like @model {
-  id: ID!
-  post: Post @belongsTo
   user: User @belongsTo
+  userPostsId: String!
+  username: String!
+
+  likedBy: [ID!]
+  likesCount: Int!
+
+  reposts: [Repost] @hasMany
+
+  spotifyAlbumId: ID
+  spotifyAlbumName: String
+  spotifyAlbumType: String
+  spotifyAlbumImageUrl: String
+  spotifyAlbumReleaseDate: String
+  spotifyAlbumArtists: String
+  spotifyAlbumTotalTracks: String
+  spotifyAlbumExternalUrl: String
+
+  spotifyTrackId: ID
+  spotifyTrackName: String
+  spotifyTrackAlbumName: String
+  spotifyTrackImageUrl: String
+  spotifyTrackArtists: String
+  spotifyTrackPreviewUrl: String
+  spotifyTrackExternalUrl: String
+  spotifyTrackReleaseDate: String
+  spotifyTrackDurationMs: Int
+
+  scTrackId: ID
+  scTrackTitle: String
+  scTrackArtworkUrl: String
+  scTrackUserId: ID
+  scTrackUsername: String
+  scTrackLikes: Int
+  scTrackGenre: String
+  scTrackPermalinkUrl: String
+  scTrackWaveformUrl: String
 }
 
+type Comment @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  post: Post @belongsTo
+  postId: String
+  repost: Repost @belongsTo
+  repostId: String
+  content: String!
+  likedBy: [ID!]
+  likesCount: Int!
+  user: User @belongsTo
+  userPostsId: String!
+  username: String!
+}
+
+type Repost @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  body: String
+  originalPost: Post @belongsTo 
+  user: User @belongsTo
+  userRepostsId: String!
+  userOriginalPostId: String!
+  username: String!
+  comments: [Comment] @hasMany
+  likedBy: [ID!]
+  likesCount: Int!
+}
+
+type SpotifyRecentlyPlayedTrack @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  user: User @belongsTo
+  userSpotifyRecentlyPlayedTrackId: ID @index(name: "byUser", sortKeyFields: ["playedAt"])
+  spotifyId: ID
+  trackId: String!
+  trackName: String!
+  artistName: String!
+  albumName: String
+  albumImageUrl: String
+  playedAt: AWSDateTime!
+}

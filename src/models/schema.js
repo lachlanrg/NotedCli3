@@ -24,22 +24,6 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "likes": {
-                    "name": "likes",
-                    "isArray": true,
-                    "type": {
-                        "model": "Like"
-                    },
-                    "isRequired": false,
-                    "attributes": [],
-                    "isArrayNullable": true,
-                    "association": {
-                        "connectionType": "HAS_MANY",
-                        "associatedWith": [
-                            "userLikesId"
-                        ]
-                    }
-                },
                 "posts": {
                     "name": "posts",
                     "isArray": true,
@@ -104,6 +88,68 @@ export const schema = {
                         ]
                     }
                 },
+                "comments": {
+                    "name": "comments",
+                    "isArray": true,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "userCommentsId"
+                        ]
+                    }
+                },
+                "publicProfile": {
+                    "name": "publicProfile",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "reposts": {
+                    "name": "reposts",
+                    "isArray": true,
+                    "type": {
+                        "model": "Repost"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "userRepostsId"
+                        ]
+                    }
+                },
+                "spotifyRecentlyPlayedTrack": {
+                    "name": "spotifyRecentlyPlayedTrack",
+                    "isArray": true,
+                    "type": {
+                        "model": "SpotifyRecentlyPlayedTrack"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "userSpotifyRecentlyPlayedTrackId"
+                        ]
+                    }
+                },
+                "recentlyPlayedDisabled": {
+                    "name": "recentlyPlayedDisabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -127,6 +173,22 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -200,6 +262,22 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -287,6 +365,22 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -304,24 +398,8 @@ export const schema = {
                     "name": "body",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": true,
-                    "attributes": []
-                },
-                "likes": {
-                    "name": "likes",
-                    "isArray": true,
-                    "type": {
-                        "model": "Like"
-                    },
                     "isRequired": false,
-                    "attributes": [],
-                    "isArrayNullable": true,
-                    "association": {
-                        "connectionType": "HAS_MANY",
-                        "associatedWith": [
-                            "postLikesId"
-                        ]
-                    }
+                    "attributes": []
                 },
                 "comments": {
                     "name": "comments",
@@ -354,6 +432,233 @@ export const schema = {
                         ]
                     }
                 },
+                "userPostsId": {
+                    "name": "userPostsId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "username": {
+                    "name": "username",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "likedBy": {
+                    "name": "likedBy",
+                    "isArray": true,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "reposts": {
+                    "name": "reposts",
+                    "isArray": true,
+                    "type": {
+                        "model": "Repost"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "postRepostsId"
+                        ]
+                    }
+                },
+                "spotifyAlbumId": {
+                    "name": "spotifyAlbumId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumName": {
+                    "name": "spotifyAlbumName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumType": {
+                    "name": "spotifyAlbumType",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumImageUrl": {
+                    "name": "spotifyAlbumImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumReleaseDate": {
+                    "name": "spotifyAlbumReleaseDate",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumArtists": {
+                    "name": "spotifyAlbumArtists",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumTotalTracks": {
+                    "name": "spotifyAlbumTotalTracks",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyAlbumExternalUrl": {
+                    "name": "spotifyAlbumExternalUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackId": {
+                    "name": "spotifyTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackName": {
+                    "name": "spotifyTrackName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackAlbumName": {
+                    "name": "spotifyTrackAlbumName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackImageUrl": {
+                    "name": "spotifyTrackImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackArtists": {
+                    "name": "spotifyTrackArtists",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackPreviewUrl": {
+                    "name": "spotifyTrackPreviewUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackExternalUrl": {
+                    "name": "spotifyTrackExternalUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackReleaseDate": {
+                    "name": "spotifyTrackReleaseDate",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyTrackDurationMs": {
+                    "name": "spotifyTrackDurationMs",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackId": {
+                    "name": "scTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackTitle": {
+                    "name": "scTrackTitle",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackArtworkUrl": {
+                    "name": "scTrackArtworkUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackUserId": {
+                    "name": "scTrackUserId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackUsername": {
+                    "name": "scTrackUsername",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackLikes": {
+                    "name": "scTrackLikes",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackGenre": {
+                    "name": "scTrackGenre",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackPermalinkUrl": {
+                    "name": "scTrackPermalinkUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackWaveformUrl": {
+                    "name": "scTrackWaveformUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -369,13 +674,6 @@ export const schema = {
                     "isRequired": false,
                     "attributes": [],
                     "isReadOnly": true
-                },
-                "userPostsId": {
-                    "name": "userPostsId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
                 }
             },
             "syncable": true,
@@ -384,6 +682,22 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -412,6 +726,35 @@ export const schema = {
                         ]
                     }
                 },
+                "postId": {
+                    "name": "postId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "repost": {
+                    "name": "repost",
+                    "isArray": false,
+                    "type": {
+                        "model": "Repost"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "repostCommentsId"
+                        ]
+                    }
+                },
+                "repostId": {
+                    "name": "repostId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "content": {
                     "name": "content",
                     "isArray": false,
@@ -419,21 +762,49 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "likes": {
-                    "name": "likes",
+                "likedBy": {
+                    "name": "likedBy",
                     "isArray": true,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "user": {
+                    "name": "user",
+                    "isArray": false,
                     "type": {
-                        "model": "Like"
+                        "model": "User"
                     },
                     "isRequired": false,
                     "attributes": [],
-                    "isArrayNullable": true,
                     "association": {
-                        "connectionType": "HAS_MANY",
-                        "associatedWith": [
-                            "commentLikesId"
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "userCommentsId"
                         ]
                     }
+                },
+                "userPostsId": {
+                    "name": "userPostsId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "username": {
+                    "name": "username",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
                 },
                 "createdAt": {
                     "name": "createdAt",
@@ -451,8 +822,22 @@ export const schema = {
                     "attributes": [],
                     "isReadOnly": true
                 },
+                "userCommentsId": {
+                    "name": "userCommentsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "postCommentsId": {
                     "name": "postCommentsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "repostCommentsId": {
+                    "name": "repostCommentsId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": false,
@@ -465,11 +850,27 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
                 }
             ]
         },
-        "Like": {
-            "name": "Like",
+        "Repost": {
+            "name": "Repost",
             "fields": {
                 "id": {
                     "name": "id",
@@ -478,8 +879,15 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "post": {
-                    "name": "post",
+                "body": {
+                    "name": "body",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "originalPost": {
+                    "name": "originalPost",
                     "isArray": false,
                     "type": {
                         "model": "Post"
@@ -489,7 +897,7 @@ export const schema = {
                     "association": {
                         "connectionType": "BELONGS_TO",
                         "targetNames": [
-                            "postLikesId"
+                            "postRepostsId"
                         ]
                     }
                 },
@@ -504,9 +912,61 @@ export const schema = {
                     "association": {
                         "connectionType": "BELONGS_TO",
                         "targetNames": [
-                            "userLikesId"
+                            "userRepostsId"
                         ]
                     }
+                },
+                "userRepostsId": {
+                    "name": "userRepostsId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "userOriginalPostId": {
+                    "name": "userOriginalPostId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "username": {
+                    "name": "username",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "comments": {
+                    "name": "comments",
+                    "isArray": true,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "repostCommentsId"
+                        ]
+                    }
+                },
+                "likedBy": {
+                    "name": "likedBy",
+                    "isArray": true,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
                 },
                 "createdAt": {
                     "name": "createdAt",
@@ -524,22 +984,8 @@ export const schema = {
                     "attributes": [],
                     "isReadOnly": true
                 },
-                "userLikesId": {
-                    "name": "userLikesId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "postLikesId": {
-                    "name": "postLikesId",
-                    "isArray": false,
-                    "type": "ID",
-                    "isRequired": false,
-                    "attributes": []
-                },
-                "commentLikesId": {
-                    "name": "commentLikesId",
+                "postRepostsId": {
+                    "name": "postRepostsId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": false,
@@ -547,7 +993,130 @@ export const schema = {
                 }
             },
             "syncable": true,
-            "pluralName": "Likes",
+            "pluralName": "Reposts",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "SpotifyRecentlyPlayedTrack": {
+            "name": "SpotifyRecentlyPlayedTrack",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "user": {
+                    "name": "user",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "userSpotifyRecentlyPlayedTrackId"
+                        ]
+                    }
+                },
+                "userSpotifyRecentlyPlayedTrackId": {
+                    "name": "userSpotifyRecentlyPlayedTrackId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyId": {
+                    "name": "spotifyId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "trackId": {
+                    "name": "trackId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "trackName": {
+                    "name": "trackName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "artistName": {
+                    "name": "artistName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "albumName": {
+                    "name": "albumName",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "albumImageUrl": {
+                    "name": "albumImageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "playedAt": {
+                    "name": "playedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                }
+            },
+            "syncable": true,
+            "pluralName": "SpotifyRecentlyPlayedTracks",
             "attributes": [
                 {
                     "type": "model",
@@ -556,9 +1125,26 @@ export const schema = {
                 {
                     "type": "key",
                     "properties": {
-                        "name": "gsi-Comment.likes",
+                        "name": "byUser",
                         "fields": [
-                            "commentLikesId"
+                            "userSpotifyRecentlyPlayedTrackId",
+                            "playedAt"
+                        ]
+                    }
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
                         ]
                     }
                 }
@@ -568,5 +1154,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "e9fdd95c93e37a0f1e5f8f61d72455db"
+    "version": "44747229c2cc2dd262ca4672a5679516"
 };

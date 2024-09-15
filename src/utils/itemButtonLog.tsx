@@ -1,7 +1,5 @@
 // ./src/utils/itemButtonLog
-import { Album } from "../screens/searchScreen"
-import { Artist } from "../screens/searchScreen"
-import { Track } from "../screens/searchScreen"
+import { Artist, Track, Album } from "../spotifyConfig/itemInterface";
 
 // Function to log track information
 // Exporting function to be imported to Search Screen

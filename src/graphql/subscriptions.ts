@@ -13,11 +13,6 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -38,6 +33,23 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
+    spotifyRecentlyPlayedTrack {
+      nextToken
+      startedAt
+      __typename
+    }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -55,11 +67,6 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -80,6 +87,23 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
+    spotifyRecentlyPlayedTrack {
+      nextToken
+      startedAt
+      __typename
+    }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -97,11 +121,6 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
     id
     username
     email
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     posts {
       nextToken
       startedAt
@@ -122,6 +141,23 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       startedAt
       __typename
     }
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    publicProfile
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
+    spotifyRecentlyPlayedTrack {
+      nextToken
+      startedAt
+      __typename
+    }
+    recentlyPlayedDisabled
     createdAt
     updatedAt
     _version
@@ -143,6 +179,8 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -154,6 +192,8 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -183,6 +223,8 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -194,6 +236,8 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -223,6 +267,8 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -234,6 +280,8 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -263,6 +311,8 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -274,6 +324,8 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -305,6 +357,8 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -316,6 +370,8 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -347,6 +403,8 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -358,6 +416,8 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -384,11 +444,6 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
   onCreatePost(filter: $filter) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -398,6 +453,8 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -405,12 +462,46 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       _lastChangedAt
       __typename
     }
+    userPostsId
+    username
+    likedBy
+    likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyAlbumExternalUrl
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    spotifyTrackPreviewUrl
+    spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
+    scTrackPermalinkUrl
+    scTrackWaveformUrl
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -422,11 +513,6 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
   onUpdatePost(filter: $filter) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -436,6 +522,8 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -443,12 +531,46 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       _lastChangedAt
       __typename
     }
+    userPostsId
+    username
+    likedBy
+    likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyAlbumExternalUrl
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    spotifyTrackPreviewUrl
+    spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
+    scTrackPermalinkUrl
+    scTrackWaveformUrl
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -460,11 +582,6 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
   onDeletePost(filter: $filter) {
     id
     body
-    likes {
-      nextToken
-      startedAt
-      __typename
-    }
     comments {
       nextToken
       startedAt
@@ -474,6 +591,8 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -481,12 +600,46 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       _lastChangedAt
       __typename
     }
+    userPostsId
+    username
+    likedBy
+    likesCount
+    reposts {
+      nextToken
+      startedAt
+      __typename
+    }
+    spotifyAlbumId
+    spotifyAlbumName
+    spotifyAlbumType
+    spotifyAlbumImageUrl
+    spotifyAlbumReleaseDate
+    spotifyAlbumArtists
+    spotifyAlbumTotalTracks
+    spotifyAlbumExternalUrl
+    spotifyTrackId
+    spotifyTrackName
+    spotifyTrackAlbumName
+    spotifyTrackImageUrl
+    spotifyTrackArtists
+    spotifyTrackPreviewUrl
+    spotifyTrackExternalUrl
+    spotifyTrackReleaseDate
+    spotifyTrackDurationMs
+    scTrackId
+    scTrackTitle
+    scTrackArtworkUrl
+    scTrackUserId
+    scTrackUsername
+    scTrackLikes
+    scTrackGenre
+    scTrackPermalinkUrl
+    scTrackWaveformUrl
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userPostsId
     __typename
   }
 }
@@ -500,26 +653,87 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
     post {
       id
       body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
+    postId
+    repost {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    repostId
     content
-    likes {
-      nextToken
-      startedAt
+    likedBy
+    likesCount
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
       __typename
     }
+    userPostsId
+    username
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
+    repostCommentsId
     __typename
   }
 }
@@ -533,26 +747,87 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
     post {
       id
       body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
+    postId
+    repost {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    repostId
     content
-    likes {
-      nextToken
-      startedAt
+    likedBy
+    likesCount
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
       __typename
     }
+    userPostsId
+    username
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
+    repostCommentsId
     __typename
   }
 }
@@ -566,26 +841,87 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
     post {
       id
       body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
+    postId
+    repost {
+      id
+      body
+      userRepostsId
+      userOriginalPostId
+      username
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      postRepostsId
+      __typename
+    }
+    repostId
     content
-    likes {
-      nextToken
-      startedAt
+    likedBy
+    likesCount
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
       __typename
     }
+    userPostsId
+    username
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userCommentsId
     postCommentsId
+    repostCommentsId
     __typename
   }
 }
@@ -593,24 +929,56 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
   APITypes.OnDeleteCommentSubscriptionVariables,
   APITypes.OnDeleteCommentSubscription
 >;
-export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: ModelSubscriptionLikeFilterInput) {
-  onCreateLike(filter: $filter) {
+export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter: ModelSubscriptionRepostFilterInput) {
+  onCreateRepost(filter: $filter) {
     id
-    post {
+    body
+    originalPost {
       id
       body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -618,39 +986,79 @@ export const onCreateLike = /* GraphQL */ `subscription OnCreateLike($filter: Mo
       _lastChangedAt
       __typename
     }
+    userRepostsId
+    userOriginalPostId
+    username
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
-    commentLikesId
+    postRepostsId
     __typename
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnCreateLikeSubscriptionVariables,
-  APITypes.OnCreateLikeSubscription
+  APITypes.OnCreateRepostSubscriptionVariables,
+  APITypes.OnCreateRepostSubscription
 >;
-export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: ModelSubscriptionLikeFilterInput) {
-  onUpdateLike(filter: $filter) {
+export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter: ModelSubscriptionRepostFilterInput) {
+  onUpdateRepost(filter: $filter) {
     id
-    post {
+    body
+    originalPost {
       id
       body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -658,39 +1066,79 @@ export const onUpdateLike = /* GraphQL */ `subscription OnUpdateLike($filter: Mo
       _lastChangedAt
       __typename
     }
+    userRepostsId
+    userOriginalPostId
+    username
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
-    commentLikesId
+    postRepostsId
     __typename
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnUpdateLikeSubscriptionVariables,
-  APITypes.OnUpdateLikeSubscription
+  APITypes.OnUpdateRepostSubscriptionVariables,
+  APITypes.OnUpdateRepostSubscription
 >;
-export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: ModelSubscriptionLikeFilterInput) {
-  onDeleteLike(filter: $filter) {
+export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter: ModelSubscriptionRepostFilterInput) {
+  onDeleteRepost(filter: $filter) {
     id
-    post {
+    body
+    originalPost {
       id
       body
+      userPostsId
+      username
+      likedBy
+      likesCount
+      spotifyAlbumId
+      spotifyAlbumName
+      spotifyAlbumType
+      spotifyAlbumImageUrl
+      spotifyAlbumReleaseDate
+      spotifyAlbumArtists
+      spotifyAlbumTotalTracks
+      spotifyAlbumExternalUrl
+      spotifyTrackId
+      spotifyTrackName
+      spotifyTrackAlbumName
+      spotifyTrackImageUrl
+      spotifyTrackArtists
+      spotifyTrackPreviewUrl
+      spotifyTrackExternalUrl
+      spotifyTrackReleaseDate
+      spotifyTrackDurationMs
+      scTrackId
+      scTrackTitle
+      scTrackArtworkUrl
+      scTrackUserId
+      scTrackUsername
+      scTrackLikes
+      scTrackGenre
+      scTrackPermalinkUrl
+      scTrackWaveformUrl
       createdAt
       updatedAt
       _version
       _deleted
       _lastChangedAt
-      userPostsId
       __typename
     }
     user {
       id
       username
       email
+      publicProfile
+      recentlyPlayedDisabled
       createdAt
       updatedAt
       _version
@@ -698,18 +1146,140 @@ export const onDeleteLike = /* GraphQL */ `subscription OnDeleteLike($filter: Mo
       _lastChangedAt
       __typename
     }
+    userRepostsId
+    userOriginalPostId
+    username
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    likedBy
+    likesCount
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
-    userLikesId
-    postLikesId
-    commentLikesId
+    postRepostsId
     __typename
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnDeleteLikeSubscriptionVariables,
-  APITypes.OnDeleteLikeSubscription
+  APITypes.OnDeleteRepostSubscriptionVariables,
+  APITypes.OnDeleteRepostSubscription
+>;
+export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription OnCreateSpotifyRecentlyPlayedTrack(
+  $filter: ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput
+) {
+  onCreateSpotifyRecentlyPlayedTrack(filter: $filter) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
+    trackId
+    trackName
+    artistName
+    albumName
+    albumImageUrl
+    playedAt
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateSpotifyRecentlyPlayedTrackSubscriptionVariables,
+  APITypes.OnCreateSpotifyRecentlyPlayedTrackSubscription
+>;
+export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription OnUpdateSpotifyRecentlyPlayedTrack(
+  $filter: ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput
+) {
+  onUpdateSpotifyRecentlyPlayedTrack(filter: $filter) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
+    trackId
+    trackName
+    artistName
+    albumName
+    albumImageUrl
+    playedAt
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateSpotifyRecentlyPlayedTrackSubscriptionVariables,
+  APITypes.OnUpdateSpotifyRecentlyPlayedTrackSubscription
+>;
+export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription OnDeleteSpotifyRecentlyPlayedTrack(
+  $filter: ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput
+) {
+  onDeleteSpotifyRecentlyPlayedTrack(filter: $filter) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userSpotifyRecentlyPlayedTrackId
+    spotifyId
+    trackId
+    trackName
+    artistName
+    albumName
+    albumImageUrl
+    playedAt
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteSpotifyRecentlyPlayedTrackSubscriptionVariables,
+  APITypes.OnDeleteSpotifyRecentlyPlayedTrackSubscription
 >;

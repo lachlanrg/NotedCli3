@@ -44,11 +44,19 @@ export const useRecentSearches = () => {
     }
   };
 
-  
+  const clearAllRecentSearches = async () => {
+    try {
+      setRecentSearches([]);
+      await AsyncStorage.removeItem('recentSearches');
+    } catch (error) {
+      console.error('Failed to clear all recent searches:', error);
+    }
+  };
 
   return {
     recentSearches,
     saveRecentSearch,
     clearRecentSearch,
+    clearAllRecentSearches,
   };
 };

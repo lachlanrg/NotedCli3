@@ -4,10 +4,8 @@ import { generateClient } from 'aws-amplify/api';
 import { createPost } from '../graphql/mutations';
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import { User } from '../models';
-
+import { dark, light, placeholder, error, lgray, gray, dgray } from '../components/colorModes';
 import CustomError from '../errorHandling/CustomError';
-import { CustomCreatePostInput } from '../components/CustomTypes';
-
 
 const CreatePostScreen = () => {
   const [postContent, setPostContent] = useState('');
@@ -29,20 +27,28 @@ const CreatePostScreen = () => {
   }
 
   const handlePost = async () => {
-   
+  
     try {
       const client = generateClient();
       const { userId, username } = await getCurrentUser();
       const PostDetails = { 
         body: postContent,
-        userPostsId: username, // This used to be 'userId', which showd the userID, but have subsituted the username
+        userPostsId: userId, 
+        username: username,
+        spotifyTrackName: "track 2",
+        spotifyTrackArtists: "Artists",
+        spotifyTrackId: "143443423",
+        likesCount: 0,
+        
+        //Needs user id to associate @belongs to with user
         // username: username,
       }
       await client.graphql({
         query: createPost,
         variables: { input: PostDetails }
       });
-      console.log('New Post created successfully:', postContent, "User ID:", userId, "Username:", username);
+      console.log('New Post created successfully:', postContent, "User:", userId);
+      
       setPostContent('');
 
     } catch (error) {
@@ -68,9 +74,11 @@ const CreatePostScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Create a new post.."
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholder}
           value={postContent}
           onChangeText={setPostContent}
+          autoCapitalize="none"   
+          autoCorrect={false}  
           multiline
           numberOfLines={6}
         />
@@ -85,17 +93,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     paddingTop: 100, // Add padding at the top
-    backgroundColor: '#fff',
+    backgroundColor: dark,
   },
   inputContainer: {
     marginBottom: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: gray,
     borderRadius: 8,
     padding: 10,
   },
   input: {
     fontSize: 16,
-    color: '#333',
+    color: light,
   },
 });
 

@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ScrollView } from 'react-native';
-import { SearchScreenStackParamList } from '../components/types';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ScrollView } from 'react-native';
+import { SearchScreenStackParamList } from '../../components/types';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'; 
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'; // Import specific icon 
+import { dark, light, gray, placeholder, lgray, dgray, error } from '../../components/colorModes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { CLIENT_ID, CLIENT_SECRET } from '../config';
-import { Track } from './searchScreen';
-
-
+import { CLIENT_ID, CLIENT_SECRET } from '../../config';
+import { Track, Album } from '../../spotifyConfig/itemInterface';
 
 type AlbumDetailsScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'AlbumDetail'>;
 
@@ -57,43 +56,78 @@ const AlbumDetailsScreen: React.FC<AlbumDetailsScreenProps> = ({ route, navigati
     }
   }, [accessToken]);
 
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <Image source={{ uri: album.images[0]?.url }} style={styles.albumImage} />
+      <Text style={styles.artistNames}>{album.artists.map(artist => artist.name).join(', ')}</Text>
+        <View style={styles.albumInfo}>
+          <Text style={styles.releaseDate}>{new Date(album.release_date).getFullYear()} </Text>
+          <Text style={styles.totalTracks}>• {album.total_tracks} songs</Text>
+        </View>
+    </View>
+  );
+
+  const renderItem = ({ item }: {item: Track}) => (
+    <TouchableOpacity key={item.id} style={styles.itemContainer} onPress={() => logTrack(item)}>
+      <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
+        {item.name}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const renderFooter = () => (
+    <View style={styles.footerContainer}>
+      <Text style={styles.totalTracks}>{album.total_tracks} songs</Text>
+    </View>
+  );
+
+  const navigateToPostScreen = (album: Album) => {
+    navigation.navigate('PostSpotifyAlbum', { album }); 
+    console.log("Navigating to Post with:", album.name,", ", album.id)
+  };
+
+
+
   return (
+    <SafeAreaView style={styles.safeAreaContainer}> 
+
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesomeIcon icon={faChevronLeft} size={18} color="black" />
+          <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
         </TouchableOpacity>
         <View style={styles.albumNameContainer}>
           <Text style={styles.albumName} numberOfLines={1} ellipsizeMode="tail">{album.name}</Text>
         </View>
+        <TouchableOpacity >
+          <Text style={styles.postButtonText} onPress={() => navigateToPostScreen(album)}>Share</Text>
+        </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <Image source={{ uri: album.images[0]?.url }} style={styles.albumImage} />
-        <Text style={styles.artistNames}>{album.artists.map(artist => artist.name).join(', ')}</Text>
-        <Text style={styles.releaseDate}>{new Date(album.release_date).getFullYear()}</Text>
-        {tracks.map((track) => (
-          <TouchableOpacity key={track.id} style={styles.itemContainer} onPress={() => logTrack(track)}>
-            <Text key={track.id} style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
-              {track.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <FlatList
+        data={tracks}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        contentContainerStyle={styles.scrollViewContainer}
+      />
     </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: dark,
   },
   header: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    paddingTop: 30,
+    // paddingTop: 30,
     paddingBottom: 15,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: dark,
   },
   backButton: {
     // not sure if needed
@@ -101,16 +135,23 @@ const styles = StyleSheet.create({
   albumNameContainer: {
     flex: 1,
     alignItems: 'center',
+    paddingLeft: 30,
   },
   albumName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     paddingRight: 10,
+    color: light,
   },
   scrollViewContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
     padding: 20,
+  },
+  headerContainer: {
+    alignItems: 'center',
+  },
+  footerContainer: {
+    paddingTop: 10,
+    alignItems: 'flex-start',
   },
   albumImage: {
     width: 200,
@@ -121,25 +162,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
     fontWeight: 'bold',
-
+    color: light,
+  },
+  albumInfo: {
+    flexDirection: 'row',
+  },
+  totalTracks: {
+    fontSize: 16,
+    marginBottom: 10,
+    color: lgray,
   },
   releaseDate: {
     fontSize: 16,
     marginBottom: 20,
+    color: lgray,
   },
   trackName: {
     fontSize: 16,
     marginBottom: 5,
     alignSelf: 'flex-start',
+    color: light,
   },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: gray,
     borderRadius: 8,
     marginBottom: 10,
-    shadowColor: '#000',
+    shadowColor: dark,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -148,6 +199,15 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     width: '100%',
+  },
+  postButtonText: {
+    color: 'lightblue',
+    fontWeight: 'bold',
+    justifyContent: 'flex-end',
+  },
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark, // or your background color
   },
 });
 
