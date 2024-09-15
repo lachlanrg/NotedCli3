@@ -1,14 +1,15 @@
+// SearchPostBottomSheetModal.tsx
 import React, { useMemo, forwardRef, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { dark, gray, lgray, light, modalBackground } from "../colorModes";
-import { Track } from "../../spotifyConfig/itemInterface";
 import { scTrack } from "../../soundcloudConfig/itemInterface";
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { Track, Album, Artist } from "../../spotifyConfig/itemInterface";
 
 const musicIcon = faMusic as IconProp;
 const searchIcon = faMagnifyingGlass as IconProp;
@@ -16,20 +17,23 @@ const searchIcon = faMagnifyingGlass as IconProp;
 type RootStackParamList = {
   PostSpotifyTrack: { track: Track };
   PostSCTrack: { sctrack: scTrack };
+  PostSpotifyAlbum: { album: Album };
+  SearchSpotifyAlbum: { albumId: string };
+  SearchSpotifyTrack: { trackId: string };
+  SearchSpotifyArtist: { artistId: string };
   // ... other routes
 };
 
 export type Ref = BottomSheetModal;
 
 interface SearchPostBottomSheetProps {
-    item: Track | scTrack | null;
+    item: Track | scTrack | Album | Artist | null;
     onClose: () => void;
 }
 
 const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottomSheetProps>(({ item, onClose }, ref) => { 
     const snapPoints = useMemo(() => ['25%'], []);
     const navigation = useNavigation<any>();
-
 
     const renderBackDrop = useCallback(
         (props: any) => <BottomSheetBackdrop appearsOnIndex={0} disappearsOnIndex={-1} {...props} />,
@@ -44,20 +48,42 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
     };
 
     const isSpotifyTrack = (item: any): item is Track => {
-        return 'artists' in item;
+        return item && typeof item === 'object' && 'type' in item && item.type === 'track';
+    };
+
+    const isSpotifyAlbum = (item: any): item is Album => {
+        return item && typeof item === 'object' && 'type' in item && item.type === 'album';
+    };
+
+    const isSpotifyArtist = (item: any): item is Artist => {
+        return item && typeof item === 'object' && 'type' in item && item.type === 'artist';
     };
 
     const handlePostPress = () => {
         if (item) {
             if (isSpotifyTrack(item)) {
                 navigation.navigate('PostSpotifyTrack', { track: item });
-            } else {
+            } else if (isSpotifyAlbum(item)) {
+                navigation.navigate('PostSpotifyAlbum', { album: item });
+            } else if (!isSpotifyArtist(item)) {
                 navigation.navigate('PostSCTrack', { sctrack: item });
             }
         }
         handleDismiss();
     };
 
+    const handleSearchPress = () => {
+        if (item) {
+            if (isSpotifyAlbum(item)) {
+                navigation.navigate('SearchSpotifyAlbum', { albumId: item.id });
+            } else if (isSpotifyTrack(item)) {
+                navigation.navigate('SearchSpotifyTrack', { trackId: item.id });
+            } else if (isSpotifyArtist(item)) {
+                navigation.navigate('SearchSpotifyArtist', { artistId: item.id });
+            }
+        }
+        handleDismiss();
+    };
 
     return (
         <BottomSheetModal
@@ -72,23 +98,37 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                 {item && (
                     <>
                         <Text style={styles.trackTitle}>
-                            {isSpotifyTrack(item) ? item.name : item.title}
+                            {isSpotifyTrack(item) || isSpotifyAlbum(item) || isSpotifyArtist(item) ? item.name : 'title' in item ? item.title : ''}
                         </Text>
                         <Text style={styles.artistName}>
                             {isSpotifyTrack(item) 
                                 ? item.artists.map(artist => artist.name).join(', ')
-                                : item.user_id
+                                : isSpotifyAlbum(item)
+                                    ? item.artists.map(artist => artist.name).join(', ')
+                                    : isSpotifyArtist(item)
+                                        ? 'Artist'
+                                        : 'user_id' in item ? item.user_id : ''
                             }
                         </Text>
                     </>
                 )}
                 <View style={styles.iconRow}>
-                    <TouchableOpacity style={styles.searchButton}>
-                        <FontAwesomeIcon icon={searchIcon} size={24} color={dark} /> 
+                    <TouchableOpacity 
+                        style={styles.searchButton} 
+                        onPress={handleSearchPress}
+                        disabled={!isSpotifyAlbum(item) && !isSpotifyTrack(item) && !isSpotifyArtist(item)}
+                    >
+                        <FontAwesomeIcon 
+                            icon={searchIcon} 
+                            size={24} 
+                            color={(isSpotifyAlbum(item) || isSpotifyTrack(item) || isSpotifyArtist(item)) ? dark : gray} 
+                        /> 
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.postButton} onPress={handlePostPress}>
-                        <Text style={styles.postButtonText}>Post</Text>
-                    </TouchableOpacity>
+                    {!isSpotifyArtist(item) && (
+                        <TouchableOpacity style={styles.postButton} onPress={handlePostPress}>
+                            <Text style={styles.postButtonText}>Post</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         </BottomSheetModal>

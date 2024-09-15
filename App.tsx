@@ -41,7 +41,11 @@ import AccessibilitySettingsScreen from './src/screens/ProfileStack/accessibilit
 import PrivacySettingsScreen from './src/screens/ProfileStack/privacySettingsScreen';
 import AppLoadingScreen from './src/screens/AppLoadingScreen';
 import FollowListScreen from './src/screens/ProfileStack/FollowListScreen';
-import ExplorePostScreen from './src/screens/ExploreStack/ExplorePostScreen';
+import ExplorePostScreen from './src/screens/HomeStack/ExplorePostScreen';
+import SearchSpotifyAlbumScreen from './src/screens/SearchStack/searchSpotifyAlbumScreen';
+import SearchSpotifyTrackScreen from './src/screens/SearchStack/searchSpotifyTrackScreen';
+import SearchSpotifyArtistScreen from './src/screens/SearchStack/searchSpotifyArtistScreen';
+
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -78,6 +82,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen name="HomeUserProfile" component={HomeUserProfileScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="PostRepost" component={PostRepostScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="RepostOriginalPost" component={RepostOriginalPostScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen name="ExplorePost" component={ExplorePostScreen} options={{ headerShown: false }} />
 
     </HomeStack.Navigator>
   );
@@ -91,7 +96,9 @@ const SearchStackNavigator = () => {
       <SearchStack.Screen name="PostSpotifyTrack" component={PostSpotifyTrackScreen} options={{ headerShown: false }} />
       <SearchStack.Screen name="PostSpotifyAlbum" component={PostSpotifyAlbumScreen} options={{ headerShown: false }} />
       <SearchStack.Screen name="PostSCTrack" component={PostSCTrackScreen} options={{ headerShown: false }} />
-
+      <SearchStack.Screen name="SearchSpotifyAlbum" component={SearchSpotifyAlbumScreen} options={{ headerShown: false }} />
+      <SearchStack.Screen name="SearchSpotifyTrack" component={SearchSpotifyTrackScreen} options={{ headerShown: false }} />
+      <SearchStack.Screen name="SearchSpotifyArtist" component={SearchSpotifyArtistScreen} options={{ headerShown: false }} />
     </SearchStack.Navigator>
   );
 };
@@ -120,7 +127,6 @@ const ExploreStackNavigator = () => {
     <ExploreStack.Navigator>
       <ExploreStack.Screen name="Explore" component={ExploreScreen} options={{ headerShown: false }} />
       <ExploreStack.Screen name="ItemDetailsExplore" component={ItemDetailsExploreScreen} options={{ headerShown: false }} />
-      <ExploreStack.Screen name="ExplorePost" component={ExplorePostScreen} options={{ headerShown: false }} />
     </ExploreStack.Navigator>
   )
 }

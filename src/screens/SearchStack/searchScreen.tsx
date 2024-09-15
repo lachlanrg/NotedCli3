@@ -1,4 +1,4 @@
-// SearchScreen.tsx
+// searchScreen.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   View, 
@@ -35,7 +35,6 @@ import { SearchScreenStackParamList } from '../../components/types';
 
 import { useRecentSearches } from '../../components/recentSearchItems';
 
-import { Artist, Track } from '../../spotifyConfig/itemInterface';
 import { searchSCTracks } from '../../soundcloudConfig/scTrackSearch';
 import { scTrack } from '../../soundcloudConfig/itemInterface';
 import useSpotifySearch from '../../spotifyConfig/spotifySearchAll';
@@ -43,6 +42,7 @@ import { MenuItem } from '@aws-amplify/ui-react';
 import SearchPostBottomSheetModal from '../../components/BottomSheets/SearchPostBottomSheetModal';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { heavyImpact, mediumImpact, selectionChange } from '../../utils/hapticFeedback';
+import { Artist, Track } from '../../spotifyConfig/itemInterface';
 
 //Apparently including this is the only way for it to work in the albumDetailsScreen
 export interface Album {
@@ -84,7 +84,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
 
   const sortedTracks = tracks.sort((a, b) => b.popularity - a.popularity);
 
-  const [selectedItem, setSelectedItem] = useState<Track | scTrack | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Track | scTrack | Album | null>(null);
 
   const bottomSheetHeight = useRef(new Animated.Value(0)).current;
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false); 
@@ -213,10 +213,17 @@ const closeBottomSheet = useCallback(() => {
   setSelectedItem(null);
 }, []);
 
-const handlePresentModalPress = useCallback((item: Track | scTrack) => {
-  bottomSheetModalRef.current?.present();
-  setSelectedItem(item);
+const handlePresentModalPress = useCallback((item: Track | scTrack | Album) => {
+  if (item) {
+    bottomSheetModalRef.current?.present();
+    setSelectedItem(item);
+  }
 }, []);
+
+const handleNavigateToArtistDetail = (artistId: string) => {
+  navigation.navigate('SearchSpotifyArtist', { artistId });
+  console.log("Navigating to Artist Details Screen with ID:", artistId);
+};
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
@@ -318,66 +325,85 @@ const handlePresentModalPress = useCallback((item: Track | scTrack) => {
         <ScrollView 
           ref={scrollViewRef} onScrollBeginDrag={closeBottomSheet} showsVerticalScrollIndicator={false}
           >
-          {artists.slice(0, 2).map(artist => (
-            <TouchableOpacity key={artist.id} style={styles.itemContainer} onPress={() => logArtistInfo(artist)}>
-              <Image
-                source={{ uri: artist.images[0]?.url }}
-                style={styles.albumImage}
-              />
-              <View style={styles.itemDetails}>
-                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{artist.name}</Text>
-                <View style={styles.itemLowerDetails}>
-                  <Text style={styles.itemType}>{artist.type.charAt(0).toUpperCase() + artist.type.slice(1)}</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-
-          {albums.slice(0, 5).map(album => (
-            <TouchableOpacity key={album.id} style={styles.itemContainer} onPress={() => handleNavigateToAlbumDetail(album)}>
-              <Image
-                source={{ uri: album.images[0]?.url }}
-                style={styles.albumImage}
-              />
-              <View style={styles.itemDetails}>
-                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{album.name}</Text>
-                <View style={styles.itemLowerDetails}>
-                  <Text style={styles.itemType}>{album.album_type.charAt(0).toUpperCase() + album.album_type.slice(1)}</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {album.artists.map(artist => artist.name).join(', ')}
-                    </Text>
+          {artists.length > 0 && (
+            <View>
+              <Text style={styles.sectionTitle}>Artists</Text>
+              {artists.slice(0, 2).map(artist => (
+                <TouchableOpacity key={artist.id} style={styles.itemContainer} onPress={() => handleNavigateToArtistDetail(artist.id)}>
+                  <Image
+                    source={{ uri: artist.images[0]?.url }}
+                    style={styles.albumImage}
+                  />
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{artist.name}</Text>
+                    <View style={styles.itemLowerDetails}>
+                      <Text style={styles.itemType}>{artist.type.charAt(0).toUpperCase() + artist.type.slice(1)}</Text>
+                    </View>
                   </View>
-                  {/* <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text> */}
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
-          {tracks.slice(0, 10).map(track => (
-            <TouchableOpacity 
-              key={track.id} 
-              style={styles.itemContainer} 
-              onPress={() => handlePresentModalPress(track)}
-            >
-              <Image
-                source={{ uri: track.album.images[0]?.url }}
-                style={styles.albumImage}
-              />
-              <View style={styles.itemDetails}>
-                <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{track.name}</Text>
-                <View style={styles.itemLowerDetails}>
-                  <Text style={styles.itemType}>
-                    {track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}
-                  </Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-                      • {track.artists.map(artist => artist.name).join(', ')}
-                    </Text>
+          {albums.length > 0 && (
+            <View>
+              <Text style={styles.sectionTitle}>Albums</Text>
+              {albums.slice(0, 5).map(album => (
+                <TouchableOpacity 
+                  key={album.id} 
+                  style={styles.itemContainer} 
+                  onPress={() => handlePresentModalPress(album)}
+                >
+                  <Image
+                    source={{ uri: album.images[0]?.url }}
+                    style={styles.albumImage}
+                  />
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{album.name}</Text>
+                    <View style={styles.itemLowerDetails}>
+                      <Text style={styles.itemType}>{album.album_type.charAt(0).toUpperCase() + album.album_type.slice(1)}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {album.artists.map(artist => artist.name).join(', ')}
+                        </Text>
+                      </View>
+                      {/* <Text style={styles.albumYear}>{new Date(album.release_date).getFullYear()}</Text> */}
+                    </View>
                   </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {tracks.length > 0 && (
+            <View>
+              <Text style={styles.sectionTitle}>Tracks</Text>
+              {tracks.slice(0, 10).map(track => (
+                <TouchableOpacity 
+                  key={track.id} 
+                  style={styles.itemContainer} 
+                  onPress={() => handlePresentModalPress(track)}
+                >
+                  <Image
+                    source={{ uri: track.album.images[0]?.url }}
+                    style={styles.albumImage}
+                  />
+                  <View style={styles.itemDetails}>
+                    <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{track.name}</Text>
+                    <View style={styles.itemLowerDetails}>
+                      <Text style={styles.itemType}>
+                        {track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}
+                      </Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                          • {track.artists.map(artist => artist.name).join(', ')}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
       </ScrollView>
 
       </View>
@@ -493,7 +519,7 @@ const styles = StyleSheet.create({
   albumImage: {
     width: 60, 
     height: 60, 
-    borderRadius: 8,
+    // borderRadius: 8, // Abaid by Spotify policies
     marginRight: 10,
   },
   albumName: {
@@ -616,6 +642,15 @@ const styles = StyleSheet.create({
     backgroundColor: dark,
     borderRadius: 5,
     marginTop: 10,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    color: lgray,
+    marginTop: 10,
+    marginBottom: 5,
+    paddingLeft: 5,
+    fontStyle: "italic",
+
   },
 });
 

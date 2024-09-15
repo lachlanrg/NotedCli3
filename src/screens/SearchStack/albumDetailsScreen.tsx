@@ -6,8 +6,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'; // Import spe
 import { dark, light, gray, placeholder, lgray, dgray, error } from '../../components/colorModes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CLIENT_ID, CLIENT_SECRET } from '../../config';
-import { Track } from '../../spotifyConfig/itemInterface';
-import { Album } from '../../spotifyConfig/itemInterface';
+import { Track, Album } from '../../spotifyConfig/itemInterface';
 
 type AlbumDetailsScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'AlbumDetail'>;
 

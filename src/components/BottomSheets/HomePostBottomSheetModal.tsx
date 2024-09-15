@@ -81,7 +81,7 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
         return;
       }
 
-      navigation.navigate('ExploreTab', { screen: 'ExplorePost', params: { id, type } });
+      navigation.navigate('ExplorePost', { id, type });
       dismiss(); // Close the bottom sheet after navigation
     } else {
       console.warn('No item selected');

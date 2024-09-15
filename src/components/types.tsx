@@ -2,9 +2,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Album } from '../screens/SearchStack/searchScreen'
 import { User } from '../models';
-import { Track } from '../spotifyConfig/itemInterface';
 import { scTrack } from '../soundcloudConfig/itemInterface';
 import { Post } from '../API';
+import { Track } from '../spotifyConfig/itemInterface';
 
 export type HomeStackParamList = {
   Home: undefined;
@@ -13,6 +13,7 @@ export type HomeStackParamList = {
   RepostOriginalPost: {post: Post};
   FollowList: { userId: string; initialTab: 'following' | 'followers' };
   Profile: undefined
+  ExplorePost: { id: string, type: string };
 };
 
 export type SearchScreenStackParamList = {
@@ -21,6 +22,9 @@ export type SearchScreenStackParamList = {
   PostSpotifyTrack: { track: Track };
   PostSpotifyAlbum: { album: Album };
   PostSCTrack: { sctrack: scTrack };
+  SearchSpotifyAlbum: { albumId: string };
+  SearchSpotifyTrack: { trackId: string };
+  SearchSpotifyArtist: { artistId: string };
 };
 
 export type ProfileStackParamList = {
@@ -41,5 +45,4 @@ export type ProfileStackParamList = {
 export type ExploreStackParamList = {
   Explore: undefined;
   ItemDetailsExplore: undefined;
-  ExplorePost: { id: string, type: string };
 };
