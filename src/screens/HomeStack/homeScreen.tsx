@@ -428,7 +428,7 @@ const HomeScreen: React.FC = () => {
                 {(isSpotifyAlbum || isSpotifyTrack) && (
                   <FontAwesomeIcon 
                     icon={isSpotifyAlbum ? faCompactDisc : faMusic} 
-                    size={14} 
+                    size={16} 
                     color="#1DB954" 
                     style={styles.mediaTypeIcon}
                   />
@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
   bodyText: {
     color: '#fff',
     fontSize: 14,
-    marginBottom: 4,
+    marginBottom: 10,
   },
   seeMoreButton: {
     marginTop: 4,
@@ -678,7 +678,9 @@ const styles = StyleSheet.create({
   mediaContainer: {
     flexDirection: 'row',
     backgroundColor: '#2a2a2a',
-    borderRadius: 8,
+    // borderRadius: 8,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
     overflow: 'hidden',
     position: 'relative', // Add this to allow absolute positioning of the icon
   },
@@ -700,7 +702,7 @@ const styles = StyleSheet.create({
   },
   mediaTitle: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     flex: 1,
   },
@@ -857,6 +859,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 6,
+    fontStyle: 'italic',
   },
   RepostCommentLikeSection: {
     marginTop: 20,

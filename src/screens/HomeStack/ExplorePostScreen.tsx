@@ -1,14 +1,15 @@
+// ExplorePostScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ScrollView, Linking, ActivityIndicator, FlatList } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
-import { ExploreStackParamList } from '../../components/types';
-import { light, dark, gray } from '../../components/colorModes';
+import { HomeStackParamList } from '../../components/types';
+import { light, dark, gray, lgray } from '../../components/colorModes';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
 import { Track } from '../../spotifyConfig/itemInterface';
 
-type ExplorePostScreenRouteProp = RouteProp<ExploreStackParamList, 'ExplorePost'>;
+type ExplorePostScreenRouteProp = RouteProp<HomeStackParamList, 'ExplorePost'>;
 
 interface ExplorePostScreenProps {
   route: ExplorePostScreenRouteProp;
@@ -34,7 +35,7 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
               break;
             case 'spotifyAlbum':
               data = await getSpotifyAlbumById(id);
-              console.log("Spotify Album: ", JSON.stringify(data, null, 2));
+            //   console.log("Spotify Album: ", JSON.stringify(data, null, 2));
               break;
             case 'scTrack':
               // data = await mockScTrackFunction(id);
@@ -114,19 +115,6 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
         {spotifyData.genres && spotifyData.genres.length > 0 && (
           <Text style={styles.text}>Genres: {spotifyData.genres.join(', ')}</Text>
         )}
-        <Text style={styles.sectionTitle}>Tracks:</Text>
-        <FlatList
-          data={spotifyData.tracks?.items}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.trackItem}>
-              <Text style={styles.trackItemName}>{item.name}</Text>
-              <Text style={styles.trackItemArtist}>{item.artists.map((artist: any) => artist.name).join(', ')}</Text>
-            </View>
-          )}
-          scrollEnabled={false}
-          nestedScrollEnabled={true}
-        />
         {spotifyData.external_urls && spotifyData.external_urls.spotify && (
           <TouchableOpacity 
             style={styles.button}
@@ -135,6 +123,23 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
             <Text style={styles.buttonText}>Open in Spotify</Text>
           </TouchableOpacity>
         )}
+        <Text style={styles.sectionTitle}>Tracks</Text>
+        <FlatList
+          data={spotifyData.tracks?.items}
+          keyExtractor={(item) => item.id}
+          style={styles.trackList}
+          renderItem={({ item, index }) => (
+            <View style={styles.trackItem}>
+              <Text style={styles.trackItemNumber}>{index + 1}</Text>
+              <View style={styles.trackItemContent}>
+                <Text style={styles.trackItemName} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
+                <Text style={styles.trackItemArtist} numberOfLines={1} ellipsizeMode="tail">{item.artists.map((artist: any) => artist.name).join(', ')}</Text>
+              </View>
+            </View>
+          )}
+          scrollEnabled={false}
+          nestedScrollEnabled={true}
+        />
       </ScrollView>
     );
   };
@@ -261,23 +266,41 @@ const styles = StyleSheet.create({
       marginTop: 10,
     },
     sectionTitle: {
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: 'bold',
       color: light,
-      marginTop: 20,
-      marginBottom: 10,
-    },
-    trackItem: {
-      marginBottom: 10,
+      marginTop: 30,
+      marginBottom: 15,
     },
     trackItemName: {
       fontSize: 16,
       color: light,
-      fontWeight: 'bold',
+      fontWeight: '500',
+      marginBottom: 4,
     },
     trackItemArtist: {
       fontSize: 14,
-      color: gray,
+      color: lgray,
+    },
+    trackList: {
+      marginBottom: 40,
+    },
+    trackItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    trackItemNumber: {
+      width: 30,
+      fontSize: 16,
+      color: light,
+      textAlign: 'center',
+    },
+    trackItemContent: {
+      flex: 1,
+      marginLeft: 10,
     },
 });
 

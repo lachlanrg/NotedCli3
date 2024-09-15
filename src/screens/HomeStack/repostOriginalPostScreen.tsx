@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -18,6 +18,7 @@ import { updatePost } from '../../graphql/mutations';
 import CustomBottomSheet from '../../components/BottomSheets/CommentsBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { listComments } from '../../graphql/queries'; // Ensure you have the correct import for listComments
+import { Linking } from 'react-native';
 
 const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
@@ -133,125 +134,82 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
     fetchCommentCounts();
   }, [fetchCommentCounts]);
 
+  const handleSpotifyPress = () => {
+    const url = post.spotifyTrackExternalUrl || post.spotifyAlbumExternalUrl;
+    if (url) {
+      Linking.openURL(url);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
             <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
           </TouchableOpacity>
           <Text style={styles.headerText}>Post</Text>
+          {(post.spotifyTrackExternalUrl || post.spotifyAlbumExternalUrl) ? (
+            <TouchableOpacity onPress={handleSpotifyPress} style={styles.headerButton}>
+              <Text style={styles.spotifyButtonText}>Spotify</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.headerButton} /> // Empty view for spacing
+          )}
         </View>
 
-        <View style={styles.repostedPostContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('HomeUserProfile', { userId: post.userPostsId })}>
-            <Text style={styles.repostedPostUser}>{post.username}</Text>
-          </TouchableOpacity>
-          <Text style={styles.bodytext}>{post.body}</Text>
+        <View>
+          <View style={styles.postContent}>
+            <TouchableOpacity onPress={() => navigation.navigate('HomeUserProfile', { userId: post.userPostsId })}>
+              <Text style={styles.username}>{post.username}</Text>
+            </TouchableOpacity>
+            <Text style={styles.bodyText}>{post.body}</Text>
 
-          {post.scTrackId && (
-            <View style={styles.soundCloudPost}>
-              <Image source={getImageUrl(post.scTrackArtworkUrl)} style={styles.image} />
-              <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{post.scTrackTitle}</Text>
-              <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
-              <View style={styles.commentLikeSection}>
-                <TouchableOpacity
-                  style={styles.likeIcon}
-                  onPress={() => handleLikePress(updatedPost.id)}
-                >
-                  <FontAwesomeIcon
-                    icon={(updatedPost.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
-                    size={20}
-                    color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.likesCountText}>
-                  {updatedPost.likesCount || ''}
-                </Text>
-                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(post)}>
-                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.commentCountText}>
-                  {commentCounts[post.id] || null}
-                </Text>
-                <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
-                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
-                </TouchableOpacity>
-              </View>
+            <View style={styles.imageContainer}>
+              <Image source={getImageUrl(post.scTrackArtworkUrl || post.spotifyAlbumImageUrl || post.spotifyTrackImageUrl)} style={styles.image} />
             </View>
-          )}
 
-          {post.spotifyAlbumId && (
-            <View style={styles.spotifyPost}>
-              <Image source={getImageUrl(post.spotifyAlbumImageUrl)} style={styles.image} />
-              <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">Album: {post.spotifyAlbumName}</Text>
-              <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-                {post.spotifyAlbumArtists}
-              </Text>
-              <Text style={styles.date}>Total Tracks: {post.spotifyAlbumTotalTracks}</Text>
-              <Text style={styles.date}>Release Date: {post.spotifyAlbumReleaseDate}</Text>
+            <View style={styles.trackDetails}>
+              {post.scTrackId && (
+                <>
+                  <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{post.scTrackTitle}</Text>
+                </>
+              )}
+              {post.spotifyAlbumId && (
+                <>
+                  <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Album: {post.spotifyAlbumName}</Text>
+                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{post.spotifyAlbumArtists}</Text>
+                  <Text style={styles.trackInfo}>Total Tracks: {post.spotifyAlbumTotalTracks}</Text>
+                  <Text style={styles.trackInfo}>Release Date: {post.spotifyAlbumReleaseDate}</Text>
+                </>
+              )}
+              {post.spotifyTrackId && (
+                <>
+                  <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {post.spotifyTrackName}</Text>
+                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{post.spotifyTrackArtists}</Text>
+                </>
+              )}
               <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
-              <View style={styles.commentLikeSection}>
-                <TouchableOpacity
-                  style={styles.likeIcon}
-                  onPress={() => handleLikePress(updatedPost.id)}
-                >
-                  <FontAwesomeIcon
-                    icon={(updatedPost.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
-                    size={20}
-                    color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.likesCountText}>
-                  {updatedPost.likesCount || ''}
-                </Text>
-                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(post)}>
-                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.commentCountText}>
-                  {commentCounts[post.id] || null}
-                </Text>
-                <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
-                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
-                </TouchableOpacity>
-              </View>
             </View>
-          )}
 
-          {post.spotifyTrackId && (
-            <View style={styles.spotifyPost}>
-              <Image source={getImageUrl(post.spotifyTrackImageUrl)} style={styles.image} />
-              <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {post.spotifyTrackName}</Text>
-              <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
-                {post.spotifyTrackArtists}
-              </Text>
-              <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
-              <View style={styles.commentLikeSection}>
-                <TouchableOpacity
-                  style={styles.likeIcon}
-                  onPress={() => handleLikePress(updatedPost.id)}
-                >
-                  <FontAwesomeIcon
-                    icon={(updatedPost.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
-                    size={20}
-                    color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.likesCountText}>
-                  {updatedPost.likesCount || ''}
-                </Text>
-                <TouchableOpacity style={styles.commentIcon} onPress={() => handlePresentModalPress(post)}>
-                  <FontAwesomeIcon icon={commentIcon} size={20} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.commentCountText}>
-                  {commentCounts[post.id] || null}
-                </Text>
-                <TouchableOpacity style={styles.repostIcon} onPress={() => navigation.navigate('PostRepost', { post: post })}>
-                  <FontAwesomeIcon icon={repostIcon} size={20} color="#fff" transform={{ rotate: 160 }} />
-                </TouchableOpacity>
-              </View>
+            <View style={styles.actionBar}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(updatedPost.id)}>
+                <FontAwesomeIcon
+                  icon={(updatedPost.likedBy || []).includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                  size={24}
+                  color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
+                />
+                <Text style={styles.actionText}>{updatedPost.likesCount || ''}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.actionButton} onPress={() => handlePresentModalPress(post)}>
+                <FontAwesomeIcon icon={commentIcon} size={24} color="#fff" />
+                <Text style={styles.actionText}>{commentCounts[post.id] || 0}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('PostRepost', { post: post })}>
+                <FontAwesomeIcon icon={repostIcon} size={24} color="#fff" transform={{ rotate: 160 }} />
+              </TouchableOpacity>
             </View>
-          )}
+          </View>
         </View>
       </View>
 
@@ -268,100 +226,104 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: dark,
     flexDirection: 'row',
-    paddingBottom: 10,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
     borderBottomColor: gray,
   },
   headerText: {
-    flex: 1,
     fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'center',
-    paddingRight: 15,
     color: light,
+    textAlign: 'center',
+    flex: 1,
   },
-  repostText: {
-    color: '#ccc',
-    marginBottom: 5,
-    fontStyle: 'italic',
+  headerButton: {
+    width: 60, // Set a fixed width for both buttons
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  repostDate: {
-    color: '#888',
-    fontSize: 12,
-    marginBottom: 10,
+  spotifyButtonText: {
+    color: '#1DB954', // Spotify green color
+    fontWeight: 'bold',
   },
-  repostedPostContainer: {
-    padding: 10,
-    marginLeft: 5,
-    borderRadius: 8,
-    marginTop: 10,
+  scrollContent: {
+    flexGrow: 1,
   },
-  repostedPostUser: {
+  postContent: {
+    padding: 20,
+  },
+  username: {
     color: '#fff',
     fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  soundCloudPost: {},
-  spotifyPost: {},
-  image: {
-    height: 100,
-    width: 100,
-    borderRadius: 8,
+    fontSize: 18,
     marginBottom: 10,
+  },
+  bodyText: {
+    color: '#ccc',
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  image: {
+    height: 200,
+    width: 200,
+  },
+  trackDetails: {
+    alignItems: 'center',
   },
   trackTitle: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-  },
-  albumTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 5,
   },
   artist: {
     color: '#ccc',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  trackInfo: {
+    color: '#888',
     fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 3,
   },
   date: {
     color: '#888',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  commentLikeSection: {
+    fontSize: 14,
     marginTop: 10,
+  },
+  actionBar: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-around',
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    paddingTop: 15,
   },
-  commentIcon: {
-    marginLeft: 20,
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  repostIcon: {
-    marginLeft: 20,
-  },
-  likeIcon: {
-    marginLeft: 2,
-  },
-  likesCountText: {
+  actionText: {
     color: '#fff',
-    fontSize: 16,
     marginLeft: 8,
+    fontSize: 16,
   },
-  commentCountText: {
-    color: '#fff',
-    fontSize: 16,
-    marginLeft: 8,
+  backButton: {
+    padding: 10,
   },
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark,
-  },
-  bodytext: {
-    color: '#ccc',
-    marginBottom: 10,
   },
 });
 

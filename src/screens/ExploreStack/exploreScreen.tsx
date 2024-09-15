@@ -1,3 +1,4 @@
+// exploreScreen.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -20,7 +21,6 @@ import { fetchTopSpotifyTracks, RankedTrack } from '../../components/exploreAPIs
 import { fetchTopTrendingItems, RankedTopTrending } from '../../components/exploreAPIs/topTrendingItems';
 import { fetchTopSoundCloudTracks, RankedSoundCloudTrack } from '../../components/exploreAPIs/scTopTracks';
 import { Track } from '../../spotifyConfig/itemInterface';
-
 
 
 Amplify.configure(awsconfig);
