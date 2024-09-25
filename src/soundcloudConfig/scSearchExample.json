@@ -1,0 +1,75 @@
+{
+    "collection": [
+      {
+        "artwork_url": "https://i1.sndcdn.com/artworks-yc8QFK2J1nY3NeKy-v36PnQ-large.jpg",
+        "caption": null,
+        "commentable": true,
+        "comment_count": 1801,
+        "created_at": "2020-12-22T04:04:29Z",
+        "description": "",
+        "duration": 197224,
+        "genre": "Hip-hop & Rap",
+        "id": 952081225,
+        "kind": "track",
+        "label_name": null,
+        "last_modified": "2024-08-28T00:54:59Z",
+        "license": "all-rights-reserved",
+        "likes_count": 120159,
+        "permalink": "for-the-night",
+        "permalink_url": "https://soundcloud.com/cartins/for-the-night",
+        "playback_count": 5546505,
+        "public": true,
+        "publisher_metadata": {
+          "artist": "Xavi cc",
+          "contains_music": true,
+          "isrc": "QZS672264056",
+          "explicit": false,
+          "writer_composer": "cartier shamar"
+        },
+        "title": "drake",
+        "uri": "https://api.soundcloud.com/tracks/952081225",
+        "user": {
+          "avatar_url": "https://i1.sndcdn.com/avatars-dTY9paB9NwwzyhRA-LrRmQw-large.jpg",
+          "username": "carti",
+          "verified": false
+        }
+      },
+      {
+        "artwork_url": "https://i1.sndcdn.com/artworks-hSgj7aqHd8uK-0-large.jpg",
+        "caption": null,
+        "commentable": true,
+        "comment_count": 1037,
+        "created_at": "2024-08-10T01:11:48Z",
+        "description": null,
+        "duration": 278047,
+        "genre": "Hip Hop",
+        "id": 1893595887,
+        "kind": "track",
+        "label_name": "OVO/Republic",
+        "last_modified": "2024-09-02T01:59:05Z",
+        "license": "all-rights-reserved",
+        "likes_count": 31854,
+        "permalink": "drake-young-thug-21-savage-its",
+        "permalink_url": "https://soundcloud.com/octobersveryown/drake-young-thug-21-savage-its",
+        "playback_count": 1240424,
+        "public": true,
+        "publisher_metadata": {
+          "artist": "Drake, Young Thug, 21 Savage",
+          "album_title": "100 GIGS",
+          "contains_music": true,
+          "isrc": "USUG12405316",
+          "explicit": true
+        },
+        "title": "It's Up",
+        "uri": "https://api.soundcloud.com/tracks/1893595887",
+        "user": {
+          "avatar_url": "https://i1.sndcdn.com/avatars-000111004820-tzrvo1-large.jpg",
+          "username": "octobersveryown",
+          "verified": true
+        }
+      }
+    ],
+    "total_results": 853084,
+    "next_href": "https://api-v2.soundcloud.com/search/tracks?query_urn=soundcloud%3Asearch%3A192d5e90690740e782eeeb9977400a41&limit=15&offset=15&q=drake",
+    "query_urn": "soundcloud:search:192d5e90690740e782eeeb9977400a41"
+  }

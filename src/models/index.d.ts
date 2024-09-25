@@ -159,6 +159,7 @@ type EagerPost = {
   readonly scTrackUserId?: string | null;
   readonly scTrackUsername?: string | null;
   readonly scTrackLikes?: number | null;
+  readonly scTrackArtist?: string | null;
   readonly scTrackGenre?: string | null;
   readonly scTrackPermalinkUrl?: string | null;
   readonly scTrackWaveformUrl?: string | null;
@@ -203,6 +204,7 @@ type LazyPost = {
   readonly scTrackUserId?: string | null;
   readonly scTrackUsername?: string | null;
   readonly scTrackLikes?: number | null;
+  readonly scTrackArtist?: string | null;
   readonly scTrackGenre?: string | null;
   readonly scTrackPermalinkUrl?: string | null;
   readonly scTrackWaveformUrl?: string | null;

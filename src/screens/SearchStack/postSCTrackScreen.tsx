@@ -24,9 +24,6 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
       const { userId } = await getCurrentUser();
       const { username  } = await getCurrentUser();
 
-      
-      // const openInApp = "soundcloud://tracks/" + id + "?utm_source=direct&utm_content=download_button_header&utm_medium=mobi&utm_campaign=no_campaign&mt=8&at=direct&pt=mobi&ct=no_campaign"
-    
       const PostDetails = {
         body: postText,
         userPostsId: userId,
@@ -37,6 +34,8 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         scTrackArtworkUrl: sctrack.artwork_url,
         scTrackPermalinkUrl: sctrack.permalink_url,
         scTrackWaveformUrl: sctrack.waveform_url,
+        scTrackArtist: sctrack.publisher_metadata.artist || 'Unknown Artist',
+        scTrackGenre: sctrack.genre,
         likesCount: 0,
       };
 
@@ -45,9 +44,9 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         variables: { input: PostDetails },
       });
       console.log('New SC Post created successfully!');
-      console.log('Permalink URL: ', sctrack.permalink_url)
+      console.log('Permalink URL: ', sctrack.permalink_url);
       setPostText('');
-      navigation.goBack()
+      navigation.goBack();
     } catch (error) {
         if (error instanceof CustomError) {
           console.error('Custom error:', error.message, error.code, error.stack);
@@ -77,6 +76,9 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
               <Image source={{ uri: sctrack.artwork_url }} style={styles.trackImage} />
               <View style={styles.trackDetails}>
                 <Text style={styles.trackTitle} numberOfLines={2}>{sctrack.title}</Text>
+                <Text style={styles.trackArtist} numberOfLines={1}>
+                  {sctrack.publisher_metadata.artist || 'Unknown Artist'}
+                </Text>
                 <Text style={styles.trackReleaseDate} numberOfLines={1}>
                   {new Date(sctrack.release_date).getMonth() + 1}-{new Date(sctrack.release_date).getFullYear()}
                 </Text>
@@ -158,6 +160,11 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
       fontSize: 18,
       fontWeight: 'bold',
       color: light,
+      marginBottom: 5,
+    },
+    trackArtist: {
+      fontSize: 16,
+      color: lgray,
       marginBottom: 5,
     },
     trackReleaseDate: {

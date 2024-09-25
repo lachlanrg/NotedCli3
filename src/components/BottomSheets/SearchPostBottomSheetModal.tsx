@@ -107,7 +107,9 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                                     ? item.artists.map(artist => artist.name).join(', ')
                                     : isSpotifyArtist(item)
                                         ? 'Artist'
-                                        : 'user_id' in item ? item.user_id : ''
+                                        : 'publisher_metadata' in item && item.publisher_metadata.artist
+                                            ? item.publisher_metadata.artist
+                                            : 'Unknown Artist'
                             }
                         </Text>
                     </>

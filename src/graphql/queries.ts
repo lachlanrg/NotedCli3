@@ -371,6 +371,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -419,6 +420,7 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -477,6 +479,7 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -526,6 +529,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -695,6 +699,7 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl

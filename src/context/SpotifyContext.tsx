@@ -89,7 +89,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         // Schedule the next check (recursive call)
         scheduleRefreshToken(); 
       } catch (error) {
-        console.error('Error scheduling refresh:', error);
+        console.log('Error scheduling refresh:', error);
         setTimeout(scheduleRefreshToken, 5 * 60 * 1000); // Retry after 5 mins on error
       }
     };
@@ -110,7 +110,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         console.log("New Spotify Access Token: ", accessToken)
         return accessToken;
       } catch (error) {
-        console.error('Failed to refresh Spotify token:', error);
+        console.log('Failed to refresh Spotify token:', error);
         return null;
       }
     }
@@ -131,7 +131,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
     try {
       const accessToken = await AsyncStorage.getItem('spotifyAccessToken');
       if (!accessToken) {
-        console.error("No access token found.");
+        console.log("No access token found.");
         return;
       }
 
@@ -142,7 +142,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
       });
 
       if (!response.ok) {
-        throw new Error(`Error fetching recently played: ${response.status}`);
+        console.log(`Error fetching recently played: ${response.status}`);
       }
 
       const data = await response.json();
@@ -154,7 +154,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         const { userId: currentUserId } = await getCurrentUser();
 
         if (!currentUserId) {
-          console.error('No authenticated user found');
+          console.log('No authenticated user found');
           return;
         }
 
@@ -228,7 +228,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
 
       lastFetchTime.current = Date.now();
     } catch (error) {
-      console.error('Error fetching and updating recently played tracks:', error);
+      console.log('Error fetching and updating recently played tracks:', error);
     } finally {
       fetchingRef.current = false;
     }
@@ -267,7 +267,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
 export const useSpotify = () => {
   const context = useContext(SpotifyContext);
   if (context === undefined) {
-    throw new Error('useSpotify must be used within a SpotifyProvider');
+    console.log('useSpotify must be used within a SpotifyProvider');
   }
   return context;
 };

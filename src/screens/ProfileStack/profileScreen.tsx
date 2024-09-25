@@ -49,7 +49,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const [recentlyPlayedDisabled, setRecentlyPlayedDisabled] = useState(false);
   const [recentlyPlayedTrack, setRecentlyPlayedTrack] = useState<SpotifyRecentlyPlayedTrack | null>(null);
-  const { recentlyPlayed } = useSpotify();
+  const spotifyContext = useSpotify();
+  const recentlyPlayed = spotifyContext?.recentlyPlayed || [];
 
 
   const fetchUserDataAndCounts = useCallback(async () => {

@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faShare } from '@fortawesome/free-solid-svg-icons';
 import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
 import { Track } from '../../spotifyConfig/itemInterface';
+import { getSpotifyItemPostCount } from '../../utils/spotifyPostCounts';
 
 type SearchSpotifyTrackScreenRouteProp = RouteProp<SearchScreenStackParamList, 'SearchSpotifyTrack'>;
 
@@ -20,6 +21,7 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<any>();
   const [spotifyData, setSpotifyData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [postCount, setPostCount] = useState<number>(0);
   const { getSpotifyTrackById } = useSpotifyItemById();
 
   useEffect(() => {
@@ -29,6 +31,10 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
         try {
           let data = await getSpotifyTrackById(trackId);
           setSpotifyData(data);
+          
+          // Fetch post count
+          const count = await getSpotifyItemPostCount(trackId, false);
+          setPostCount(count);
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
@@ -72,9 +78,15 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
           />
         )}
         <Text style={styles.trackName}>{spotifyData.name || 'Unknown Track'}</Text>
-        <Text style={styles.artistName}>
-          {spotifyData.artists ? spotifyData.artists.map((artist: any) => artist.name).join(', ') : 'Unknown Artist'}
-        </Text>
+        {spotifyData.artists && spotifyData.artists.length > 0 && (
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('SearchSpotifyArtist', { artistId: spotifyData.artists[0].id })}
+          >
+            <Text style={styles.artistName}>
+              {spotifyData.artists.map((artist: any) => artist.name).join(', ')}
+            </Text>
+          </TouchableOpacity>
+        )}
         <Text style={styles.albumName}>{album.name || 'Unknown Album'}</Text>
         <Text style={styles.text}>Release Date: {album.release_date || 'Unknown'}</Text>
         <Text style={styles.text}>Track Number: {spotifyData.track_number || 'Unknown'}</Text>
@@ -82,6 +94,7 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
           Duration: {spotifyData.duration_ms ? `${Math.floor(spotifyData.duration_ms / 60000)}:${((spotifyData.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}` : 'Unknown'}
         </Text>
         <Text style={styles.text}>Popularity: {spotifyData.popularity || 'Unknown'}</Text>
+        <Text style={styles.text}>Posts: {postCount}</Text>
         {spotifyData.external_urls && spotifyData.external_urls.spotify && (
           <TouchableOpacity 
             style={styles.button}

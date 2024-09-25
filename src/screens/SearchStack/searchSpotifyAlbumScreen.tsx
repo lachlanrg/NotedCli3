@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faShare } from '@fortawesome/free-solid-svg-icons';
 import { Album } from '../../spotifyConfig/itemInterface';
 import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
+import { getSpotifyItemPostCount } from '../../utils/spotifyPostCounts';
 
 type SearchSpotifyAlbumScreenRouteProp = RouteProp<SearchScreenStackParamList, 'SearchSpotifyAlbum'>;
 
@@ -20,6 +21,7 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
   const { albumId } = route.params;
   const [spotifyData, setSpotifyData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [postCount, setPostCount] = useState<number>(0);
   const { getSpotifyAlbumById } = useSpotifyItemById();
 
   useEffect(() => {
@@ -28,8 +30,11 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
         setIsLoading(true);
         try {
           let data = await getSpotifyAlbumById(albumId);
-            //   console.log("Spotify Album: ", JSON.stringify(data, null, 2));
           setSpotifyData(data);
+          
+          // Fetch post count
+          const count = await getSpotifyItemPostCount(albumId, true);
+          setPostCount(count);
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
@@ -82,9 +87,11 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
         )}
         <Text style={styles.text}>Release Date: {spotifyData.release_date || 'Unknown'}</Text>
         <Text style={styles.text}>Total Tracks: {spotifyData.total_tracks || 'Unknown'}</Text>
-        <Text style={styles.text}>Album Type: {spotifyData.album_type || 'Unknown'}</Text>
+        {/* <Text style={styles.text}>Album Type: {spotifyData.album_type || 'Unknown'}</Text> */}
         <Text style={styles.text}>Popularity: {spotifyData.popularity || 'Unknown'}</Text>
         <Text style={styles.text}>Label: {spotifyData.label || 'Unknown'}</Text>
+        <Text style={styles.text}>Posts: {postCount}</Text>
+
         {spotifyData.genres && spotifyData.genres.length > 0 && (
           <Text style={styles.text}>Genres: {spotifyData.genres.join(', ')}</Text>
         )}

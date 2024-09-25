@@ -16,6 +16,7 @@ export async function searchSCTracks(searchInput: string, saveRecentSearch: any,
         throw new Error('Failed to fetch search results');
       }
       var searchSCData = await response.json();
+      // console.log("SoundCloud Search Data: " + JSON.stringify(searchSCData));
 
       const keyInfo = searchSCData.collection.map((sctrack: scTrack) => ({
         artwork_url: sctrack.artwork_url,
@@ -29,6 +30,18 @@ export async function searchSCTracks(searchInput: string, saveRecentSearch: any,
         user_id: sctrack.user_id,
         kind: sctrack.kind,
         waveform_url: sctrack.waveform_url,
+        publisher_metadata: {
+          artist: sctrack.publisher_metadata?.artist || '',
+          contains_music: sctrack.publisher_metadata?.contains_music || false,
+          isrc: sctrack.publisher_metadata?.isrc || '',
+          explicit: sctrack.publisher_metadata?.explicit || false,
+          writer_composer: sctrack.publisher_metadata?.writer_composer || '',
+        },
+        user: {
+          avatar_url: sctrack.user?.avatar_url || '',
+          username: sctrack.user?.username || '',
+          verified: sctrack.user?.verified || false,
+        },
       }));
       
     //   console.log('--------------------------------------------'); 

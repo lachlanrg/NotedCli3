@@ -494,6 +494,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -563,6 +564,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -632,6 +634,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -680,6 +683,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -774,6 +778,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -868,6 +873,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -963,6 +969,7 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -1043,6 +1050,7 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -1123,6 +1131,7 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl

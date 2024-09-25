@@ -10,4 +10,16 @@ export interface scTrack {
     user_id: string;
     kind: string;
     waveform_url: string;
-  }
+    publisher_metadata: {
+        artist: string;
+        contains_music: boolean;
+        isrc: string;
+        explicit: boolean;
+        writer_composer: string;
+    };
+    user: {
+        avatar_url: string;
+        username: string;
+        verified: boolean;
+    };
+}
