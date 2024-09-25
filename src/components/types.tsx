@@ -25,6 +25,8 @@ export type SearchScreenStackParamList = {
   SearchSpotifyAlbum: { albumId: string };
   SearchSpotifyTrack: { trackId: string };
   SearchSpotifyArtist: { artistId: string };
+  SearchSCTrack: { trackId: string };
+  SearchSCUser: { userId: string }; // Add this if not already present
 };
 
 export type ProfileStackParamList = {

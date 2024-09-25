@@ -20,3 +20,21 @@ export async function getSpotifyItemPostCount(itemId: string, isAlbum: boolean):
     return 0;
   }
 }
+
+export async function getSCTrackPostCount(trackId: string): Promise<number> {
+  const client = generateClient();
+  
+  try {
+    const response = await client.graphql({
+      query: queries.listPosts,
+      variables: {
+        filter: { scTrackId: { eq: trackId } },
+      },
+    });
+
+    return response.data.listPosts.items.length;
+  } catch (error) {
+    console.error('Error fetching SoundCloud track post count:', error);
+    return 0;
+  }
+}
