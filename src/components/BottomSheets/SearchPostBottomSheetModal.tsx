@@ -21,6 +21,7 @@ type RootStackParamList = {
   SearchSpotifyAlbum: { albumId: string };
   SearchSpotifyTrack: { trackId: string };
   SearchSpotifyArtist: { artistId: string };
+  SearchSCTrack: { trackId: string };
   // ... other routes
 };
 
@@ -59,13 +60,17 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
         return item && typeof item === 'object' && 'type' in item && item.type === 'artist';
     };
 
+    const isSoundCloudTrack = (item: any): item is scTrack => {
+        return item && typeof item === 'object' && 'kind' in item && item.kind === 'track';
+    };
+
     const handlePostPress = () => {
         if (item) {
             if (isSpotifyTrack(item)) {
                 navigation.navigate('PostSpotifyTrack', { track: item });
             } else if (isSpotifyAlbum(item)) {
                 navigation.navigate('PostSpotifyAlbum', { album: item });
-            } else if (!isSpotifyArtist(item)) {
+            } else if (isSoundCloudTrack(item)) {
                 navigation.navigate('PostSCTrack', { sctrack: item });
             }
         }
@@ -80,6 +85,8 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                 navigation.navigate('SearchSpotifyTrack', { trackId: item.id });
             } else if (isSpotifyArtist(item)) {
                 navigation.navigate('SearchSpotifyArtist', { artistId: item.id });
+            } else if (isSoundCloudTrack(item)) {
+                navigation.navigate('SearchSCTrack', { trackId: item.id });
             }
         }
         handleDismiss();
@@ -107,7 +114,9 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                                     ? item.artists.map(artist => artist.name).join(', ')
                                     : isSpotifyArtist(item)
                                         ? 'Artist'
-                                        : 'user_id' in item ? item.user_id : ''
+                                        : 'publisher_metadata' in item && item.publisher_metadata.artist
+                                            ? item.publisher_metadata.artist
+                                            : 'Unknown Artist'
                             }
                         </Text>
                     </>
@@ -116,12 +125,12 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                     <TouchableOpacity 
                         style={styles.searchButton} 
                         onPress={handleSearchPress}
-                        disabled={!isSpotifyAlbum(item) && !isSpotifyTrack(item) && !isSpotifyArtist(item)}
+                        disabled={!isSpotifyAlbum(item) && !isSpotifyTrack(item) && !isSpotifyArtist(item) && !isSoundCloudTrack(item)}
                     >
                         <FontAwesomeIcon 
                             icon={searchIcon} 
                             size={24} 
-                            color={(isSpotifyAlbum(item) || isSpotifyTrack(item) || isSpotifyArtist(item)) ? dark : gray} 
+                            color={(isSpotifyAlbum(item) || isSpotifyTrack(item) || isSpotifyArtist(item) || isSoundCloudTrack(item)) ? dark : gray} 
                         /> 
                     </TouchableOpacity>
                     {!isSpotifyArtist(item) && (

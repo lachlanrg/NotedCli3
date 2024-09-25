@@ -305,7 +305,7 @@ const handleNavigateToArtistDetail = (artistId: string) => {
                     <View style={styles.itemLowerDetails}>
                         <Text style={styles.itemType}>{item.kind.charAt(0).toUpperCase() + item.kind.slice(1)}</Text>
                           <View style={{ flex: 1 }}>
-                            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {item.user_id}</Text>
+                            <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">• {item.publisher_metadata.artist || 'Unknown Artist'}</Text>
                           </View>
                     </View>
                 </View>

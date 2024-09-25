@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faShare } from '@fortawesome/free-solid-svg-icons';
 import { Album } from '../../spotifyConfig/itemInterface';
 import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
+import { getSpotifyItemPostCount } from '../../utils/musicPostCounts';
 
 type SearchSpotifyAlbumScreenRouteProp = RouteProp<SearchScreenStackParamList, 'SearchSpotifyAlbum'>;
 
@@ -20,6 +21,7 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
   const { albumId } = route.params;
   const [spotifyData, setSpotifyData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [postCount, setPostCount] = useState<number>(0);
   const { getSpotifyAlbumById } = useSpotifyItemById();
 
   useEffect(() => {
@@ -28,8 +30,11 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
         setIsLoading(true);
         try {
           let data = await getSpotifyAlbumById(albumId);
-            //   console.log("Spotify Album: ", JSON.stringify(data, null, 2));
           setSpotifyData(data);
+          
+          // Fetch post count
+          const count = await getSpotifyItemPostCount(albumId, true);
+          setPostCount(count);
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
@@ -70,6 +75,16 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
             style={styles.albumCover}
           />
         )}
+        <View style={styles.postCountContainer}>
+          {postCount > 0 ? (
+            <>
+              <Text style={styles.postCountText}>{postCount}</Text>
+              <Text style={styles.postCountLabel}>Posts</Text>
+            </>
+          ) : (
+            <Text style={styles.firstPostText}>Be the first to Post this!</Text>
+          )}
+        </View>
         <Text style={styles.trackName}>{spotifyData.name || 'Unknown Album'}</Text>
         {spotifyData.artists && spotifyData.artists.length > 0 && (
           <TouchableOpacity 
@@ -82,7 +97,7 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
         )}
         <Text style={styles.text}>Release Date: {spotifyData.release_date || 'Unknown'}</Text>
         <Text style={styles.text}>Total Tracks: {spotifyData.total_tracks || 'Unknown'}</Text>
-        <Text style={styles.text}>Album Type: {spotifyData.album_type || 'Unknown'}</Text>
+        {/* <Text style={styles.text}>Album Type: {spotifyData.album_type || 'Unknown'}</Text> */}
         <Text style={styles.text}>Popularity: {spotifyData.popularity || 'Unknown'}</Text>
         <Text style={styles.text}>Label: {spotifyData.label || 'Unknown'}</Text>
         {spotifyData.genres && spotifyData.genres.length > 0 && (
@@ -276,6 +291,30 @@ const styles = StyleSheet.create({
   trackItemArtist: {
     fontSize: 14,
     color: lgray,
+  },
+  postCountContainer: {
+    backgroundColor: 'rgba(29, 185, 84, 0.1)', // Spotify green with opacity
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
+    minWidth: 150, // Add this to ensure consistent width
+  },
+  postCountText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1DB954', // Spotify green
+  },
+  postCountLabel: {
+    fontSize: 14,
+    color: light,
+  },
+  firstPostText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1DB954', // Spotify green
+    textAlign: 'center',
   },
 });
 

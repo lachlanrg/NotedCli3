@@ -110,6 +110,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
               />
               <View style={styles.mediaInfo}>
                 <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.scTrackTitle}</Text>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.scTrackArtist}</Text>
                 <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>
             </View>
@@ -125,7 +126,7 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
                 <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyAlbumName}</Text>
                 <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyAlbumArtists}</Text>
                 <Text style={styles.date}>Total Tracks: {postToRender.spotifyAlbumTotalTracks}</Text>
-                <Text style={styles.date}>Release Date: {postToRender.spotifyAlbumReleaseDate}</Text>
+                {/* <Text style={styles.date}>Release Date: {postToRender.spotifyAlbumReleaseDate}</Text> */}
                 <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>
             </View>

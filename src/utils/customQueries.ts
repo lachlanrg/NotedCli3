@@ -51,8 +51,7 @@ export const listRepostsWithOriginalPost = /* GraphQL */ `query ListRepostsWithO
           scTrackUsername
           scTrackLikes
           scTrackGenre
-          scTrackPermalinkUrl
-          scTrackWaveformUrl
+          scTrackArtist
           createdAt
           updatedAt
           _version

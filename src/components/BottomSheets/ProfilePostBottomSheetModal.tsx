@@ -5,18 +5,20 @@ import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gor
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { dark, light, error, modalBackground } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMusic, faRetweet } from '@fortawesome/free-solid-svg-icons';
+import { faMusic, faPenToSquare, faRetweet } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { generateClient } from 'aws-amplify/api';
 import * as mutations from '../../graphql/mutations';
 import { getPost, getRepost } from "../../graphql/queries";
+import { Linking } from 'react-native';
 
 import { getCurrentUser } from 'aws-amplify/auth';
 
-const trashIcon = faTrashCan as IconProp;
 const musicIcon = faMusic as IconProp;
+const editIcon = faPenToSquare as IconProp;
 const repostIcon = faRetweet as IconProp;
+const trashIcon = faTrashCan as IconProp;
 
 export type Ref = BottomSheetModal;
 
@@ -112,6 +114,29 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
     }
   };
 
+  const handleOpenUri = useCallback(() => {
+    if (item) {
+      const postToRender = 'originalPost' in item ? item.originalPost : item;
+      const url = postToRender.scTrackPermalinkUrl 
+                  || postToRender.spotifyAlbumExternalUrl 
+                  || postToRender.spotifyTrackExternalUrl;
+
+      if (url) {
+        Linking.openURL(url).catch((err) => console.error('An error occurred', err));
+        dismiss(); // Optionally close the modal after opening the link 
+      } else {
+        console.warn('No external URL found for the selected item');
+      }
+    }
+  }, [item, dismiss]);
+
+  const handleEditItem = useCallback(() => {
+    // Implement edit functionality here
+    console.log('Edit item:', item.id);
+    dismiss();
+    // Navigate to edit screen or open edit modal
+  }, [item, dismiss]);
+
   const getItemTitle = () => {
     const postToRender = 'originalPost' in item ? item.originalPost : item;
     if (postToRender.spotifyAlbumName) {
@@ -155,18 +180,12 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
           <Text style={styles.containerHeadline}>No item selected</Text>
         )}
         <View style={styles.iconRow}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleOpenUri}>
             <FontAwesomeIcon icon={musicIcon} size={24} color={dark} /> 
           </TouchableOpacity>
-          {item && 'originalPost' in item ? (
-            <TouchableOpacity>
-              <FontAwesomeIcon icon={repostIcon} size={24} color={dark} /> 
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity>
-              <FontAwesomeIcon icon={musicIcon} size={24} color={dark} /> 
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={handleEditItem}>
+            <FontAwesomeIcon icon={editIcon} size={24} color={dark} /> 
+          </TouchableOpacity>
           <TouchableOpacity onPress={handleDeleteItem}> 
             <FontAwesomeIcon icon={trashIcon} size={24} color={error} />
           </TouchableOpacity>

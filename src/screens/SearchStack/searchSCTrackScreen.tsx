@@ -1,39 +1,38 @@
-// searchSpotifyTrackScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Linking, SafeAreaView, ActivityIndicator } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { SearchScreenStackParamList } from '../../components/types';
-import { dark, gray, light } from '../../components/colorModes';
+import { light, dark, gray, lgray } from '../../components/colorModes';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faShare } from '@fortawesome/free-solid-svg-icons';
-import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
-import { Track } from '../../spotifyConfig/itemInterface';
-import { getSpotifyItemPostCount } from '../../utils/musicPostCounts';
+import { scTrack } from '../../soundcloudConfig/itemInterface';
+import useSCTrackById from '../../soundcloudConfig/getSCTrackById';
+import { getSCTrackPostCount } from '../../utils/musicPostCounts';
 
-type SearchSpotifyTrackScreenRouteProp = RouteProp<SearchScreenStackParamList, 'SearchSpotifyTrack'>;
+type SearchSCTrackScreenRouteProp = RouteProp<SearchScreenStackParamList, 'SearchSCTrack'>;
 
 type Props = {
-  route: SearchSpotifyTrackScreenRouteProp;
+  route: SearchSCTrackScreenRouteProp;
 };
 
-const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
-  const { trackId } = route.params;
+const SearchSCTrackScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<any>();
-  const [spotifyData, setSpotifyData] = useState<any>(null);
+  const { trackId } = route.params;
+  const [scData, setSCData] = useState<scTrack | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [postCount, setPostCount] = useState<number>(0);
-  const { getSpotifyTrackById } = useSpotifyItemById();
+  const { getSCTrackById } = useSCTrackById();
 
   useEffect(() => {
     const fetchData = async () => {
       if (trackId) {
         setIsLoading(true);
         try {
-          let data = await getSpotifyTrackById(trackId);
-          setSpotifyData(data);
+          let data = await getSCTrackById(trackId);
+          setSCData(data);
           
           // Fetch post count
-          const count = await getSpotifyItemPostCount(trackId, false);
+          const count = await getSCTrackPostCount(trackId);
           setPostCount(count);
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -44,37 +43,25 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
     };
 
     fetchData();
-  }, [trackId, getSpotifyTrackById]);
+  }, [trackId, getSCTrackById]);
 
   const handlePostPress = () => {
-    if (spotifyData) {
-      const track: Track = {
-        id: spotifyData.id,
-        name: spotifyData.name,
-        artists: spotifyData.artists,
-        album: spotifyData.album,
-        duration_ms: spotifyData.duration_ms,
-        external_urls: spotifyData.external_urls,
-        preview_url: spotifyData.preview_url,
-        popularity: spotifyData.popularity,
-        type: spotifyData.type,
-      };
-      navigation.navigate('PostSpotifyTrack', { track });
+    if (scData) {
+      navigation.navigate('PostSCTrack', { sctrack: scData });
     }
   };
 
   const renderTrackInfo = () => {
-    if (!spotifyData) return null;
+    if (!scData) return null;
 
-    const album = spotifyData.album || {};
-    const albumImageUrl = album.images && album.images[0] ? album.images[0].url : null;
+    const trackImageUrl = scData.artwork_url ? scData.artwork_url.replace('-large', '-t500x500') : null;
 
     return (
       <ScrollView style={styles.content}>
-        {albumImageUrl && (
+        {trackImageUrl && (
           <Image 
-            source={{ uri: albumImageUrl }} 
-            style={styles.albumCover}
+            source={{ uri: trackImageUrl }} 
+            style={styles.trackCover}
           />
         )}
         <View style={styles.postCountContainer}>
@@ -87,29 +74,22 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
             <Text style={styles.firstPostText}>Be the first to Post this!</Text>
           )}
         </View>
-        <Text style={styles.trackName}>{spotifyData.name || 'Unknown Track'}</Text>
-        {spotifyData.artists && spotifyData.artists.length > 0 && (
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('SearchSpotifyArtist', { artistId: spotifyData.artists[0].id })}
-          >
-            <Text style={styles.artistName}>
-              {spotifyData.artists.map((artist: any) => artist.name).join(', ')}
-            </Text>
-          </TouchableOpacity>
-        )}
-        <Text style={styles.albumName}>{album.name || 'Unknown Album'}</Text>
-        <Text style={styles.text}>Release Date: {album.release_date || 'Unknown'}</Text>
-        <Text style={styles.text}>Track Number: {spotifyData.track_number || 'Unknown'}</Text>
-        <Text style={styles.text}>
-          Duration: {spotifyData.duration_ms ? `${Math.floor(spotifyData.duration_ms / 60000)}:${((spotifyData.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}` : 'Unknown'}
-        </Text>
-        <Text style={styles.text}>Popularity: {spotifyData.popularity || 'Unknown'}</Text>
-        {spotifyData.external_urls && spotifyData.external_urls.spotify && (
+        <Text style={styles.trackName}>{scData.title || 'Unknown Track'}</Text>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('SearchSCUser', { userId: scData.user_id })}
+        >
+          <Text style={styles.artistName}>{scData.user?.username || 'Unknown Artist'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.text}>Genre: {scData.genre || 'Unknown'}</Text>
+        <Text style={styles.text}>Release Date: {new Date(scData.release_date).toLocaleDateString()}</Text>
+        <Text style={styles.text}>Likes: {scData.likes_count}</Text>
+        <Text style={styles.text}>Plays: {scData.playback_count}</Text>
+        {scData.permalink_url && (
           <TouchableOpacity 
             style={styles.button}
-            onPress={() => Linking.openURL(spotifyData.external_urls.spotify)}
+            onPress={() => Linking.openURL(scData.permalink_url)}
           >
-            <Text style={styles.buttonText}>Open in Spotify</Text>
+            <Text style={styles.buttonText}>Open in SoundCloud</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -123,7 +103,7 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
             <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Spotify Track Details</Text>
+          <Text style={styles.headerTitle}>SoundCloud Track Details</Text>
           <TouchableOpacity onPress={handlePostPress} style={styles.headerButton}>
             <Text style={styles.shareText}>Share</Text>
           </TouchableOpacity>
@@ -134,16 +114,17 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
             <Text style={styles.loadingText}>Loading...</Text>
           </View>
         ) : 
-        renderTrackInfo()
-      }
-    </View>
-  </SafeAreaView>
-);
+          renderTrackInfo()
+        }
+      </View>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: dark,
   },
   header: {
     flexDirection: 'row',
@@ -157,7 +138,7 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     padding: 10,
-    width: 70, // Set a fixed width for both buttons
+    width: 70,
     alignItems: 'center',
   },
   headerTitle: {
@@ -167,19 +148,9 @@ const styles = StyleSheet.create({
     color: light,
     textAlign: 'center',
   },
-  postButton: {
-    padding: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  shareText: {
     color: light,
-  },
-  exploreBack: {
-    color: light,
-    marginLeft: 5,
-    fontSize: 10,
+    fontSize: 16,
   },
   safeAreaContainer: {
     flex: 1,
@@ -193,7 +164,7 @@ const styles = StyleSheet.create({
     color: light,
     marginBottom: 5,
   },
-  albumCover: {
+  trackCover: {
     width: 200,
     height: 200,
     alignSelf: 'center',
@@ -210,13 +181,8 @@ const styles = StyleSheet.create({
     color: light,
     marginBottom: 5,
   },
-  albumName: {
-    fontSize: 16,
-    color: gray,
-    marginBottom: 20,
-  },
   button: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#ff5500', // SoundCloud orange
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -235,42 +201,19 @@ const styles = StyleSheet.create({
     color: light,
     marginTop: 10,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: light,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  trackItem: {
-    marginBottom: 10,
-  },
-  trackItemName: {
-    fontSize: 16,
-    color: light,
-    fontWeight: 'bold',
-  },
-  trackItemArtist: {
-    fontSize: 14,
-    color: gray,
-  },
-  shareText: {
-    color: light,
-    fontSize: 16,
-  },
   postCountContainer: {
-    backgroundColor: 'rgba(29, 185, 84, 0.1)', // Spotify green with opacity
+    backgroundColor: 'rgba(255, 85, 0, 0.1)', // SoundCloud orange with opacity
     borderRadius: 10,
     padding: 10,
     alignItems: 'center',
     alignSelf: 'center',
     marginBottom: 20,
-    minWidth: 150, // Add this to ensure consistent width
+    minWidth: 150,
   },
   postCountText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1DB954', // Spotify green
+    color: '#ff5500', // SoundCloud orange
   },
   postCountLabel: {
     fontSize: 14,
@@ -279,9 +222,9 @@ const styles = StyleSheet.create({
   firstPostText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#1DB954', // Spotify green
+    color: '#ff5500', // SoundCloud orange
     textAlign: 'center',
   },
 });
 
-export default SearchSpotifyTrackScreen;
+export default SearchSCTrackScreen;

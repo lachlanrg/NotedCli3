@@ -32,8 +32,6 @@ import { HomeStackParamList } from '../../components/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
 import { listRepostsWithOriginalPost } from '../../utils/customQueries';
-import { useSpotify } from '../../context/SpotifyContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { selectionChange } from '../../utils/hapticFeedback';
 
 
@@ -79,7 +77,7 @@ const HomeScreen: React.FC = () => {
 
   const [following, setFollowing] = useState<string[]>([]);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
-  const { spotifyUser } = useSpotify();
+  // const { spotifyUser } = useSpotify();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
@@ -420,7 +418,11 @@ const HomeScreen: React.FC = () => {
         {(isSoundCloud || isSpotifyAlbum || isSpotifyTrack) && (
           <View style={styles.mediaContainer}>
             <Image
-              source={{ uri: postContent.scTrackArtworkUrl || postContent.spotifyAlbumImageUrl || postContent.spotifyTrackImageUrl }}
+              source={{ 
+                uri: isSoundCloud 
+                  ? postContent.scTrackArtworkUrl.replace('-large', '-t500x500') 
+                  : postContent.spotifyAlbumImageUrl || postContent.spotifyTrackImageUrl 
+              }}
               style={styles.mediaImage}
             />
             <View style={styles.mediaInfo}>
@@ -439,11 +441,11 @@ const HomeScreen: React.FC = () => {
                    postContent.spotifyTrackName}
                 </Text>
               </View>
-              {(isSpotifyAlbum || isSpotifyTrack) && (
-                <Text style={styles.mediaArtist} numberOfLines={1} ellipsizeMode="tail">
-                  {isSpotifyAlbum ? postContent.spotifyAlbumArtists : postContent.spotifyTrackArtists}
-                </Text>
-              )}
+              <Text style={styles.mediaArtist} numberOfLines={1} ellipsizeMode="tail">
+                {isSoundCloud ? postContent.scTrackArtist :
+                 isSpotifyAlbum ? postContent.spotifyAlbumArtists :
+                 postContent.spotifyTrackArtists}
+              </Text>
               {isSpotifyAlbum && (
                 <Text style={styles.mediaDetails}>
                   {`${postContent.spotifyAlbumTotalTracks} tracks • ${postContent.spotifyAlbumReleaseDate}`}
@@ -709,6 +711,7 @@ const styles = StyleSheet.create({
   mediaArtist: {
     color: '#ccc',
     fontSize: 12,
+    // marginTop: 2,
   },
   mediaDetails: {
     color: '#888',

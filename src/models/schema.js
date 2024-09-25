@@ -638,6 +638,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "scTrackArtist": {
+                    "name": "scTrackArtist",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "scTrackGenre": {
                     "name": "scTrackGenre",
                     "isArray": false,
@@ -1154,5 +1161,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "44747229c2cc2dd262ca4672a5679516"
+    "version": "804286e769993bca464006931ab482e8"
 };

@@ -45,7 +45,7 @@ import ExplorePostScreen from './src/screens/HomeStack/ExplorePostScreen';
 import SearchSpotifyAlbumScreen from './src/screens/SearchStack/searchSpotifyAlbumScreen';
 import SearchSpotifyTrackScreen from './src/screens/SearchStack/searchSpotifyTrackScreen';
 import SearchSpotifyArtistScreen from './src/screens/SearchStack/searchSpotifyArtistScreen';
-
+import SearchSCTrackScreen from './src/screens/SearchStack/searchSCTrackScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -99,6 +99,7 @@ const SearchStackNavigator = () => {
       <SearchStack.Screen name="SearchSpotifyAlbum" component={SearchSpotifyAlbumScreen} options={{ headerShown: false }} />
       <SearchStack.Screen name="SearchSpotifyTrack" component={SearchSpotifyTrackScreen} options={{ headerShown: false }} />
       <SearchStack.Screen name="SearchSpotifyArtist" component={SearchSpotifyArtistScreen} options={{ headerShown: false }} />
+      <SearchStack.Screen name="SearchSCTrack" component={SearchSCTrackScreen} options={{ headerShown: false }} />
     </SearchStack.Navigator>
   );
 };

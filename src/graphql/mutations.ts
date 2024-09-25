@@ -512,6 +512,7 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -584,6 +585,7 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -656,6 +658,7 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
     scTrackUserId
     scTrackUsername
     scTrackLikes
+    scTrackArtist
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
@@ -707,6 +710,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -804,6 +808,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -901,6 +906,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -999,6 +1005,7 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -1082,6 +1089,7 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
@@ -1165,6 +1173,7 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       scTrackUserId
       scTrackUsername
       scTrackLikes
+      scTrackArtist
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl

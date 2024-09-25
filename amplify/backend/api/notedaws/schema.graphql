@@ -64,6 +64,7 @@ type Post @model @auth(rules: [{allow: public}]) {
   scTrackUserId: ID
   scTrackUsername: String
   scTrackLikes: Int
+  scTrackArtist: String
   scTrackGenre: String
   scTrackPermalinkUrl: String
   scTrackWaveformUrl: String
