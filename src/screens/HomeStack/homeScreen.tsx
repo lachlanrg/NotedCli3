@@ -418,7 +418,11 @@ const HomeScreen: React.FC = () => {
         {(isSoundCloud || isSpotifyAlbum || isSpotifyTrack) && (
           <View style={styles.mediaContainer}>
             <Image
-              source={{ uri: postContent.scTrackArtworkUrl || postContent.spotifyAlbumImageUrl || postContent.spotifyTrackImageUrl }}
+              source={{ 
+                uri: isSoundCloud 
+                  ? postContent.scTrackArtworkUrl.replace('-large', '-t500x500') 
+                  : postContent.spotifyAlbumImageUrl || postContent.spotifyTrackImageUrl 
+              }}
               style={styles.mediaImage}
             />
             <View style={styles.mediaInfo}>
