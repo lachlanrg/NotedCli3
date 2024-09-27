@@ -488,6 +488,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
     spotifyTrackExternalUrl
     spotifyTrackReleaseDate
     spotifyTrackDurationMs
+    spotifyTrackExplicit
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -498,6 +499,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
+    scTrackCreatedAt
     createdAt
     updatedAt
     _version
@@ -558,6 +560,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
     spotifyTrackExternalUrl
     spotifyTrackReleaseDate
     spotifyTrackDurationMs
+    spotifyTrackExplicit
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -568,6 +571,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
+    scTrackCreatedAt
     createdAt
     updatedAt
     _version
@@ -628,6 +632,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
     spotifyTrackExternalUrl
     spotifyTrackReleaseDate
     spotifyTrackDurationMs
+    spotifyTrackExplicit
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -638,6 +643,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
+    scTrackCreatedAt
     createdAt
     updatedAt
     _version
@@ -677,6 +683,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -687,6 +694,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -772,6 +780,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -782,6 +791,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -867,6 +877,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -877,6 +888,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -963,6 +975,7 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -973,6 +986,7 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -1044,6 +1058,7 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -1054,6 +1069,7 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -1125,6 +1141,7 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -1135,6 +1152,7 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version

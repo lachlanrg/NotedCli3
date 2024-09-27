@@ -44,6 +44,9 @@ export const listRepostsWithOriginalPost = /* GraphQL */ `query ListRepostsWithO
           spotifyTrackArtists
           spotifyTrackPreviewUrl
           spotifyTrackExternalUrl
+          spotifyTrackReleaseDate
+          spotifyTrackDurationMs
+          spotifyTrackExplicit
           scTrackId
           scTrackTitle
           scTrackArtworkUrl
@@ -52,6 +55,7 @@ export const listRepostsWithOriginalPost = /* GraphQL */ `query ListRepostsWithO
           scTrackLikes
           scTrackGenre
           scTrackArtist
+          scTrackCreatedAt
           createdAt
           updatedAt
           _version

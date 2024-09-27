@@ -391,7 +391,7 @@ const handleNavigateToArtistDetail = (artistId: string) => {
                     <Text style={styles.itemName} numberOfLines={1} ellipsizeMode="tail">{track.name}</Text>
                     <View style={styles.itemLowerDetails}>
                       <Text style={styles.itemType}>
-                        {track.type === 'track' ? 'Song' : track.type.charAt(0).toUpperCase() + track.type.slice(1)}
+                        {track.type.charAt(0).toUpperCase() + track.type.slice(1)}
                       </Text>
                       <View style={{ flex: 1 }}>
                         <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
@@ -399,6 +399,11 @@ const handleNavigateToArtistDetail = (artistId: string) => {
                         </Text>
                       </View>
                     </View>
+                    {track.explicit && (
+                      <View style={styles.explicitLabelContainer}>
+                        <Text style={styles.explicitLabel}>Explicit</Text>
+                      </View>
+                    )}
                   </View>
                 </TouchableOpacity>
               ))}
@@ -498,7 +503,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
+    // marginBottom: 5,
     color: light,
   },
   itemType: {
@@ -651,6 +656,19 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     fontStyle: "italic",
 
+  },
+  explicitLabelContainer: {
+    backgroundColor: '#444',
+    borderRadius: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginTop: 4,
+    alignSelf: 'flex-start',
+  },
+  explicitLabel: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
 

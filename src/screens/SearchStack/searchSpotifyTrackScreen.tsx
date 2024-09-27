@@ -58,6 +58,7 @@ const SearchSpotifyTrackScreen: React.FC<Props> = ({ route }) => {
         preview_url: spotifyData.preview_url,
         popularity: spotifyData.popularity,
         type: spotifyData.type,
+        explicit: spotifyData.explicit,
       };
       navigation.navigate('PostSpotifyTrack', { track });
     }

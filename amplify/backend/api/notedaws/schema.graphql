@@ -57,6 +57,7 @@ type Post @model @auth(rules: [{allow: public}]) {
   spotifyTrackExternalUrl: String
   spotifyTrackReleaseDate: String
   spotifyTrackDurationMs: Int
+  spotifyTrackExplicit: Boolean
 
   scTrackId: ID
   scTrackTitle: String
@@ -68,6 +69,7 @@ type Post @model @auth(rules: [{allow: public}]) {
   scTrackGenre: String
   scTrackPermalinkUrl: String
   scTrackWaveformUrl: String
+  scTrackCreatedAt: String
 }
 
 type Comment @model @auth(rules: [{allow: public}]) {

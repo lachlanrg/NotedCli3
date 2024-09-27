@@ -32,6 +32,7 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
         spotifyTrackExternalUrl: track.external_urls.spotify,
         spotifyTrackReleaseDate: track.album.release_date,
         spotifyTrackDurationMs: track.duration_ms,
+        spotifyTrackExplicit: track.explicit,
         likesCount: 0,
       };
 
@@ -70,10 +71,18 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
           <View style={styles.trackInfoContainer}>
             <Image source={{ uri: track.album.images[0]?.url }} style={styles.trackImage} />
             <View style={styles.trackDetails}>
-              <Text style={styles.trackTitle} numberOfLines={2}>{track.name}</Text>
+              <Text style={styles.trackTitle} numberOfLines={2}>
+                {track.name}
+              </Text>
               <Text style={styles.trackArtist} numberOfLines={1}>{track.artists.map(artist => artist.name).join(', ')}</Text>
-              <Text style={styles.trackAlbum} numberOfLines={1}>{track.album.name}  •  {
-              new Date(track.album.release_date).getMonth() + 1}-{new Date(track.album.release_date).getFullYear()}</Text>
+              <Text style={styles.trackAlbum} numberOfLines={1}>
+                {track.album.name}  •  {new Date(track.album.release_date).getMonth() + 1}-{new Date(track.album.release_date).getFullYear()}
+              </Text>
+              {track.explicit && (
+                <View style={styles.explicitLabelContainer}>
+                  <Text style={styles.explicitLabel}>Explicit</Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -171,6 +180,19 @@ const styles = StyleSheet.create({
     color: light,
     fontSize: 16,
     textAlignVertical: 'top',
+  },
+  explicitLabelContainer: {
+    backgroundColor: '#444',
+    borderRadius: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginTop: 4,
+    alignSelf: 'flex-start',
+  },
+  explicitLabel: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
 

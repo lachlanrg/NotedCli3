@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, ScrollView, Linking, ActivityIndicator, FlatList } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { HomeStackParamList } from '../../components/types';
-import { light, dark, gray, lgray } from '../../components/colorModes';
+import { light, dark, gray, lgray, soundcloudOrange, spotifyGreen } from '../../components/colorModes';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
 import { Track } from '../../spotifyConfig/itemInterface';
+import useSCTrackById from '../../soundcloudConfig/getSCTrackById';
+import { scTrack } from '../../soundcloudConfig/itemInterface';
+import { getSCTrackPostCount, getSpotifyItemPostCount } from '../../utils/musicPostCounts';
 
 type ExplorePostScreenRouteProp = RouteProp<HomeStackParamList, 'ExplorePost'>;
 
@@ -19,8 +22,11 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
   const { id, type } = route.params;
   const navigation = useNavigation<any>();
   const [spotifyData, setSpotifyData] = useState<any>(null);
+  const [scData, setSCData] = useState<scTrack | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [postCount, setPostCount] = useState<number>(0);
   const { getSpotifyTrackById, getSpotifyAlbumById } = useSpotifyItemById();
+  const { getSCTrackById } = useSCTrackById();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,20 +34,26 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
         setIsLoading(true);
         try {
           let data = null;
+          let count = 0;
           switch (type) {
             case 'spotifyTrack':
               data = await getSpotifyTrackById(id);
-            //   console.log("Simplified Spotify Track: ", JSON.stringify(data, null, 2));
+              count = await getSpotifyItemPostCount(id, false);
+              setSpotifyData(data);
               break;
             case 'spotifyAlbum':
               data = await getSpotifyAlbumById(id);
-            //   console.log("Spotify Album: ", JSON.stringify(data, null, 2));
+              count = await getSpotifyItemPostCount(id, true);
+              setSpotifyData(data);
               break;
             case 'scTrack':
-              // data = await mockScTrackFunction(id);
+              data = await getSCTrackById(id);
+              count = await getSCTrackPostCount(id);
+              setSCData(data);
               break;
           }
-          setSpotifyData(data);
+          setPostCount(count);
+          console.log('Fetched data:', data); // Debug log
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
@@ -51,7 +63,7 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
     };
 
     fetchData();
-  }, [id, type, getSpotifyTrackById, getSpotifyAlbumById]);
+  }, [id, type, getSpotifyTrackById, getSpotifyAlbumById, getSCTrackById]);
 
   const renderTrackInfo = () => {
     if (!spotifyData) return null;
@@ -67,6 +79,16 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
             style={styles.albumCover}
           />
         )}
+        <View style={styles.postCountContainer}>
+          {postCount > 0 ? (
+            <>
+              <Text style={styles.postCountText}>{postCount}</Text>
+              <Text style={styles.postCountLabel}>Posts</Text>
+            </>
+          ) : (
+            <Text style={styles.firstPostText}>Be the first to Post this!</Text>
+          )}
+        </View>
         <Text style={styles.trackName}>{spotifyData.name || 'Unknown Track'}</Text>
         <Text style={styles.artistName}>
           {spotifyData.artists ? spotifyData.artists.map((artist: any) => artist.name).join(', ') : 'Unknown Artist'}
@@ -103,6 +125,16 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
             style={styles.albumCover}
           />
         )}
+        <View style={styles.postCountContainer}>
+          {postCount > 0 ? (
+            <>
+              <Text style={styles.postCountText}>{postCount}</Text>
+              <Text style={styles.postCountLabel}>Posts</Text>
+            </>
+          ) : (
+            <Text style={styles.firstPostText}>Be the first to Post this!</Text>
+          )}
+        </View>
         <Text style={styles.trackName}>{spotifyData.name || 'Unknown Album'}</Text>
         <Text style={styles.artistName}>
           {spotifyData.artists ? spotifyData.artists.map((artist: any) => artist.name).join(', ') : 'Unknown Artist'}
@@ -144,15 +176,64 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
     );
   };
 
+  const renderSCTrackInfo = () => {
+    console.log('Rendering SC Track Info, scData:', scData); // Debug log
+    if (!scData) return null;
+
+    const trackImageUrl = scData.artwork_url ? scData.artwork_url.replace('-large', '-t500x500') : null;
+
+    return (
+      <ScrollView style={styles.content}>
+        {trackImageUrl && (
+          <Image 
+            source={{ uri: trackImageUrl }} 
+            style={styles.trackCover}
+          />
+        )}
+        <View style={styles.postCountContainerSC}>
+          {postCount > 0 ? (
+            <>
+              <Text style={styles.postCountTextSC}>{postCount}</Text>
+              <Text style={styles.postCountLabelSC}>Posts</Text>
+            </>
+          ) : (
+            <Text style={styles.firstPostTextSC}>Be the first to Post this!</Text>
+          )}
+        </View>
+        <Text style={styles.trackName}>{scData.title || 'Unknown Track'}</Text>
+        <TouchableOpacity 
+          onPress={() => navigation.navigate('SearchSCUser', { userId: scData.user_id })}
+        >
+          <Text style={styles.artistName}>{scData.user?.username || 'Unknown Artist'}</Text>
+        </TouchableOpacity>
+        <Text style={styles.text}>Genre: {scData.genre || 'Unknown'}</Text>
+        <Text style={styles.text}>Release Date: {new Date(scData.created_at).toLocaleDateString()}</Text>
+        <Text style={styles.text}>Likes: {scData.likes_count}</Text>
+        <Text style={styles.text}>Plays: {scData.playback_count}</Text>
+        {scData.permalink_url && (
+          <TouchableOpacity 
+            style={styles.buttonSC}
+            onPress={() => Linking.openURL(scData.permalink_url)}
+          >
+            <Text style={styles.buttonTextSC}>Open in SoundCloud</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
-            {/* <Text style={styles.exploreBack}>Explore</Text> */}
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{type === 'spotifyTrack' ? 'Track Details' : 'Album Details'}</Text>
+          <Text style={styles.headerTitle}>
+            {type === 'spotifyTrack' ? 'Track Details' : 
+             type === 'spotifyAlbum' ? 'Album Details' : 
+             type === 'scTrack' ? 'SoundCloud Track Details' : ''}
+          </Text>
         </View>
         {isLoading ? (
           <View style={styles.loadingContainer}>
@@ -163,6 +244,8 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
           renderTrackInfo()
         ) : type === 'spotifyAlbum' ? (
           renderAlbumInfo()
+        ) : type === 'scTrack' ? (
+          renderSCTrackInfo()
         ) : (
           <View style={styles.content}>
             <Text style={styles.text}>ID: {id}</Text>
@@ -301,6 +384,71 @@ const styles = StyleSheet.create({
     trackItemContent: {
       flex: 1,
       marginLeft: 10,
+    },
+    trackCover: {
+      width: 200,
+      height: 200,
+      alignSelf: 'center',
+      marginBottom: 20,
+    },
+    postCountContainer: {
+      backgroundColor: 'rgba(29, 185, 84, 0.1)', // Spotify green with opacity
+      borderRadius: 10,
+      padding: 10,
+      alignItems: 'center',
+      alignSelf: 'center',
+      marginBottom: 20,
+      minWidth: 150,
+    },
+    postCountText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: spotifyGreen, // Spotify green
+    },
+    postCountLabel: {
+      fontSize: 14,
+      color: light,
+    },
+    firstPostText: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: spotifyGreen, // Spotify green
+      textAlign: 'center',
+    },
+    postCountContainerSC: {
+      backgroundColor: 'rgba(255, 85, 0, 0.1)', // SoundCloud orange with opacity
+      borderRadius: 10,
+      padding: 10,
+      alignItems: 'center',
+      alignSelf: 'center',
+      marginBottom: 20,
+      minWidth: 150,
+    },
+    postCountTextSC: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: soundcloudOrange, // SoundCloud orange
+    },
+    postCountLabelSC: {
+      fontSize: 14,
+      color: light,
+    },
+    firstPostTextSC: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: soundcloudOrange, // SoundCloud orange
+      textAlign: 'center',
+    },
+    buttonSC: {
+      backgroundColor: soundcloudOrange, // SoundCloud orange
+      padding: 10,
+      borderRadius: 5,
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    buttonTextSC: {
+      color: light,
+      fontWeight: 'bold',
     },
 });
 

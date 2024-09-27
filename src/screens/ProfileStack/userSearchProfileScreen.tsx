@@ -425,7 +425,6 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
   const handlePresentPostModalPress = (post: any) => {
     setSelectedPost(post);
     postBottomSheetRef.current?.present();
-    console.log('Selecting Post:', post.body);
   };
 
   const canViewFollowList = user?.publicProfile || friendRequestStatus === 'Following';

@@ -32,6 +32,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
         scTrackWaveformUrl: sctrack?.waveform_url || '',
         scTrackArtist: sctrack?.publisher_metadata?.artist || 'Unknown Artist',
         scTrackGenre: sctrack?.genre || 'Unknown Genre',
+        scTrackCreatedAt: sctrack?.created_at || 'Unknown Date',
         likesCount: 0,
       };
 
@@ -77,7 +78,7 @@ const PostSCTrackScreen: React.FC<PostSCTrackScreenProps> = ({ route, navigation
                 {sctrack?.publisher_metadata?.artist || 'Unknown Artist'}
               </Text>
               <Text style={styles.trackReleaseDate} numberOfLines={1}>
-                {sctrack?.release_date ? new Date(sctrack.release_date).toLocaleDateString() : 'Unknown Date'}
+                {sctrack?.created_at ? new Date(sctrack.created_at).toLocaleDateString() : 'Unknown Date'}
               </Text>
             </View>
           </View>

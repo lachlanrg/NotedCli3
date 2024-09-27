@@ -1,0 +1,147 @@
+{
+  "collection": [
+    {
+      "artwork_url": "https://i1.sndcdn.com/artworks-2pCcNuspBz14GFMp-v3ALhw-large.jpg",
+      "caption": null,
+      "commentable": true,
+      "comment_count": 104,
+      "created_at": "2024-09-19T18:07:15Z",
+      "description": "",
+      "downloadable": false,
+      "download_count": 0,
+      "duration": 142759,
+      "full_duration": 142759,
+      "embeddable_by": "all",
+      "genre": "Hip-hop & Rap",
+      "has_downloads_left": false,
+      "id": 1919520821,
+      "kind": "track",
+      "label_name": "",
+      "last_modified": "2024-09-20T04:01:30Z",
+      "license": "all-rights-reserved",
+      "likes_count": 5660,
+      "permalink": "06-24hrs_5-master_2448",
+      "permalink_url": "https://soundcloud.com/liltecca/06-24hrs_5-master_2448",
+      "playback_count": 127203,
+      "public": true,
+      "publisher_metadata": {
+        "id": 1919520821,
+        "urn": "soundcloud:tracks:1919520821",
+        "artist": "Lil Tecca ✰",
+        "contains_music": true,
+        "isrc": "USUM72410601",
+        "explicit": false
+      },
+      "purchase_title": null,
+      "purchase_url": null,
+      "release_date": null,
+      "reposts_count": 49,
+      "secret_token": null,
+      "sharing": "public",
+      "state": "finished",
+      "streamable": true,
+      "tag_list": "",
+      "title": "Lil Tecca - 24HRS",
+      "uri": "https://api.soundcloud.com/tracks/1919520821",
+      "urn": "soundcloud:tracks:1919520821",
+      "user_id": 294810691,
+      "visuals": null,
+      "waveform_url": "https://wave.sndcdn.com/f2vEZfPqOGaL_m.json",
+      "display_date": "2024-09-20T04:01:30Z",
+      "media": {
+        "transcodings": [
+          {
+            "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:1919520821/dc2affbd-14e7-4824-8365-8fb85462a56a/stream/hls",
+            "preset": "mp3_1_0",
+            "duration": 142759,
+            "snipped": false,
+            "format": {
+              "protocol": "hls",
+              "mime_type": "audio/mpeg"
+            },
+            "quality": "sq"
+          },
+          {
+            "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:1919520821/9a61893b-6246-4277-bc93-17a6240a792e/stream/hls",
+            "preset": "opus_0_0",
+            "duration": 142723,
+            "snipped": false,
+            "format": {
+              "protocol": "hls",
+              "mime_type": "audio/ogg; codecs=\"opus\""
+            },
+            "quality": "sq"
+          }
+        ]
+      },
+      "station_urn": "soundcloud:system-playlists:track-stations:1919520821",
+      "station_permalink": "track-stations:1919520821",
+      "track_authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJBVSIsInN1YiI6IiIsInJpZCI6IjQ1YmVlMWU5LWI4YmItNDhkMC1hNDNlLWE2MTNhZDJmZDlkMCIsImlhdCI6MTcyNzMzNzI2N30.WBb9R--9fy0pxiWgyO0yNW5QGlqb1fOhyzsFm8cbP4g",
+      "monetization_model": "AD_SUPPORTED",
+      "policy": "MONETIZE",
+      "user": {
+        "avatar_url": "https://i1.sndcdn.com/avatars-a89a7p13ChvYawym-ytp0gA-large.jpg",
+        "city": "The Trap",
+        "comments_count": 0,
+        "country_code": "JP",
+        "created_at": "2017-03-12T19:35:47Z",
+        "creator_subscriptions": [
+          {
+            "product": {
+              "id": "creator-pro-unlimited"
+            }
+          }
+        ],
+        "creator_subscription": {
+          "product": {
+            "id": "creator-pro-unlimited"
+          }
+        },
+        "description": "PLAN A is OUT NOW: https://liltecca.lnk.to/plana\n\ntecca.co",
+        "followers_count": 822106,
+        "followings_count": 2,
+        "first_name": "2900",
+        "full_name": "2900 Racers",
+        "groups_count": 0,
+        "id": 294810691,
+        "kind": "user",
+        "last_modified": "2024-09-20T04:06:58Z",
+        "last_name": "Racers",
+        "likes_count": 83,
+        "playlist_likes_count": 10,
+        "permalink": "liltecca",
+        "permalink_url": "https://soundcloud.com/liltecca",
+        "playlist_count": 7,
+        "reposts_count": null,
+        "track_count": 121,
+        "uri": "https://api.soundcloud.com/users/294810691",
+        "urn": "soundcloud:users:294810691",
+        "username": "Lil Tecca ✰",
+        "verified": true,
+        "visuals": {
+          "urn": "soundcloud:users:294810691",
+          "enabled": true,
+          "visuals": [
+            {
+              "urn": "soundcloud:visuals:216017790",
+              "entry_time": 0,
+              "visual_url": "https://i1.sndcdn.com/visuals-000294810691-L7RYO6-original.jpg"
+            }
+          ],
+          "tracking": null
+        },
+        "badges": {
+          "pro": false,
+          "creator_mid_tier": false,
+          "pro_unlimited": true,
+          "verified": true
+        },
+        "station_urn": "soundcloud:system-playlists:artist-stations:294810691",
+        "station_permalink": "artist-stations:294810691"
+      }
+    }
+  ],
+  "total_results": 8900,
+  "next_href": "https://api-v2.soundcloud.com/search/tracks?query_urn=soundcloud%3Asearch%3Abff09e2614a643a294e469c290f614fd&limit=1&offset=1&q=24hrs",
+  "query_urn": "soundcloud:search:bff09e2614a643a294e469c290f614fd"
+}
