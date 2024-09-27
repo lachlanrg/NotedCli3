@@ -33,6 +33,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
 import { listRepostsWithOriginalPost } from '../../utils/customQueries';
 import { selectionChange } from '../../utils/hapticFeedback';
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
+import { spotifyGreen, soundcloudOrange } from '../../components/colorModes';
 
 
 Amplify.configure(awsconfig);
@@ -59,6 +61,15 @@ const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
 const repostIcon = faArrowsRotate as IconProp;
+const spotifyIcon = faSpotify as IconProp;
+const soundcloudIcon = faSoundcloud as IconProp;
+
+const isWithinLastWeek = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  return date > oneWeekAgo;
+};
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
@@ -427,14 +438,12 @@ const HomeScreen: React.FC = () => {
             />
             <View style={styles.mediaInfo}>
               <View style={styles.mediaTitleContainer}>
-                {(isSpotifyAlbum || isSpotifyTrack) && (
-                  <FontAwesomeIcon 
-                    icon={isSpotifyAlbum ? faCompactDisc : faMusic} 
-                    size={16} 
-                    color="#1DB954" 
-                    style={styles.mediaTypeIcon}
-                  />
-                )}
+                <FontAwesomeIcon 
+                  icon={isSoundCloud ? soundcloudIcon : spotifyIcon} 
+                  size={16} 
+                  color={isSoundCloud ? soundcloudOrange : spotifyGreen} 
+                  style={styles.mediaTypeIcon}
+                />
                 <Text style={styles.mediaTitle} numberOfLines={1} ellipsizeMode="tail">
                   {isSoundCloud ? postContent.scTrackTitle :
                    isSpotifyAlbum ? postContent.spotifyAlbumName :
@@ -452,12 +461,37 @@ const HomeScreen: React.FC = () => {
                 </Text>
               )}
               {isSpotifyTrack && (
+                <View>
+                  <Text style={styles.mediaDetails}>
+                    {`${postContent.spotifyTrackReleaseDate} • ${Math.floor(
+                      postContent.spotifyTrackDurationMs / 60000)}m ${((postContent.spotifyTrackDurationMs % 60000) / 1000).toFixed(0).padStart(2, '0')}s`}
+                  </Text>
+                  {postContent.spotifyTrackExplicit && (
+                    <View style={styles.explicitLabelContainer}>
+                      <Text style={styles.explicitLabel}>Explicit</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+              {isSoundCloud && (
                 <Text style={styles.mediaDetails}>
-                  {`${postContent.spotifyTrackReleaseDate} • ${Math.floor(
-                    postContent.spotifyTrackDurationMs / 60000)}m ${((postContent.spotifyTrackDurationMs % 60000) / 1000).toFixed(0).padStart(2, '0')}s`}
+                  {`${new Date(postContent.scTrackCreatedAt).toLocaleDateString()}`}
                 </Text>
               )}
             </View>
+            {isWithinLastWeek(isSoundCloud ? postContent.scTrackCreatedAt :
+                              isSpotifyAlbum ? postContent.spotifyAlbumReleaseDate :
+                              postContent.spotifyTrackReleaseDate) && (
+              <View style={[
+                styles.newContainer,
+                isSoundCloud && styles.newContainerSoundCloud
+              ]}>
+                <Text style={[
+                  styles.newText,
+                  isSoundCloud && styles.newTextSoundCloud
+                ]}>New!</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -489,7 +523,7 @@ const HomeScreen: React.FC = () => {
         )}
 
         {isRepost ? (
-          <TouchableOpacity activeOpacity={0.8}onPress={handlePostPress}>
+          <TouchableOpacity activeOpacity={0.8} onPress={handlePostPress}>
             {renderPostContent()}
           </TouchableOpacity>
         ) : (
@@ -680,11 +714,10 @@ const styles = StyleSheet.create({
   mediaContainer: {
     flexDirection: 'row',
     backgroundColor: '#2a2a2a',
-    // borderRadius: 8,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
     overflow: 'hidden',
-    position: 'relative', // Add this to allow absolute positioning of the icon
+    position: 'relative', // Add this to allow absolute positioning of the new label
   },
   mediaImage: {
     width: 120,
@@ -698,6 +731,7 @@ const styles = StyleSheet.create({
   mediaTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4, // Add some space below the title container
   },
   mediaTypeIcon: {
     marginRight: 6,
@@ -844,11 +878,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: dark,
   },
-  // repostText: {
-  //   color: '#ccc',
-  //   marginBottom: 5,
-  //   fontStyle: 'italic',
-  // },
   repostedPostContainer: {
     borderWidth: 1,
     borderColor: '#333',
@@ -891,6 +920,39 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 8,
     alignSelf: 'flex-end',
+  },
+  newContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(29, 185, 84, 0.1)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  newContainerSoundCloud: {
+    backgroundColor: `rgba(255, 85, 0, 0.1)`, // SoundCloud orange with opacity
+  },
+  newText: {
+    color: spotifyGreen,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  newTextSoundCloud: {
+    color: soundcloudOrange,
+  },
+  explicitLabel: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  explicitLabelContainer: {
+    backgroundColor: '#444',
+    borderRadius: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginTop: 4,
+    alignSelf: 'flex-start',
   },
 });
 

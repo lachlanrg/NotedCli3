@@ -1,9 +1,9 @@
 // HomePostBottomSheetModal.tsx
 import React, { useMemo, forwardRef, useCallback, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { dark, light, error, modalBackground } from "../colorModes";
+import { dark, light, error, modalBackground, spotifyGreen, soundcloudOrange } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
@@ -12,11 +12,13 @@ import { generateClient } from 'aws-amplify/api';
 import * as mutations from '../../graphql/mutations';
 
 import { getCurrentUser } from 'aws-amplify/auth';
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 
 const trashIcon = faTrashCan as IconProp;
 const musicIcon = faMusic as IconProp;
 const searchIcon = faMagnifyingGlass as IconProp;
-
+const spotifyIcon = faSpotify as IconProp;
+const soundcloudIcon = faSoundcloud as IconProp;
 
 export type Ref = BottomSheetModal;
 
@@ -88,6 +90,24 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
     }
   };
 
+  const getListenIcon = () => {
+    if (item.spotifyTrackId || item.spotifyAlbumId) {
+      return spotifyIcon;
+    } else if (item.scTrackId) {
+      return soundcloudIcon;
+    }
+    return musicIcon; // Fallback to music icon if neither Spotify nor SoundCloud
+  };
+
+  const getListenIconColor = () => {
+    if (item.spotifyTrackId || item.spotifyAlbumId) {
+      return spotifyGreen;
+    } else if (item.scTrackId) {
+      return soundcloudOrange;
+    }
+    return dark; // Fallback to dark color if neither Spotify nor SoundCloud
+  };
+
   const { dismiss } = useBottomSheetModal();
 
 
@@ -100,31 +120,30 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
       backdropComponent={renderBackDrop}
       backgroundStyle={{ backgroundColor: modalBackground }}
     >
-        <View style={styles.contentContainer}>
-        {item && ( // Conditionally render content if 'item' exists
-          <View>
-            <Text style={styles.containerHeadline}>
-              {item.spotifyAlbumName ? (
-                `Spotify Album: ${item.spotifyAlbumName}`
-              ) : item.spotifyTrackName ? (
-                `Spotify Track: ${item.spotifyTrackName}`
-              ) : item.scTrackTitle ? (
-                `SoundCloud Track: ${item.scTrackTitle}`
-              ) : (
-                'No Title Available' // Handle cases where no title is found
-              )}
-              </Text>
-            </View>
-          )}
-          <View style={styles.iconRow}>
-            <TouchableOpacity onPress={handleDetailsPress}>
-              <FontAwesomeIcon icon={searchIcon} size={24} color={dark} /> 
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleListenPress}> 
-              <FontAwesomeIcon icon={musicIcon} size={24} color={dark} /> 
-            </TouchableOpacity>
+      <View style={styles.contentContainer}>
+        {item && (
+          <View style={styles.itemInfoContainer}>
+            <Text style={styles.itemType}>
+              {item.spotifyAlbumName ? "Spotify Album" : 
+               item.spotifyTrackName ? "Spotify Track" : 
+               item.scTrackTitle ? "SoundCloud Track" : "Unknown Type"}
+            </Text>
+            <Text style={styles.itemTitle} numberOfLines={2} ellipsizeMode="tail">
+              {item.spotifyAlbumName || item.spotifyTrackName || item.scTrackTitle || "No Title Available"}
+            </Text>
           </View>
+        )}
+        <View style={styles.actionContainer}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleDetailsPress}>
+            <FontAwesomeIcon icon={searchIcon} size={24} color={dark} />
+            <Text style={styles.actionText}>Details</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} onPress={handleListenPress}>
+            <FontAwesomeIcon icon={getListenIcon()} size={24} color={getListenIconColor()} />
+            <Text style={styles.actionText}>Listen</Text>
+          </TouchableOpacity>
         </View>
+      </View>
     </BottomSheetModal>
   );
 });
@@ -132,17 +151,35 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
+    paddingRight: 16,
+    paddingLeft: 16,
   },
-  containerHeadline: {
-    fontSize: 16,
-    paddingLeft: 10,
+  itemInfoContainer: {
+    marginBottom: 8,
   },
-  iconRow: {
+  itemType: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 4,
+  },
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: dark,
+  },
+  actionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    marginTop: 40, 
-    paddingHorizontal: 20, 
+  },
+  actionButton: {
+    alignItems: 'center',
+    padding: 10,
+  },
+  actionText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: dark,
   },
 });
 

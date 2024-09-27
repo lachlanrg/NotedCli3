@@ -596,6 +596,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "spotifyTrackExplicit": {
+                    "name": "spotifyTrackExplicit",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "scTrackId": {
                     "name": "scTrackId",
                     "isArray": false,
@@ -661,6 +668,13 @@ export const schema = {
                 },
                 "scTrackWaveformUrl": {
                     "name": "scTrackWaveformUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "scTrackCreatedAt": {
+                    "name": "scTrackCreatedAt",
                     "isArray": false,
                     "type": "String",
                     "isRequired": false,
@@ -1161,5 +1175,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "804286e769993bca464006931ab482e8"
+    "version": "d2725412ab97658aa59c311643ae8f26"
 };

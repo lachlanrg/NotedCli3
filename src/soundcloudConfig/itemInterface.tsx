@@ -1,6 +1,6 @@
 export interface scTrack {
     artwork_url: string;
-    release_date: string;
+    created_at: string;  
     id: string;
     genre: string;
     likes_count: number;

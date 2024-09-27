@@ -19,7 +19,7 @@ const useSCTrackById = () => {
                 id: fullData.id,
                 title: fullData.title,
                 artwork_url: fullData.artwork_url,
-                release_date: fullData.release_date,
+                created_at: fullData.created_at,
                 genre: fullData.genre,
                 likes_count: fullData.likes_count,
                 permalink_url: fullData.permalink_url,

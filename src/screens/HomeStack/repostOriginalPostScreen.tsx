@@ -110,7 +110,14 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
   }
 
   const getImageUrl = (url: string | null | undefined) => {
-    return url ? { uri: url } : require('../../assets/placeholder.png');
+    if (url) {
+      if (post.scTrackId) {
+        // For SoundCloud tracks, replace '-large' with '-t500x500'
+        return { uri: url.replace('-large', '-t500x500') };
+      }
+      return { uri: url };
+    }
+    return require('../../assets/placeholder.png');
   };
 
   const fetchCommentCounts = useCallback(async () => {
@@ -173,6 +180,12 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
               {post.scTrackId && (
                 <>
                   <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{post.scTrackTitle}</Text>
+                  <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{post.scTrackArtist}</Text>
+                  {post.scTrackCreatedAt && (
+                    <Text style={styles.trackInfo}>
+                      Created: {new Date(post.scTrackCreatedAt).toLocaleDateString()}
+                    </Text>
+                  )}
                 </>
               )}
               {post.spotifyAlbumId && (
@@ -187,6 +200,17 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
                 <>
                   <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">Track: {post.spotifyTrackName}</Text>
                   <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{post.spotifyTrackArtists}</Text>
+                  <Text style={styles.trackInfo}>Release Date: {post.spotifyTrackReleaseDate}</Text>
+                  {post.spotifyTrackDurationMs && (
+                    <Text style={styles.trackInfo}>
+                      {Math.floor(post.spotifyTrackDurationMs / 60000)}m {((post.spotifyTrackDurationMs % 60000) / 1000).toFixed(0).padStart(2, '0')}s
+                    </Text>
+                  )}
+                  {post.spotifyTrackExplicit && (
+                    <View style={styles.explicitLabelContainer}>
+                      <Text style={styles.explicitLabel}>Explicit</Text>
+                    </View>
+                  )}
                 </>
               )}
               <Text style={styles.date}>{formatRelativeTime(post.createdAt)}</Text>
@@ -324,6 +348,18 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: dark,
+  },
+  explicitLabelContainer: {
+    backgroundColor: '#444',
+    borderRadius: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginTop: 4,
+  },
+  explicitLabel: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
 

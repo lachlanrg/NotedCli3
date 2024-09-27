@@ -365,6 +365,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     spotifyTrackExternalUrl
     spotifyTrackReleaseDate
     spotifyTrackDurationMs
+    spotifyTrackExplicit
     scTrackId
     scTrackTitle
     scTrackArtworkUrl
@@ -375,6 +376,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
     scTrackGenre
     scTrackPermalinkUrl
     scTrackWaveformUrl
+    scTrackCreatedAt
     createdAt
     updatedAt
     _version
@@ -414,6 +416,7 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -424,6 +427,7 @@ export const listPosts = /* GraphQL */ `query ListPosts(
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -473,6 +477,7 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -483,6 +488,7 @@ export const syncPosts = /* GraphQL */ `query SyncPosts(
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -523,6 +529,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -533,6 +540,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version
@@ -693,6 +701,7 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       spotifyTrackExternalUrl
       spotifyTrackReleaseDate
       spotifyTrackDurationMs
+      spotifyTrackExplicit
       scTrackId
       scTrackTitle
       scTrackArtworkUrl
@@ -703,6 +712,7 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       scTrackGenre
       scTrackPermalinkUrl
       scTrackWaveformUrl
+      scTrackCreatedAt
       createdAt
       updatedAt
       _version

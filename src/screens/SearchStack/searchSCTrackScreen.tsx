@@ -81,7 +81,7 @@ const SearchSCTrackScreen: React.FC<Props> = ({ route }) => {
           <Text style={styles.artistName}>{scData.user?.username || 'Unknown Artist'}</Text>
         </TouchableOpacity>
         <Text style={styles.text}>Genre: {scData.genre || 'Unknown'}</Text>
-        <Text style={styles.text}>Release Date: {new Date(scData.release_date).toLocaleDateString()}</Text>
+        <Text style={styles.text}>Release Date: {new Date(scData.created_at).toLocaleDateString()}</Text>
         <Text style={styles.text}>Likes: {scData.likes_count}</Text>
         <Text style={styles.text}>Plays: {scData.playback_count}</Text>
         {scData.permalink_url && (

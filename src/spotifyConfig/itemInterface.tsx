@@ -42,6 +42,7 @@ export interface Album {
     preview_url: string,
     external_urls: { spotify: string },
     duration_ms: number,
+    explicit: boolean,
   }
   
   export interface SearchResult {

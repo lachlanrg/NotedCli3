@@ -153,6 +153,7 @@ type EagerPost = {
   readonly spotifyTrackExternalUrl?: string | null;
   readonly spotifyTrackReleaseDate?: string | null;
   readonly spotifyTrackDurationMs?: number | null;
+  readonly spotifyTrackExplicit?: boolean | null;
   readonly scTrackId?: string | null;
   readonly scTrackTitle?: string | null;
   readonly scTrackArtworkUrl?: string | null;
@@ -163,6 +164,7 @@ type EagerPost = {
   readonly scTrackGenre?: string | null;
   readonly scTrackPermalinkUrl?: string | null;
   readonly scTrackWaveformUrl?: string | null;
+  readonly scTrackCreatedAt?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -198,6 +200,7 @@ type LazyPost = {
   readonly spotifyTrackExternalUrl?: string | null;
   readonly spotifyTrackReleaseDate?: string | null;
   readonly spotifyTrackDurationMs?: number | null;
+  readonly spotifyTrackExplicit?: boolean | null;
   readonly scTrackId?: string | null;
   readonly scTrackTitle?: string | null;
   readonly scTrackArtworkUrl?: string | null;
@@ -208,6 +211,7 @@ type LazyPost = {
   readonly scTrackGenre?: string | null;
   readonly scTrackPermalinkUrl?: string | null;
   readonly scTrackWaveformUrl?: string | null;
+  readonly scTrackCreatedAt?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
