@@ -41,7 +41,7 @@ type Props = {
 };
 
 const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
-  const snapPoints = useMemo(() => ['82%'], []);
+  const snapPoints = useMemo(() => ['80%'], []);
   const [newComment, setNewComment] = useState('');
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -141,8 +141,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         variables: { filter: filter },
       });
 
-      console.log('Response from listComments query:', response);
-
       if (response.data && response.data.listComments) {
         const sortedComments = [...response.data.listComments.items].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -204,10 +202,10 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         },
       });
 
-      console.log("Response from updateComment mutation:", updatedComment);
+      // console.log("Response from updateComment mutation:", updatedComment);
 
       if (updatedComment.data && updatedComment.data.updateComment) {
-        console.log("Comment updated successfully in the backend.");
+        // console.log("Comment updated successfully in the backend.");
 
         setComments(prevComments => prevComments.map(comment =>
           comment.id === commentId ? {
@@ -216,7 +214,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           } : comment
         ));
       } else {
-        console.warn("No data returned from updateComment mutation:", updatedComment);
+        // console.warn("No data returned from updateComment mutation:", updatedComment);
       }
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -261,11 +259,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       backdropComponent={renderBackDrop}
       keyboardBehavior="extend"
       backgroundStyle={{ backgroundColor: modalBackground }}
-
-      // handleIndicatorStyle={{ backgroundColor: 'white '}}
     >
       <View style={styles.contentContainer}>
-        {/* <Text style={styles.containerHeadline}>Comments</Text> */}
 
         {selectedPost && (
           <FlatList
@@ -297,6 +292,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
+
   },
   containerHeadline: {
     fontSize: 24,
@@ -316,8 +312,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: light,
     padding: 8,
-    borderColor: dark,
-    borderWidth: 1,
     // height: 50,
   },
   postButton: {

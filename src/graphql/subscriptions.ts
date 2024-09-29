@@ -1222,6 +1222,7 @@ export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version
@@ -1260,6 +1261,7 @@ export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version
@@ -1298,6 +1300,7 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version

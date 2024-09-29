@@ -6,6 +6,8 @@ export const gray = '#262626'
 
 export const lgray = '#B9B9B9'
 
+export const mediumgray = '#1e1e1e'
+
 export const dgray = '#CECECE'
 
 export const error = '#CF6679'
@@ -14,6 +16,6 @@ export const placeholder = '#868686'
 
 export const modalBackground = '#e2e2e2'
 
-export const spotifyGreen = '#1DB954'
+export const spotifyGreen = '#1ED760'
 
 export const soundcloudOrange = '#FF7700'

@@ -16,6 +16,10 @@ import awsmobile from '../aws-exports';
 import { formatRelativeTime } from './formatComponents';
 import { dark, light, lgray, gray } from './colorModes'; 
 import { getCurrentUser } from '@aws-amplify/auth';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
+import { spotifyGreen, soundcloudOrange } from './colorModes';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 Amplify.configure(awsmobile);
 
@@ -24,6 +28,9 @@ interface UserPostListProps {
   onPostPress: (post: any) => void;
   onPostsCountUpdate?: (count: number) => void; // Add this line
 }
+
+const soundcloudIcon = faSoundcloud as IconProp;
+const spotifyIcon = faSpotify as IconProp;
 
 const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPostsCountUpdate }) => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -65,26 +72,27 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
         .filter(item => !item._deleted)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-      setPosts(sortedContent);
+      // Update posts state without clearing the previous posts
+      setPosts(prevPosts => {
+        const newPosts = sortedContent;
+        // Only update onPostsCountUpdate if the count has changed
+        if (onPostsCountUpdate && newPosts.length !== prevPosts.length) {
+          onPostsCountUpdate(newPosts.length);
+        }
+        return newPosts;
+      });
     } catch (error) {
       console.error('Error fetching user posts and reposts:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, onPostsCountUpdate]);
 
   useEffect(() => {
     if (userId) {
       fetchUserPosts();
     }
   }, [userId, fetchUserPosts]);
-
-  useEffect(() => {
-    // Update the parent component with the post count
-    if (onPostsCountUpdate) {
-      onPostsCountUpdate(posts.length);
-    }
-  }, [posts, onPostsCountUpdate]);
 
   const renderPostItem = (item: any) => {
     const isRepost = 'originalPost' in item;
@@ -95,52 +103,49 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
     const isSpotifyTrack = postToRender.spotifyTrackId;
 
     return (
-      <TouchableOpacity key={item.id} onPress={() => onPostPress(item)}>
+      <TouchableOpacity 
+        key={item.id} 
+        onPress={() => onPostPress(item)}
+        activeOpacity={1} // Add this line to remove opacity change
+      >
         <View style={styles.postContainer}>
           {isRepost && (
             <Text style={styles.repostText}>
               Reposted from <Text style={styles.boldUsername}>{postToRender.username || 'Unknown User'}</Text>
             </Text>
           )}
-          {isSoundCloud && (
+          {(isSoundCloud || isSpotifyAlbum || isSpotifyTrack) && (
             <View style={styles.mediaContainer}>
               <Image
-                source={{ uri: postToRender.scTrackArtworkUrl }}
+                source={{ 
+                  uri: isSoundCloud 
+                    ? postToRender.scTrackArtworkUrl.replace('-large', '-t500x500') 
+                    : postToRender.spotifyAlbumImageUrl || postToRender.spotifyTrackImageUrl 
+                }}
                 style={styles.image}
               />
               <View style={styles.mediaInfo}>
-                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.scTrackTitle}</Text>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.scTrackArtist}</Text>
-                <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
-              </View>
-            </View>
-          )}
-
-          {isSpotifyAlbum && (
-            <View style={styles.mediaContainer}>
-              <Image
-                source={{ uri: postToRender.spotifyAlbumImageUrl }}
-                style={styles.image}
-              />
-              <View style={styles.mediaInfo}>
-                <Text style={styles.albumTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyAlbumName}</Text>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyAlbumArtists}</Text>
-                <Text style={styles.date}>Total Tracks: {postToRender.spotifyAlbumTotalTracks}</Text>
-                {/* <Text style={styles.date}>Release Date: {postToRender.spotifyAlbumReleaseDate}</Text> */}
-                <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
-              </View>
-            </View>
-          )}
-
-          {isSpotifyTrack && (
-            <View style={styles.mediaContainer}>
-              <Image
-                source={{ uri: postToRender.spotifyTrackImageUrl }}
-                style={styles.image}
-              />
-              <View style={styles.mediaInfo}>
-                <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyTrackName}</Text>
-                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">{postToRender.spotifyTrackArtists}</Text>
+                <View style={styles.mediaTitleContainer}>
+                  <FontAwesomeIcon 
+                    icon={isSoundCloud ? soundcloudIcon : spotifyIcon} 
+                    size={21} 
+                    color={isSoundCloud ? soundcloudOrange : spotifyGreen} 
+                    style={styles.mediaTypeIcon}
+                  />
+                  <Text style={styles.trackTitle} numberOfLines={1} ellipsizeMode="tail">
+                    {isSoundCloud ? postToRender.scTrackTitle :
+                     isSpotifyAlbum ? postToRender.spotifyAlbumName :
+                     postToRender.spotifyTrackName}
+                  </Text>
+                </View>
+                <Text style={styles.artist} numberOfLines={1} ellipsizeMode="tail">
+                  {isSoundCloud ? postToRender.scTrackArtist :
+                   isSpotifyAlbum ? postToRender.spotifyAlbumArtists :
+                   postToRender.spotifyTrackArtists}
+                </Text>
+                {isSpotifyAlbum && (
+                  <Text style={styles.date}>Total Tracks: {postToRender.spotifyAlbumTotalTracks}</Text>
+                )}
                 <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>
             </View>
@@ -154,8 +159,8 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
     );
   };
 
-  if (isLoading) {
-    return null; // Return nothing while loading
+  if (isLoading && posts.length === 0) {
+    return null; // Only return null if it's the initial load
   }
 
   if (posts.length === 0 && !isLoading) {
@@ -199,6 +204,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+    flex: 1,
   },
   albumTitle: {
     color: '#fff',
@@ -243,6 +249,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 200,
+  },
+  mediaTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  mediaTypeIcon: {
+    marginRight: 6,
   },
 });
 

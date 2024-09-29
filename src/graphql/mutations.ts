@@ -1265,6 +1265,7 @@ export const createSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation CreateSp
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version
@@ -1304,6 +1305,7 @@ export const updateSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation UpdateSp
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version
@@ -1343,6 +1345,7 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version

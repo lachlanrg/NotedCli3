@@ -1119,6 +1119,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "spotifyUri": {
+                    "name": "spotifyUri",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1175,5 +1182,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "d2725412ab97658aa59c311643ae8f26"
+    "version": "77d0c212b342212e93d5a93f9738b96b"
 };

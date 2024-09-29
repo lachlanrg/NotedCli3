@@ -15,10 +15,16 @@ import { Linking } from 'react-native';
 
 import { getCurrentUser } from 'aws-amplify/auth';
 
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
+import { spotifyGreen, soundcloudOrange } from "../colorModes";
+
 const musicIcon = faMusic as IconProp;
 const editIcon = faPenToSquare as IconProp;
 const repostIcon = faRetweet as IconProp;
 const trashIcon = faTrashCan as IconProp;
+
+const spotifyIcon = faSpotify as IconProp;
+const soundcloudIcon = faSoundcloud as IconProp;
 
 export type Ref = BottomSheetModal;
 
@@ -29,7 +35,7 @@ interface ProfilePostBottomSheetProps {
 }
 
 const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBottomSheetProps>(({ item, onPostDelete, onClose }, ref) => { 
-  const snapPoints = useMemo(() => ['20%'], []);
+  const snapPoints = useMemo(() => ['25%'], []);
   const [userInfo, setUserId] = useState<any>(null);
   const navigation = useNavigation<any>();
 
@@ -114,21 +120,28 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
     }
   };
 
+  const getPostToRender = useCallback(() => {
+    if (item && typeof item === 'object' && 'originalPost' in item) {
+      return item.originalPost;
+    }
+    return item;
+  }, [item]);
+
   const handleOpenUri = useCallback(() => {
-    if (item) {
-      const postToRender = 'originalPost' in item ? item.originalPost : item;
+    const postToRender = getPostToRender();
+    if (postToRender) {
       const url = postToRender.scTrackPermalinkUrl 
                   || postToRender.spotifyAlbumExternalUrl 
                   || postToRender.spotifyTrackExternalUrl;
 
       if (url) {
         Linking.openURL(url).catch((err) => console.error('An error occurred', err));
-        dismiss(); // Optionally close the modal after opening the link 
+        dismiss();
       } else {
         console.warn('No external URL found for the selected item');
       }
     }
-  }, [item, dismiss]);
+  }, [item, dismiss, getPostToRender]);
 
   const handleEditItem = useCallback(() => {
     // Implement edit functionality here
@@ -137,17 +150,45 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
     // Navigate to edit screen or open edit modal
   }, [item, dismiss]);
 
-  const getItemTitle = () => {
-    const postToRender = 'originalPost' in item ? item.originalPost : item;
+  const getItemType = () => {
+    const postToRender = getPostToRender();
+    if (!postToRender) return "Unknown Type";
     if (postToRender.spotifyAlbumName) {
-      return `Spotify Album: ${postToRender.spotifyAlbumName}`;
+      return "Spotify Album";
     } else if (postToRender.spotifyTrackName) {
-      return `Spotify Track: ${postToRender.spotifyTrackName}`;
+      return "Spotify Track";
     } else if (postToRender.scTrackTitle) {
-      return `SoundCloud Track: ${postToRender.scTrackTitle}`;
+      return "SoundCloud Track";
     } else {
-      return 'Post Title';
+      return "Unknown Type";
     }
+  };
+
+  const getItemTitle = () => {
+    const postToRender = getPostToRender();
+    return postToRender ? (postToRender.spotifyAlbumName || postToRender.spotifyTrackName || postToRender.scTrackTitle || "No Title Available") : "No Title Available";
+  };
+
+  const getListenIcon = () => {
+    const postToRender = getPostToRender();
+    if (!postToRender) return musicIcon;
+    if (postToRender.spotifyTrackId || postToRender.spotifyAlbumId) {
+      return spotifyIcon;
+    } else if (postToRender.scTrackId) {
+      return soundcloudIcon;
+    }
+    return musicIcon;
+  };
+
+  const getListenIconColor = () => {
+    const postToRender = getPostToRender();
+    if (!postToRender) return dark;
+    if (postToRender.spotifyTrackId || postToRender.spotifyAlbumId) {
+      return spotifyGreen;
+    } else if (postToRender.scTrackId) {
+      return soundcloudOrange;
+    }
+    return dark;
   };
 
   const handleDismiss = () => {
@@ -166,28 +207,32 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
     >
       <View style={styles.contentContainer}>
         {item ? (
-          <View>
-            <Text style={styles.containerHeadline}>
+          <View style={styles.itemInfoContainer}>
+            <Text style={styles.itemType}>{getItemType()}</Text>
+            <Text style={styles.itemTitle} numberOfLines={2} ellipsizeMode="tail">
               {getItemTitle()}
             </Text>
-            {'originalPost' in item && (
+            {item && typeof item === 'object' && 'originalPost' in item && (
               <Text style={styles.repostText}>
-                Reposted from <Text style={styles.boldUsername}>{item.originalPost.username || 'Unknown User'}</Text>
+                Reposted from <Text style={styles.boldUsername}>{item.originalPost?.username || 'Unknown User'}</Text>
               </Text>
             )}
           </View>
         ) : (
-          <Text style={styles.containerHeadline}>No item selected</Text>
+          <Text style={styles.noItemText}>No item selected</Text>
         )}
-        <View style={styles.iconRow}>
-          <TouchableOpacity onPress={handleOpenUri}>
-            <FontAwesomeIcon icon={musicIcon} size={24} color={dark} /> 
+        <View style={styles.actionContainer}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleEditItem}>
+            <FontAwesomeIcon icon={editIcon} size={24} color={dark} />
+            <Text style={styles.actionText}>Edit</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleEditItem}>
-            <FontAwesomeIcon icon={editIcon} size={24} color={dark} /> 
+          <TouchableOpacity style={styles.actionButton} onPress={handleOpenUri}>
+            <FontAwesomeIcon icon={getListenIcon()} size={24} color={getListenIconColor()} />
+            <Text style={styles.actionText}>Listen</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleDeleteItem}> 
+          <TouchableOpacity style={styles.actionButton} onPress={handleDeleteItem}>
             <FontAwesomeIcon icon={trashIcon} size={24} color={error} />
+            <Text style={styles.actionText}>Delete</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -198,30 +243,56 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
+    paddingRight: 16,
+    paddingLeft: 16,
   },
-  containerHeadline: {
-    fontSize: 16,
-    paddingLeft: 10,
+  itemInfoContainer: {
+    marginBottom: 10,
+  },
+  itemType: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 4,
+  },
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: dark,
   },
   repostText: {
     fontSize: 14,
     fontStyle: 'italic',
     color: '#888',
-    paddingLeft: 10,
     marginTop: 5,
-  },
-  iconRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginTop: 40, 
-    paddingHorizontal: 20, 
   },
   boldUsername: {
     fontWeight: 'bold',
     color: '#888',
   },
+  actionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 20,
+    paddingHorizontal: 16,
+  },
+  actionButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 80,  // Set a fixed width for each button
+  },
+  actionText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: dark,
+    textAlign: 'center',
+  },
+  noItemText: {
+    fontSize: 16,
+    color: error,
+    textAlign: 'center',
+    marginTop: 20,
+  },
 });
 
 export default ProfilePostBottomSheetModal;
-

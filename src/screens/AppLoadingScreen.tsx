@@ -17,8 +17,8 @@ const AppLoadingScreen: React.FC<AppLoadingScreenProps> = ({ navigation }) => {
         if (accessToken && idToken) {
           // Navigate to Main stack if tokens are valid
           navigation.navigate('Main');
-          console.log("Access Token Valid: ", accessToken.payload.sub)
-          console.log("ID Token: ", idToken.payload.sub)
+          console.log("Access Token Valid with ID: ", accessToken.payload.sub)
+          console.log("ID Token Valid with ID: ", idToken.payload.sub)
         } else {
           // Navigate to Login screen if no valid session
           navigation.navigate('Login');
