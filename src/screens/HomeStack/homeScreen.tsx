@@ -12,11 +12,12 @@ import {
   NativeScrollEvent,
   Image,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { dark, light, gray, error, lgray, dgray } from '../../components/colorModes';
-import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid, faArrowsRotate, faCompactDisc, faMusic } from '@fortawesome/free-solid-svg-icons';
+import { dark, light, gray, error, lgray, dgray, mediumgray } from '../../components/colorModes';
+import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid, faArrowsRotate, faCompactDisc, faMusic, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular, faComment } from '@fortawesome/free-regular-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { Amplify } from 'aws-amplify';
@@ -94,6 +95,38 @@ const HomeScreen: React.FC = () => {
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
+  const [displayedPosts, setDisplayedPosts] = useState<any[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const INITIAL_BATCH_SIZE = 5;
+  const BATCH_SIZE = 5;
+
+  useEffect(() => {
+    if (posts.length > 0) {
+      setDisplayedPosts(posts.slice(0, INITIAL_BATCH_SIZE));
+    }
+  }, [posts]);
+
+  const loadMorePosts = () => {
+    if (isLoadingMore || displayedPosts.length >= posts.length) return;
+
+    setIsLoadingMore(true);
+    const nextBatch = posts.slice(
+      displayedPosts.length,
+      displayedPosts.length + BATCH_SIZE
+    );
+    setDisplayedPosts(prevPosts => [...prevPosts, ...nextBatch]);
+    setIsLoadingMore(false);
+  };
+
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="small" color="#888" />
+      </View>
+    );
+  };
 
   const togglePostExpansion = (postId: string) => {
     setExpandedPosts(prev => {
@@ -440,7 +473,7 @@ const HomeScreen: React.FC = () => {
               <View style={styles.mediaTitleContainer}>
                 <FontAwesomeIcon 
                   icon={isSoundCloud ? soundcloudIcon : spotifyIcon} 
-                  size={16} 
+                  size={21} 
                   color={isSoundCloud ? soundcloudOrange : spotifyGreen} 
                   style={styles.mediaTypeIcon}
                 />
@@ -580,24 +613,23 @@ const HomeScreen: React.FC = () => {
           <Text style={styles.title}>SoundCred</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button}>
-              <FontAwesomeIcon icon={faEdit} size={20} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.refreshButton}>
-              <FontAwesomeIcon icon={faSync} size={20} color="#fff" />
+              <FontAwesomeIcon icon={faSearch} size={20} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
 
         <FlatList
           ref={flatListRef}
-          data={posts}
+          data={displayedPosts}
           renderItem={renderPostItem}
           keyExtractor={(item) => item.id}
-          // ItemSeparatorComponent={() => <View style={styles.separator} />}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
+          onEndReached={loadMorePosts}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
         />
 
         <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} />
@@ -623,6 +655,7 @@ const styles = StyleSheet.create({
     width: 100,
     zIndex: 1,
     borderColor: 'white',
+    // borderWidth: 0.5,
   },
   topButtonArea: {
     flex: 1,
@@ -651,7 +684,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   postContainer: {
-    backgroundColor: '#1e1e1e',
+    backgroundColor: mediumgray,
+    // backgroundColor: dark,
     borderRadius: 12,
     marginBottom: 16,
     padding: 16,
@@ -720,8 +754,9 @@ const styles = StyleSheet.create({
     position: 'relative', // Add this to allow absolute positioning of the new label
   },
   mediaImage: {
-    width: 120,
-    height: 120,
+    width: 125,
+    height: 125,
+    borderRadius: 4,
   },
   mediaInfo: {
     flex: 1,
@@ -923,8 +958,8 @@ const styles = StyleSheet.create({
   },
   newContainer: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 4,
+    right: 4,
     backgroundColor: 'rgba(29, 185, 84, 0.1)',
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -953,6 +988,10 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     marginTop: 4,
     alignSelf: 'flex-start',
+  },
+  loaderContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
 });
 

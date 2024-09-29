@@ -7,7 +7,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHome, faPlus, faSearch, faUser, faCompass } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faPlus, faSearch, faUser, faCompass, faMagnifyingGlassChart } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, gray, error, placeholder, lgray } from './src/components/colorModes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 // import { faCompass } from '@fortawesome/free-regular-svg-icons';
@@ -71,8 +71,8 @@ const client = generateClient();
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
-const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>(); // Stack for Search screens
-const ProfileStack = createNativeStackNavigator<ProfileStackParamList>(); // Stack for Profile screens
+const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const ExploreStack = createNativeStackNavigator<ExploreStackParamList>();
 
 const HomeStackNavigator = () => {
@@ -148,14 +148,14 @@ const MainTabNavigator = () => {
           } else if (route.name === 'ExploreTab') { 
           iconName = focused ? faCompass : faCompass;
           } else if (route.name === 'SearchTab') {
-            iconName = focused ? faSearch : faSearch;
+            iconName = focused ? faMagnifyingGlassChart : faMagnifyingGlassChart;
           }
 
           return <FontAwesomeIcon icon={iconName || faHome} size={size} color={color} />;
         },
         tabBarActiveTintColor: light,
         tabBarInactiveTintColor: lgray,  
-        tabBarLabel: () => null, // Remove the label from below the icons
+        tabBarLabel: () => null,
         tabBarStyle: { backgroundColor: gray, borderTopWidth: 0 },
         safeAreaInsets: { top: 0 },
       })}
@@ -192,7 +192,7 @@ const App = () => {
                     component={AppLoadingScreen} 
                     options={{ 
                       headerShown: false,
-                      gestureEnabled: false, // Disable swipe gesture
+                      gestureEnabled: false,
                     }} 
                   />
                   <Stack.Screen 
@@ -200,7 +200,7 @@ const App = () => {
                     component={LoginScreen} 
                     options={{ 
                       headerShown: false,
-                      gestureEnabled: false, // Disable swipe gesture
+                      gestureEnabled: false,
                     }} 
                   />
                   <Stack.Screen 
@@ -208,7 +208,7 @@ const App = () => {
                     component={MainTabNavigator} 
                     options={{ 
                       headerShown: false,
-                      gestureEnabled: false, // Disable swipe gesture
+                      gestureEnabled: false,
                     }} 
                   />
                   <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />

@@ -12,18 +12,21 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Post } from '../../models';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { dark, gray, light } from '../../components/colorModes';
+import { dark, gray, light, soundcloudOrange, spotifyGreen } from '../../components/colorModes';
 import { generateClient } from 'aws-amplify/api';
 import { updatePost } from '../../graphql/mutations';
 import CustomBottomSheet from '../../components/BottomSheets/CommentsBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { listComments } from '../../graphql/queries'; // Ensure you have the correct import for listComments
 import { Linking } from 'react-native';
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 
 const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
 const repostIcon = faArrowsRotate as IconProp;
+const spotifyIcon = faSpotify as IconProp;
+const soundcloudIcon = faSoundcloud as IconProp;
 
 type RepostOriginalPostScreenRouteProp = NativeStackScreenProps<HomeStackParamList, 'RepostOriginalPost'>;
 
@@ -148,6 +151,12 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
     }
   };
 
+  const handleSoundCloudPress = () => {
+    if (post.scTrackPermalinkUrl) {
+      Linking.openURL(post.scTrackPermalinkUrl);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <View style={styles.container}>
@@ -155,14 +164,20 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
             <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
           </TouchableOpacity>
-          <Text style={styles.headerText}>Post</Text>
-          {(post.spotifyTrackExternalUrl || post.spotifyAlbumExternalUrl) ? (
-            <TouchableOpacity onPress={handleSpotifyPress} style={styles.headerButton}>
-              <Text style={styles.spotifyButtonText}>Spotify</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.headerButton} /> // Empty view for spacing
-          )}
+          <View style={styles.headerRightButtons}>
+            {(post.spotifyTrackExternalUrl || post.spotifyAlbumExternalUrl) && (
+              <TouchableOpacity onPress={handleSpotifyPress} style={styles.playButton}>
+                <FontAwesomeIcon icon={spotifyIcon} size={24} color={spotifyGreen} />
+                <Text style={styles.playButtonText}>Play on Spotify</Text>
+              </TouchableOpacity>
+            )}
+            {post.scTrackId && (
+              <TouchableOpacity onPress={handleSoundCloudPress} style={styles.playButton}>
+                <FontAwesomeIcon icon={soundcloudIcon} size={24} color={soundcloudOrange} />
+                <Text style={styles.playButtonText}>Play on SoundCloud</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View>
@@ -253,24 +268,41 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     borderBottomWidth: 2,
     borderBottomColor: gray,
+
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: light,
-    textAlign: 'center',
     flex: 1,
+    textAlign: 'center',
   },
   headerButton: {
-    width: 60, // Set a fixed width for both buttons
+    padding: 5,
+    justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
+  },
+  headerRightButtons: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
     justifyContent: 'center',
   },
-  spotifyButtonText: {
-    color: '#1DB954', // Spotify green color
+  playButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  playButtonText: {
+    color: light,
+    marginLeft: 8,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   scrollContent: {

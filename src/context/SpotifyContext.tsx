@@ -21,6 +21,7 @@ interface TrackObjectFull {
     track: {
       name: string;
       artists: { name: string }[];
+      external_urls: { spotify: string };
     };
   }
 
@@ -122,7 +123,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
     const DEBOUNCE_INTERVAL = 10000; // 10 seconds
 
     if (fetchingRef.current || now - lastFetchTime.current < DEBOUNCE_INTERVAL) {
-      console.log('Skipping fetch, too soon or already fetching');
+      console.log('Skipping RP fetch, too soon or already fetching');
       return;
     }
 
@@ -131,7 +132,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
     try {
       const accessToken = await AsyncStorage.getItem('spotifyAccessToken');
       if (!accessToken) {
-        console.log("No access token found.");
+        console.log("No SP access token found.");
         return;
       }
 
@@ -167,6 +168,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
           albumName: track.album.name,
           albumImageUrl: track.album.images[0]?.url,
           playedAt: new Date().toISOString(),
+          spotifyUri: track.external_urls.spotify,
         };
 
         // Fetch existing tracks for the user
@@ -200,7 +202,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
               }
             },
           });
-          console.log('Updated existing track:', input.trackName);
+          console.log('Updated existing RP track:', input.trackName);
         } else {
           // If we already have 10 tracks, delete the oldest one
           if (existingTracks.length >= 10) {
@@ -214,7 +216,7 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
                 }
               },
             });
-            console.log('Deleted oldest track:', oldestTrack.trackName);
+            console.log('Deleted oldest RP track:', oldestTrack.trackName);
           }
 
           // Create new entry
@@ -222,13 +224,13 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
             query: mutations.createSpotifyRecentlyPlayedTrack,
             variables: { input },
           });
-          console.log('Created new track entry:', input.trackName);
+          console.log('Created new RP track entry:', input.trackName);
         }
       }
 
       lastFetchTime.current = Date.now();
     } catch (error) {
-      console.log('Error fetching and updating recently played tracks:', error);
+      console.log('Error fetching and updating RP tracks:', error);
     } finally {
       fetchingRef.current = false;
     }

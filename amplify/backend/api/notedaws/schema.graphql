@@ -110,4 +110,5 @@ type SpotifyRecentlyPlayedTrack @model @auth(rules: [{allow: public}]) {
   albumName: String
   albumImageUrl: String
   playedAt: AWSDateTime!
+  spotifyUri: String
 }

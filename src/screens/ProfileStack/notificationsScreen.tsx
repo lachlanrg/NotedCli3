@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ProfileStackParamList } from '../../components/types';
 import * as queries from '../../graphql/queries';
 import * as mutations from '../../graphql/mutations';
@@ -10,9 +10,9 @@ import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { ListFriendRequestsQuery, FriendRequest } from '../../API';
+import { FriendRequest } from '../../API';
 import { formatRelativeTime } from '../../components/formatComponents';
-import { dark, light, gray, lgray, placeholder, dgray } from '../../components/colorModes';
+import { dark, light, gray, lgray, placeholder, dgray, error } from '../../components/colorModes';
 import { fetchUsernameById } from '../../components/getUserUsername'; 
 
 Amplify.configure(awsconfig);
@@ -23,7 +23,7 @@ type NotificationsScreenProps = {
 
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [currentAuthUserInfo, setCurrentAuthUserInfo] = useState<any>(null);
-  const [friendRequests, setFriendRequests] = useState<Array<FriendRequest>>([]); // Type the state
+  const [friendRequests, setFriendRequests] = useState<Array<FriendRequest>>([]);
   const [requestUsernames, setRequestUsernames] = useState<{ [userId: string]: string | null }>({});
 
   const client = generateClient();
@@ -74,7 +74,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
       });
 
       if (response.data.updateFriendRequest) {
-        fetchFriendRequests(currentAuthUserInfo.userId); // Refresh the friend requests list
+        fetchFriendRequests(currentAuthUserInfo.userId);
       } else {
         console.error('Failed to approve friend request:', response.errors);
       }
@@ -102,104 +102,146 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
 
   const renderItem = ({ item }: { item: FriendRequest }) => {
     const username = item.userSentFriendRequestsId 
-    ? requestUsernames[item.userSentFriendRequestsId] || 'Loading...' 
-    : 'Loading...';
+      ? requestUsernames[item.userSentFriendRequestsId] || 'Loading...' 
+      : 'Loading...';
 
     if (item.status !== 'Cancelled') {
       return (
         <View style={styles.friendRequestItem}>
-          <Text style={styles.friendRequestUsername}>{username}</Text> 
-           {item.status === 'Pending' ? (
-            <Text style={styles.friendRequestStatus}>Sent a friend request</Text>
-          ) : (
-            <Text style={styles.friendRequestStatus}>Is now following you</Text>
-          )}
-          {/* Remove the approve button if the status is not Pending */}
+          <View style={styles.requestInfo}>
+            <Text style={styles.friendRequestUsername}>{username}</Text> 
+            <Text style={styles.friendRequestStatus}>
+              {item.status === 'Pending' ? 'Sent a friend request' : 'Is now following you'}
+            </Text>
+            <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
+          </View>
           {item.status === 'Pending' && (
             <TouchableOpacity onPress={() => handleApproveRequest(item)} style={styles.approveButton}>
-              <Text style={styles.approveButtonText}>Approve</Text>
+              <FontAwesomeIcon icon={faCheck} size={16} color={light} />
             </TouchableOpacity>
           )}
         </View>
       );
     } else {
-      return null; // Return null for cancelled items
+      return null;
     }
   };
 
+  const renderFooter = () => {
+    if (friendRequests.length === 0) {
+      return null; // Don't render anything if there are no notifications
+    }
+    return (
+      <Text style={styles.noMoreNotifications}>No more notifications</Text>
+    );
+  };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
-      </TouchableOpacity>
-      <View style={styles.friendRequestList}>
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Notifications</Text>
+          <View style={styles.placeholderView} />
+        </View>
         <FlatList
           data={friendRequests}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          ListFooterComponent={() => (
-            <Text style={styles.noMoreNotifications}>No more notifications</Text>
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={() => (
+            <Text style={styles.noNotifications}>No notifications</Text>
           )}
+          ListFooterComponent={renderFooter}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark,
+  },
   container: {
     flex: 1,
     backgroundColor: dark,
   },
-  backButton: {
-    marginRight: 10,
-    marginTop: 30,
-    marginLeft: 20,
-  },
-  friendRequestList: {
-    flex: 1,
-    padding: 20,
-  },
-  noMoreNotifications: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 14,
-    color: lgray,
-  },
-  friendRequestItem: {
-    padding: 10,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: gray,
+  },
+  backButton: {
+    width: 40, // Set a fixed width
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: light,
+    textAlign: 'center',
+  },
+  placeholderView: {
+    width: 40, // Match the width of the backButton
+  },
+  listContent: {
+    paddingHorizontal: 20,
+  },
+  friendRequestItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: gray,
+  },
+  requestInfo: {
+    flex: 1,
   },
   friendRequestUsername: {
     fontWeight: 'bold',
     fontSize: 16,
     color: light,
+    marginBottom: 4,
   },
   friendRequestStatus: {
-    fontSize: 16,
-    color: light,
-    paddingBottom: 8,
+    fontSize: 14,
+    color: lgray,
+    marginBottom: 2,
   },
-  noFriendRequests: {
+  timestamp: {
+    fontSize: 12,
+    color: dgray,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+  },
+  approveButton: {
+    backgroundColor: '#4CAF50',
+    padding: 8,
+    borderRadius: 20,
+    marginLeft: 10,
+  },
+  noNotifications: {
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
-    color: '#666',
+    color: lgray,
   },
-  approveButton: {
-    backgroundColor: '#007AFF',
-    paddingBottom: 10,
-    borderRadius: 5,
-  },
-  approveButtonText: {
-    color: light,
-    fontWeight: 'bold',
+  noMoreNotifications: {
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 20,
     fontSize: 14,
+    color: dgray,
   },
 });
 

@@ -845,6 +845,7 @@ export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRece
     albumName
     albumImageUrl
     playedAt
+    spotifyUri
     createdAt
     updatedAt
     _version
@@ -877,6 +878,7 @@ export const listSpotifyRecentlyPlayedTracks = /* GraphQL */ `query ListSpotifyR
       albumName
       albumImageUrl
       playedAt
+      spotifyUri
       createdAt
       updatedAt
       _version
@@ -915,6 +917,7 @@ export const syncSpotifyRecentlyPlayedTracks = /* GraphQL */ `query SyncSpotifyR
       albumName
       albumImageUrl
       playedAt
+      spotifyUri
       createdAt
       updatedAt
       _version
@@ -957,6 +960,7 @@ export const spotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPla
       albumName
       albumImageUrl
       playedAt
+      spotifyUri
       createdAt
       updatedAt
       _version

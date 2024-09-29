@@ -50,24 +50,26 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
   );
 
   const handleListenPress = () => { 
-    if (item) { // Access 'item' from the props
+    if (item) {
       const url = item.scTrackPermalinkUrl 
                   || item.spotifyAlbumExternalUrl 
                   || item.spotifyTrackExternalUrl; 
 
       if (url) {
         Linking.openURL(url);
-        dismiss(); // Optionally close the modal after opening the link 
+        dismiss();
       } else {
         console.warn('No external URL found for the selected item');
       }
+    } else {
+      console.warn('No item selected');
     }
   };
 
   const handleDetailsPress = () => {
     if (item) {
-      let id: string;
-      let type: string;
+      let id: string | undefined;
+      let type: string | undefined;
 
       if (item.spotifyTrackId) {
         id = item.spotifyTrackId;
@@ -78,34 +80,39 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
       } else if (item.scTrackId) {
         id = item.scTrackId;
         type = 'scTrack';
-      } else {
-        console.warn('No valid ID found for the selected item');
-        return;
       }
 
-      navigation.navigate('ExplorePost', { id, type });
-      dismiss(); // Close the bottom sheet after navigation
+      if (id && type) {
+        navigation.navigate('ExplorePost', { id, type });
+        dismiss();
+      } else {
+        console.warn('No valid ID found for the selected item');
+      }
     } else {
       console.warn('No item selected');
     }
   };
 
   const getListenIcon = () => {
-    if (item.spotifyTrackId || item.spotifyAlbumId) {
-      return spotifyIcon;
-    } else if (item.scTrackId) {
-      return soundcloudIcon;
+    if (item) {
+      if (item.spotifyTrackId || item.spotifyAlbumId) {
+        return spotifyIcon;
+      } else if (item.scTrackId) {
+        return soundcloudIcon;
+      }
     }
-    return musicIcon; // Fallback to music icon if neither Spotify nor SoundCloud
+    return musicIcon;
   };
 
   const getListenIconColor = () => {
-    if (item.spotifyTrackId || item.spotifyAlbumId) {
-      return spotifyGreen;
-    } else if (item.scTrackId) {
-      return soundcloudOrange;
+    if (item) {
+      if (item.spotifyTrackId || item.spotifyAlbumId) {
+        return spotifyGreen;
+      } else if (item.scTrackId) {
+        return soundcloudOrange;
+      }
     }
-    return dark; // Fallback to dark color if neither Spotify nor SoundCloud
+    return dark;
   };
 
   const { dismiss } = useBottomSheetModal();
@@ -121,7 +128,7 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
       backgroundStyle={{ backgroundColor: modalBackground }}
     >
       <View style={styles.contentContainer}>
-        {item && (
+        {item ? (
           <View style={styles.itemInfoContainer}>
             <Text style={styles.itemType}>
               {item.spotifyAlbumName ? "Spotify Album" : 
@@ -132,6 +139,8 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
               {item.spotifyAlbumName || item.spotifyTrackName || item.scTrackTitle || "No Title Available"}
             </Text>
           </View>
+        ) : (
+          <Text style={styles.noItemText}>No item selected</Text>
         )}
         <View style={styles.actionContainer}>
           <TouchableOpacity style={styles.actionButton} onPress={handleDetailsPress}>
@@ -180,6 +189,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     color: dark,
+  },
+  noItemText: {
+    fontSize: 16,
+    color: error,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

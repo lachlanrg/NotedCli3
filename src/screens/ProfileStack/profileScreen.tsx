@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Animated, FlatList } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
@@ -52,6 +52,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const spotifyContext = useSpotify();
   const recentlyPlayed = spotifyContext?.recentlyPlayed || [];
 
+  const flatListRef = useRef<FlatList>(null);
+
+  const handleTopPress = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
 
   const fetchUserDataAndCounts = useCallback(async () => {
     setIsLoading(true);
@@ -218,28 +223,35 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
       <View style={[styles.container]}>
-          <View style={styles.header}>
-            <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
-            <View style={styles.icons}>
-              <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
-                <FontAwesomeIcon icon={faBell} size={25} color={light} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentSettingsModalPress)}>
-                <FontAwesomeIcon icon={faCog} size={25} color={light} />
-              </TouchableOpacity>
-            </View>
+        <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
+          <View style={styles.topButtonArea} />
+        </TouchableOpacity>
+        
+        <View style={styles.header}>
+          <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
+          <View style={styles.icons}>
+            <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
+              <FontAwesomeIcon icon={faBell} size={25} color={light} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.createPostButton} onPress={(handlePresentSettingsModalPress)}>
+              <FontAwesomeIcon icon={faCog} size={25} color={light} />
+            </TouchableOpacity>
           </View>
+        </View>
 
-          <ScrollView
-              style={styles.scrollViewContent}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-              scrollEventThrottle={16}
-              showsVerticalScrollIndicator={false}
-            >
+        <FlatList
+          ref={flatListRef}
+          style={styles.scrollViewContent}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={() => (
+            <>
               <View style={styles.statsContainer}>
                 <TouchableOpacity 
                   style={styles.statItem}
                   onPress={() => handleFollowListNavigation('following')}
+                  activeOpacity={1} 
                 >
                   <Text style={styles.statNumber}>{formatNumber(followCounts.following)}</Text>
                   <Text style={styles.statLabel}>Following</Text>
@@ -247,6 +259,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 <TouchableOpacity 
                   style={styles.statItem}
                   onPress={() => handleFollowListNavigation('followers')}
+                  activeOpacity={1}
                 >
                   <Text style={styles.statNumber}>{formatNumber(followCounts.followers)}</Text>
                   <Text style={styles.statLabel}>Followers</Text>
@@ -255,8 +268,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
                   <Text style={styles.statLabel}>Posts</Text>
                 </View>
-                <TouchableOpacity onPress={handleNavigateToUserSearch}>
+                <TouchableOpacity onPress={handleNavigateToUserSearch} activeOpacity={1}>
                   <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
+                  
                 </TouchableOpacity>
               </View>
 
@@ -302,26 +316,31 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                   </LongPressGestureHandler>
                 </GestureHandlerRootView>
               )}
-
+            </>
+          )}
+          data={[{ key: 'userPostList' }]}
+          renderItem={() => (
             <UserPostList 
               key={refreshKey}
               userId={userInfo?.userId} 
               onPostPress={handlePresentPostModalPress} 
               onPostsCountUpdate={handlePostsCountUpdate}
             />
-          </ScrollView>
-          <SettingsBottomSheet ref={settingsBottomSheetRef} />
-          <ProfilePostBottomSheetModal 
-            ref={postBottomSheetRef} 
-            item={selectedPost} 
-            onPostDelete={handlePostDeleted}
-            onClose={resetSelectedPost}
-          />
-        </View>
-        <RPBottomSheetModal ref={rpBottomSheetRef} userId={userInfo?.userId} />
-      </SafeAreaView>
-    );
-  };
+          )}
+        />
+
+        <SettingsBottomSheet ref={settingsBottomSheetRef} />
+        <ProfilePostBottomSheetModal 
+          ref={postBottomSheetRef} 
+          item={selectedPost} 
+          onPostDelete={handlePostDeleted}
+          onClose={resetSelectedPost}
+        />
+      </View>
+      <RPBottomSheetModal ref={rpBottomSheetRef} userId={userInfo?.userId} />
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -461,6 +480,18 @@ const styles = StyleSheet.create({
   waveformContainer: {
     marginLeft: 10,
     marginRight: 5,
+  },
+  topButton: {
+    position: 'absolute',
+    alignItems: 'center',
+    top: 0,
+    left: '36%',
+    height: 50,
+    width: 100,
+    zIndex: 1,
+  },
+  topButtonArea: {
+    flex: 1,
   },
 });
 

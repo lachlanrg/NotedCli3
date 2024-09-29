@@ -335,6 +335,7 @@ type EagerSpotifyRecentlyPlayedTrack = {
   readonly albumName?: string | null;
   readonly albumImageUrl?: string | null;
   readonly playedAt: string;
+  readonly spotifyUri?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -354,6 +355,7 @@ type LazySpotifyRecentlyPlayedTrack = {
   readonly albumName?: string | null;
   readonly albumImageUrl?: string | null;
   readonly playedAt: string;
+  readonly spotifyUri?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
