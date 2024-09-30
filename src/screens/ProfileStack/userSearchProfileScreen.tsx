@@ -846,7 +846,7 @@ const styles = StyleSheet.create({
     color: light,
     fontSize: 18,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 300,
   },
 });
 
