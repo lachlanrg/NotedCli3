@@ -765,6 +765,33 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -772,6 +799,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }
@@ -865,6 +893,33 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -872,6 +927,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }
@@ -965,6 +1021,33 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -972,6 +1055,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }

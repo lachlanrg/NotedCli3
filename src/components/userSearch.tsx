@@ -29,19 +29,19 @@ export const useSearchUsers = () => {
         },
       });
 
-      console.log("______________________________________")
-      console.log('Searching for Users');
-      console.log('Results found:', response.data.listUsers.items.length);
-      response.data.listUsers.items.forEach((user: User) => {
-        console.log("______________________________________")
-        console.log('User:');
-        console.log('  - username:', user.username);
-        console.log('  - email:', user.email);
-        console.log('  - ID:', user.id);
-        console.log('  - Posts:', user.posts);
-        // ... Add other properties as needed
-      });
-      console.log("______________________________________")
+      // console.log("______________________________________")
+      // console.log('Searching for Users');
+      // console.log('Results found:', response.data.listUsers.items.length);
+      // response.data.listUsers.items.forEach((user: User) => {
+      //   console.log("______________________________________")
+      //   console.log('User:');
+      //   console.log('  - username:', user.username);
+      //   console.log('  - email:', user.email);
+      //   console.log('  - ID:', user.id);
+      //   console.log('  - Posts:', user.posts);
+      //   // ... Add other properties as needed
+      // });
+      // console.log("______________________________________")
 
 
       setSearchResults(response.data.listUsers.items); 

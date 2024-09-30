@@ -238,11 +238,15 @@ type EagerComment = {
   readonly user?: User | null;
   readonly userPostsId: string;
   readonly username: string;
+  readonly parentComment?: Comment | null;
+  readonly parentCommentId?: string | null;
+  readonly replies?: (Comment | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
   readonly postCommentsId?: string | null;
   readonly repostCommentsId?: string | null;
+  readonly commentRepliesId?: string | null;
 }
 
 type LazyComment = {
@@ -261,11 +265,15 @@ type LazyComment = {
   readonly user: AsyncItem<User | undefined>;
   readonly userPostsId: string;
   readonly username: string;
+  readonly parentComment: AsyncItem<Comment | undefined>;
+  readonly parentCommentId?: string | null;
+  readonly replies: AsyncCollection<Comment>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
   readonly postCommentsId?: string | null;
   readonly repostCommentsId?: string | null;
+  readonly commentRepliesId?: string | null;
 }
 
 export declare type Comment = LazyLoading extends LazyLoadingDisabled ? EagerComment : LazyComment

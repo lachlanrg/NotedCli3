@@ -827,6 +827,44 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "parentComment": {
+                    "name": "parentComment",
+                    "isArray": false,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "commentRepliesId"
+                        ]
+                    }
+                },
+                "parentCommentId": {
+                    "name": "parentCommentId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "replies": {
+                    "name": "replies",
+                    "isArray": true,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "commentRepliesId"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -859,6 +897,13 @@ export const schema = {
                 },
                 "repostCommentsId": {
                     "name": "repostCommentsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "commentRepliesId": {
+                    "name": "commentRepliesId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": false,
@@ -1182,5 +1227,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "77d0c212b342212e93d5a93f9738b96b"
+    "version": "fb5825f0814b437155bcab14d2a4f003"
 };

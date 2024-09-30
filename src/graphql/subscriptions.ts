@@ -738,6 +738,33 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -745,6 +772,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }
@@ -835,6 +863,33 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -842,6 +897,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }
@@ -932,6 +988,33 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -939,6 +1022,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }

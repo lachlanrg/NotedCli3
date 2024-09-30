@@ -584,6 +584,33 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
     }
     userPostsId
     username
+    parentComment {
+      id
+      postId
+      repostId
+      content
+      likedBy
+      likesCount
+      userPostsId
+      username
+      parentCommentId
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userCommentsId
+      postCommentsId
+      commentRepliesId
+      repostCommentsId
+      __typename
+    }
+    parentCommentId
+    replies {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -591,6 +618,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
     _lastChangedAt
     userCommentsId
     postCommentsId
+    commentRepliesId
     repostCommentsId
     __typename
   }
@@ -614,6 +642,7 @@ export const listComments = /* GraphQL */ `query ListComments(
       likesCount
       userPostsId
       username
+      parentCommentId
       createdAt
       updatedAt
       _version
@@ -621,6 +650,7 @@ export const listComments = /* GraphQL */ `query ListComments(
       _lastChangedAt
       userCommentsId
       postCommentsId
+      commentRepliesId
       repostCommentsId
       __typename
     }
@@ -654,6 +684,7 @@ export const syncComments = /* GraphQL */ `query SyncComments(
       likesCount
       userPostsId
       username
+      parentCommentId
       createdAt
       updatedAt
       _version
@@ -661,6 +692,7 @@ export const syncComments = /* GraphQL */ `query SyncComments(
       _lastChangedAt
       userCommentsId
       postCommentsId
+      commentRepliesId
       repostCommentsId
       __typename
     }

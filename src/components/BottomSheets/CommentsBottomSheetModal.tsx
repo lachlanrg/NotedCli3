@@ -1,14 +1,14 @@
 import React, { useMemo, forwardRef, useCallback, useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList, KeyboardAvoidingView, TextInput } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, gray, lgray, light, modalBackground, mediumgray, placeholder } from "../colorModes";
+import { dark, gray, lgray, light, mediumgray, placeholder } from "../colorModes";
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import * as queries from '../../graphql/queries';
 import * as mutations from '../../graphql/mutations';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
-import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons"
+import { faHeart as faHeartSolid, faReply, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons"
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const unLikedIcon = faHeartRegular as IconProp;
@@ -21,9 +21,34 @@ type Comment = {
   content: string;
   userPostsId: string;
   username: string;
-  likedBy: string[]; 
-  likesCount: number; 
+  likedBy: string[] | null;
+  likesCount: number;
   _version: number;
+  replies?: Comment[];
+  parentComment?: Comment | null;
+  parentCommentId?: string | null;
+  postId?: string | null;
+  repostId?: string | null;
+  __typename?: string;
+  createdAt?: string;
+  post?: {
+    __typename: "Post";
+    id: string;
+    body?: string | null;
+    userPostsId: string;
+    username: string;
+    likedBy?: string[] | null;
+  } | null;
+  repost?: {
+    __typename: "Repost";
+    id: string;
+  } | null;
+  user?: {
+    __typename: "User";
+    id: string;
+    username: string;
+  } | null;
+  repostCommentsId?: string | null;
 };
 
 type Post = {
@@ -45,6 +70,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
   const [userInfo, setUserInfo] = React.useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     currentAuthenticatedUser();
@@ -106,24 +133,48 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         userPostsId: userId,
         username: username,
         likesCount: 0,
+        likedBy: [],
+        parentCommentId: replyingTo ? replyingTo.id : undefined,
       };
-      // console.log("Trying to create comment with info:")
-      // console.log("Post ID:", selectedPost.id)
-      // console.log("Comment:", newComment)
-      // console.log("userPosts ID:", userId)
-      // console.log("Username:", username)
 
-      await client.graphql({
+      const response = await client.graphql({
         query: mutations.createComment,
         variables: { input },
       });
-      // console.log('New Comment created successfully!:', newComment);
-      const fetchedComments = await fetchComments();
-      setComments(fetchedComments);
+
+      if (response.data && response.data.createComment) {
+        const newCommentData: Comment = {
+          ...response.data.createComment,
+          replies: [],
+          likedBy: response.data.createComment.likedBy || [],
+          parentComment: replyingTo || null,
+          parentCommentId: replyingTo ? replyingTo.id : null,
+        };
+
+        setComments(prevComments => {
+          if (replyingTo) {
+            // If it's a reply, find the parent comment and add the reply to its replies array
+            return prevComments.map(comment => {
+              if (comment.id === replyingTo.id) {
+                return {
+                  ...comment,
+                  replies: [...(comment.replies || []), newCommentData],
+                };
+              }
+              return comment;
+            });
+          } else {
+            // If it's a top-level comment, add it to the beginning of the array
+            return [newCommentData, ...prevComments];
+          }
+        });
+      }
+
+      setReplyingTo(null);
     } catch (error) {
       console.error('Error adding comment:', error);
     } finally {
-      setNewComment(''); // Clear the input text state regardless of success or failure
+      setNewComment('');
     }
   };
 
@@ -138,25 +189,44 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
 
       const response = await client.graphql({
         query: queries.listComments,
-        variables: { filter: filter },
+        variables: { 
+          filter: filter,
+          limit: 1000, // Adjust as needed
+        },
       });
 
       if (response.data && response.data.listComments) {
-        const sortedComments = [...response.data.listComments.items].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        const allComments = response.data.listComments.items;
+        
+        // Create a map of comments by their IDs
+        const commentMap = new Map<string, Comment>();
+        allComments.forEach(comment => {
+          commentMap.set(comment.id, {
+            ...comment,
+            likedBy: comment.likedBy || null,
+            replies: [],
+          });
+        });
+
+        // Organize comments into a tree structure
+        const topLevelComments: Comment[] = [];
+        commentMap.forEach(comment => {
+          if (comment.parentCommentId) {
+            const parentComment = commentMap.get(comment.parentCommentId);
+            if (parentComment) {
+              parentComment.replies?.push(comment);
+            }
+          } else {
+            topLevelComments.push(comment);
+          }
+        });
+
+        // Sort top-level comments by creation date
+        const sortedComments = topLevelComments.sort(
+          (a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
         );
 
-        const validatedComments = sortedComments.map(comment => ({
-          id: comment.id,
-          content: comment.content,
-          userPostsId: comment.userPostsId,
-          username: comment.username,
-          likedBy: comment.likedBy || [], 
-          likesCount: comment.likesCount || 0, 
-          _version: comment._version,
-        }));
-
-        return validatedComments;
+        return sortedComments;
       } else {
         console.warn('Unexpected response format from listComments query:', response);
         return [];
@@ -170,7 +240,20 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
   const toggleLike = async (commentId: string) => {
     try {
       const client = generateClient();
-      const commentToUpdate = comments.find((comment) => comment.id === commentId);
+      
+      // Helper function to find a comment or reply
+      const findComment = (comments: Comment[], id: string): Comment | undefined => {
+        for (const comment of comments) {
+          if (comment.id === id) return comment;
+          if (comment.replies) {
+            const reply = findComment(comment.replies, id);
+            if (reply) return reply;
+          }
+        }
+        return undefined;
+      };
+
+      const commentToUpdate = findComment(comments, commentId);
 
       if (!commentToUpdate) {
         console.warn("Comment not found:", commentId);
@@ -196,50 +279,118 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           input: {
             id: commentId,
             likedBy: updatedLikedBy,
-            likesCount: updatedLikesCount,
+            likesCount: updatedLikesCount, 
             _version: commentToUpdate._version, 
           },
         },
       });
 
-      // console.log("Response from updateComment mutation:", updatedComment);
-
       if (updatedComment.data && updatedComment.data.updateComment) {
-        // console.log("Comment updated successfully in the backend.");
-
-        setComments(prevComments => prevComments.map(comment =>
-          comment.id === commentId ? {
-            ...updatedComment.data.updateComment,
-            likedBy: updatedComment.data.updateComment.likedBy || []
-          } : comment
-        ));
+        setComments(prevComments => {
+          const updateCommentInTree = (comments: Comment[]): Comment[] => {
+            return comments.map(comment => {
+              if (comment.id === commentId) {
+                return {
+                  ...comment,
+                  likedBy: updatedComment.data.updateComment.likedBy || null,
+                  likesCount: updatedComment.data.updateComment.likesCount,
+                  _version: updatedComment.data.updateComment._version,
+                };
+              }
+              if (comment.replies) {
+                return {
+                  ...comment,
+                  replies: updateCommentInTree(comment.replies),
+                };
+              }
+              return comment;
+            });
+          };
+          
+          return updateCommentInTree(prevComments);
+        });
       } else {
-        // console.warn("No data returned from updateComment mutation:", updatedComment);
+        console.warn("No data returned from updateComment mutation:", updatedComment);
       }
     } catch (error) {
       console.error('Error toggling like:', error);
     }
   };
 
+  const toggleCommentExpansion = (commentId: string) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
+
   const renderComment = ({ item }: { item: Comment }) => {
     const isLiked = item.likedBy ? item.likedBy.includes(userInfo?.userId) : false;
+    const hasReplies = item.replies && item.replies.length > 0;
+    const isExpanded = expandedComments.has(item.id);
+
+    // Sort replies by creation date, most recent first
+    const sortedReplies = item.replies?.sort((a, b) => 
+      new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+    ) || [];
 
     return (
-      <View style={styles.commentItem}>
-        <View style={styles.commentContent}>
-          <Text style={styles.commentUser}>{item.username}</Text>
-          <Text style={styles.commentText}>{item.content}</Text>
+      <View style={styles.commentContainer}>
+        <View style={styles.commentItem}>
+          <View style={styles.commentContent}>
+            <Text style={styles.commentUser}>{item.username}</Text>
+            <Text style={styles.commentText}>{item.content}</Text>
+          </View>
+          <View style={styles.likeContainer}>
+            <TouchableOpacity onPress={() => toggleLike(item.id)}>
+              <FontAwesomeIcon
+                icon={isLiked ? likedIcon : unLikedIcon}
+                style={styles.heartIcon}
+                color={isLiked ? 'red' : light}
+              />
+            </TouchableOpacity>
+            <Text style={styles.likesCount}>{item.likesCount > 0 ? item.likesCount : '\u00A0'}</Text>
+          </View>
         </View>
-        <View style={styles.likeContainer}>
-          <TouchableOpacity onPress={() => toggleLike(item.id)}>
-            <FontAwesomeIcon
-              icon={isLiked ? likedIcon : unLikedIcon}
-              style={styles.heartIcon}
-              color={isLiked ? 'red' : light}
-            />
+        <View style={styles.commentActions}>
+          <TouchableOpacity onPress={() => setReplyingTo(item)}>
+            <Text style={styles.actionText}>Reply</Text>
           </TouchableOpacity>
-          <Text style={styles.likesCount}>{item.likesCount > 0 ? item.likesCount : '\u00A0'}</Text>
+          {hasReplies && (
+            <TouchableOpacity onPress={() => toggleCommentExpansion(item.id)} style={styles.viewRepliesButton}>
+              <Text style={styles.actionText}>
+                {isExpanded ? 'Hide replies' : `View ${sortedReplies.length} ${sortedReplies.length === 1 ? 'reply' : 'replies'}`}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
+        {isExpanded && hasReplies && (
+          <View style={styles.repliesContainer}>
+            {sortedReplies.map((reply) => (
+              <View key={reply.id} style={styles.replyItem}>
+                <View style={styles.commentContent}>
+                  <Text style={styles.commentUser}>{reply.username}</Text>
+                  <Text style={styles.commentText}>{reply.content}</Text>
+                </View>
+                <View style={styles.likeContainer}>
+                  <TouchableOpacity onPress={() => toggleLike(reply.id)}>
+                    <FontAwesomeIcon
+                      icon={reply.likedBy?.includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                      style={styles.heartIcon}
+                      color={reply.likedBy?.includes(userInfo?.userId) ? 'red' : light}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.likesCount}>{reply.likesCount > 0 ? reply.likesCount : '\u00A0'}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     );
   };
@@ -279,17 +430,29 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           style={styles.keyboardAvoidingView}
         >
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              onChangeText={handleCommentChange}
-              value={newComment}
-              placeholder="Add a comment ..."
-              placeholderTextColor={placeholder}
-              maxLength={600}
-            />
-            <TouchableOpacity onPress={createComment} style={styles.postButton}>
-              <Text style={styles.postButtonText}>Post</Text>
-            </TouchableOpacity>
+            {replyingTo && (
+              <View style={styles.replyingToContainer}>
+                <View style={styles.replyingToWrapper}>
+                  <Text style={styles.replyingToText}>Replying to {replyingTo.username}</Text>
+                  <TouchableOpacity onPress={() => setReplyingTo(null)} style={styles.cancelReplyButton}>
+                    <Text style={styles.cancelReplyText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                onChangeText={handleCommentChange}
+                value={newComment}
+                placeholder={replyingTo ? "Write a reply..." : "Add a comment ..."}
+                placeholderTextColor={placeholder}
+                maxLength={600}
+              />
+              <TouchableOpacity onPress={createComment} style={styles.postButton}>
+                <Text style={styles.postButtonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </View>
@@ -322,14 +485,35 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 18,
     paddingVertical: 15,
     paddingBottom: 40,
     backgroundColor: mediumgray,
     borderTopWidth: 1,
     borderTopColor: gray,
+  },
+  replyingToContainer: {
+    marginBottom: 10,
+  },
+  replyingToWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  replyingToText: {
+    color: lgray,
+    fontSize: 14,
+    marginRight: 8,
+  },
+  cancelReplyButton: {
+    marginLeft: 4,
+  },
+  cancelReplyText: {
+    color: 'blue',
+    fontSize: 14,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
@@ -351,37 +535,68 @@ const styles = StyleSheet.create({
     color: light,
     fontWeight: 'bold',
   },
+  commentContainer: {
+    marginBottom: 10,
+    paddingTop: 10,
+  },
   commentItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: mediumgray,
+    alignItems: 'flex-start',
+    paddingLeft: 10,
+    paddingRight: 10,
+    // borderBottomWidth: 1,
+    // borderBottomColor: gray,
   },
   commentContent: {
     flex: 1,
-    paddingRight: 26,
+    paddingRight: 10,
   },
   commentUser: {
     fontWeight: 'bold',
     paddingBottom: 2,
     color: light,
   },
+  commentText: {
+    color: lgray,
+  },
   likeContainer: {
     alignItems: 'center',
-    paddingRight: 10,
-    paddingTop: 5,
+    marginRight: 10,
   },
   heartIcon: {
     marginLeft: 'auto',
-  },
-  commentText: {
-    color: lgray,
   },
   likesCount: {
     marginTop: 4,
     fontSize: 12,
     color: light,
+  },
+  commentActions: {
+    flexDirection: 'row',
+    paddingLeft: 10,
+    paddingTop: 5,
+  },
+  actionText: {
+    color: placeholder,
+    fontSize: 14,
+    marginRight: 15,
+  },
+  viewRepliesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chevronIcon: {
+    marginLeft: 5,
+  },
+  repliesContainer: {
+    marginLeft: 20,
+    borderLeftWidth: 1,
+    borderLeftColor: gray,
+  },
+  replyItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 10,
   },
 });
 
