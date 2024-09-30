@@ -3,7 +3,7 @@ import React, { useMemo, forwardRef, useCallback, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Linking } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { dark, light, error, modalBackground, spotifyGreen, soundcloudOrange } from "../colorModes";
+import { dark, light, error, mediumgray, lgray, spotifyGreen, soundcloudOrange, gray } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
@@ -125,7 +125,8 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
-      backgroundStyle={{ backgroundColor: modalBackground }}
+      backgroundStyle={{ backgroundColor: mediumgray }}
+      handleIndicatorStyle={{ backgroundColor: light }}
     >
       <View style={styles.contentContainer}>
         {item ? (
@@ -144,7 +145,7 @@ const HomePostBottomSheetModal = forwardRef<BottomSheetModal, HomePostBottomShee
         )}
         <View style={styles.actionContainer}>
           <TouchableOpacity style={styles.actionButton} onPress={handleDetailsPress}>
-            <FontAwesomeIcon icon={searchIcon} size={24} color={dark} />
+            <FontAwesomeIcon icon={searchIcon} size={24} color={light} />
             <Text style={styles.actionText}>Details</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={handleListenPress}>
@@ -168,13 +169,13 @@ const styles = StyleSheet.create({
   },
   itemType: {
     fontSize: 14,
-    color: '#888',
+    color: lgray,
     marginBottom: 4,
   },
   itemTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: dark,
+    color: light,
   },
   actionContainer: {
     flexDirection: 'row',
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   actionText: {
     marginTop: 8,
     fontSize: 14,
-    color: dark,
+    color: light,
   },
   noItemText: {
     fontSize: 16,

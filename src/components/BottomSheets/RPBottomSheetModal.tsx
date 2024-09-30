@@ -4,7 +4,7 @@ import { BottomSheetModal, BottomSheetBackdrop, BottomSheetBackdropProps } from 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { faSearch, faMusic, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import { dark, light, gray, modalBackground } from '../colorModes';
+import { dark, light, gray, mediumgray, lgray, dgray, placeholder } from '../colorModes';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { generateClient } from 'aws-amplify/api';
 import * as queries from '../../graphql/queries';
@@ -99,7 +99,7 @@ const RPBottomSheetModal = forwardRef<BottomSheetModal, RPBottomSheetModalProps>
       {selectedTrack?.id === item.id && (
         <View style={styles.optionsContainer}>
           <TouchableOpacity style={styles.optionButton} onPress={handleSearchDetails}>
-            <FontAwesomeIcon icon={searchIcon} size={18} color={dark} />
+            <FontAwesomeIcon icon={searchIcon} size={18} color={light} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.spotifyButton} onPress={handleListenOnSpotify}>
             <Text style={[styles.optionText, { color: spotifyGreen }]}>Spotify</Text>
@@ -126,8 +126,8 @@ const RPBottomSheetModal = forwardRef<BottomSheetModal, RPBottomSheetModalProps>
       index={0}
       snapPoints={['50%']}
       backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: modalBackground }}
-      onDismiss={handleDismiss}
+      backgroundStyle={{ backgroundColor: mediumgray }}
+      handleIndicatorStyle={{ backgroundColor: light }}
     >
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Recently Played</Text>
@@ -146,13 +146,12 @@ const RPBottomSheetModal = forwardRef<BottomSheetModal, RPBottomSheetModalProps>
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-    // padding: 16,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: dark,
+    color: light,
     marginBottom: 16,
   },
   scrollView: {
@@ -171,12 +170,12 @@ const styles = StyleSheet.create({
   },
   trackName: {
     fontSize: 16,
-    color: dark,
+    color: light,
     fontWeight: 'bold',
   },
   artistName: {
     fontSize: 14,
-    color: gray,
+    color: placeholder,
   },
   optionsContainer: {
     flexDirection: 'row',
