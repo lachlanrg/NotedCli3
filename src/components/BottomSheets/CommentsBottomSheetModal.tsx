@@ -1,7 +1,7 @@
 import React, { useMemo, forwardRef, useCallback, useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList } from "react-native";
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { dark, gray, lgray, light, modalBackground } from "../colorModes";
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList, KeyboardAvoidingView, TextInput } from "react-native";
+import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
+import { dark, gray, lgray, light, modalBackground, mediumgray, placeholder } from "../colorModes";
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import * as queries from '../../graphql/queries';
@@ -10,7 +10,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons"
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native"; // Import
 
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -108,22 +107,23 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         username: username,
         likesCount: 0,
       };
-      console.log("Trying to create comment with info:")
-      console.log("Post ID:", selectedPost.id)
-      console.log("Comment:", newComment)
-      console.log("userPosts ID:", userId)
-      console.log("Username:", username)
+      // console.log("Trying to create comment with info:")
+      // console.log("Post ID:", selectedPost.id)
+      // console.log("Comment:", newComment)
+      // console.log("userPosts ID:", userId)
+      // console.log("Username:", username)
 
       await client.graphql({
         query: mutations.createComment,
         variables: { input },
       });
-      console.log('New Comment created successfully!:', newComment);
-      setNewComment(''); 
+      // console.log('New Comment created successfully!:', newComment);
       const fetchedComments = await fetchComments();
       setComments(fetchedComments);
     } catch (error) {
       console.error('Error adding comment:', error);
+    } finally {
+      setNewComment(''); // Clear the input text state regardless of success or failure
     }
   };
 
@@ -228,14 +228,14 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       <View style={styles.commentItem}>
         <View style={styles.commentContent}>
           <Text style={styles.commentUser}>{item.username}</Text>
-          <Text>{item.content}</Text>
+          <Text style={styles.commentText}>{item.content}</Text>
         </View>
         <View style={styles.likeContainer}>
           <TouchableOpacity onPress={() => toggleLike(item.id)}>
             <FontAwesomeIcon
               icon={isLiked ? likedIcon : unLikedIcon}
               style={styles.heartIcon}
-              color={isLiked ? 'red' : 'black'}
+              color={isLiked ? 'red' : light}
             />
           </TouchableOpacity>
           <Text style={styles.likesCount}>{item.likesCount > 0 ? item.likesCount : '\u00A0'}</Text>
@@ -257,33 +257,41 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
-      keyboardBehavior="extend"
-      backgroundStyle={{ backgroundColor: modalBackground }}
+      backgroundStyle={{ backgroundColor: mediumgray }}
+      handleIndicatorStyle={{ backgroundColor: light }}
     >
       <View style={styles.contentContainer}>
-
-        {selectedPost && (
-          <FlatList
-            data={comments}
-            renderItem={renderComment}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.commentList}
-            ListEmptyComponent={renderEmptyList}
-          />
-        )}
-
-        <View style={[styles.inputContainer, { paddingBottom: keyboardVisible ? 20 : 40 }]}>
-          <BottomSheetTextInput
-            style={styles.input}
-            onChangeText={handleCommentChange}
-            placeholder="Add a comment ..."
-            placeholderTextColor={gray}
-            maxLength={600}
-          />
-          <TouchableOpacity onPress={createComment} style={styles.postButton}>
-            <Text style={styles.postButtonText}>Post</Text>
-          </TouchableOpacity>
+        <View style={styles.listContainer}>
+          {selectedPost && (
+            <FlatList
+              data={comments}
+              renderItem={renderComment}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.commentList}
+              ListEmptyComponent={renderEmptyList}
+            />
+          )}
         </View>
+
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 170 : 0}
+          style={styles.keyboardAvoidingView}
+        >
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              onChangeText={handleCommentChange}
+              value={newComment}
+              placeholder="Add a comment ..."
+              placeholderTextColor={placeholder}
+              maxLength={600}
+            />
+            <TouchableOpacity onPress={createComment} style={styles.postButton}>
+              <Text style={styles.postButtonText}>Post</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
       </View>
     </BottomSheetModal>
   );
@@ -292,17 +300,36 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-
+    justifyContent: 'space-between',
+    backgroundColor: mediumgray,
   },
-  containerHeadline: {
-    fontSize: 24,
+  listContainer: {
+    flex: 1,
+  },
+  commentList: {
+    flexGrow: 1,
+  },
+  emptyListContainer: {
+    paddingTop: 20,
+    alignItems: 'center',
+  },
+  emptyListText: {
+    color: light,
+    fontSize: 16,
+    marginTop: 100,
+  },
+  keyboardAvoidingView: {
+    marginTop: 'auto',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 18,
-    paddingVertical: 8,
-    marginTop: 8,
+    paddingVertical: 15,
+    paddingBottom: 40,
+    backgroundColor: mediumgray,
+    borderTopWidth: 1,
+    borderTopColor: gray,
   },
   input: {
     flex: 1,
@@ -310,9 +337,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 20,
     borderRadius: 10,
-    backgroundColor: light,
-    padding: 8,
-    // height: 50,
+    backgroundColor: gray,
+    padding: 10,
+    color: light,
   },
   postButton: {
     backgroundColor: 'blue',
@@ -321,20 +348,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   postButtonText: {
-    color: 'white',
+    color: light,
     fontWeight: 'bold',
-  },
-  commentList: {
-    flexGrow: 1,
-    width: '100%',
-    justifyContent: "flex-start",
   },
   commentItem: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: mediumgray,
   },
   commentContent: {
     flex: 1,
@@ -343,6 +365,7 @@ const styles = StyleSheet.create({
   commentUser: {
     fontWeight: 'bold',
     paddingBottom: 2,
+    color: light,
   },
   likeContainer: {
     alignItems: 'center',
@@ -352,21 +375,13 @@ const styles = StyleSheet.create({
   heartIcon: {
     marginLeft: 'auto',
   },
+  commentText: {
+    color: lgray,
+  },
   likesCount: {
     marginTop: 4,
     fontSize: 12,
-  },
-  emptyListContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    paddingBottom: 300,
-  },
-  emptyListText: {
-    color: gray,
-    fontSize: 16,
-    // fontStyle: "italic"
+    color: light,
   },
 });
 
