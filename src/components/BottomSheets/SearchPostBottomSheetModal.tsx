@@ -2,7 +2,7 @@
 import React, { useMemo, forwardRef, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, gray, lgray, light, modalBackground } from "../colorModes";
+import { dark, gray, lgray, light, mediumgray } from "../colorModes";
 import { scTrack } from "../../soundcloudConfig/itemInterface";
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -99,7 +99,8 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
             snapPoints={snapPoints}
             enablePanDownToClose={true}
             backdropComponent={renderBackDrop}
-            backgroundStyle={{ backgroundColor: modalBackground }}
+            backgroundStyle={{ backgroundColor: mediumgray }}
+            handleIndicatorStyle={{ backgroundColor: light }}
         >
             <View style={styles.contentContainer}>
                 {item && (
@@ -130,7 +131,7 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                         <FontAwesomeIcon 
                             icon={searchIcon} 
                             size={24} 
-                            color={(isSpotifyAlbum(item) || isSpotifyTrack(item) || isSpotifyArtist(item) || isSoundCloudTrack(item)) ? dark : gray} 
+                            color={(isSpotifyAlbum(item) || isSpotifyTrack(item) || isSpotifyArtist(item) || isSoundCloudTrack(item)) ? light : gray} 
                         /> 
                     </TouchableOpacity>
                     {!isSpotifyArtist(item) && (
@@ -166,13 +167,13 @@ const styles = StyleSheet.create({
     trackTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: dark,
+        color: light,
         marginBottom: 8,
         textAlign: 'center',
     },
     artistName: {
         fontSize: 16,
-        color: dark,
+        color: lgray,
         marginBottom: 16,
         textAlign: 'center',
     },

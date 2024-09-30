@@ -2,7 +2,7 @@
 import React, { useMemo, forwardRef, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, light, modalBackground } from "../colorModes";
+import { dark, light, mediumgray } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -32,36 +32,37 @@ const UserSearchPostBottomSheetModal = forwardRef<BottomSheetModal, UserSearchPo
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
-      backgroundStyle={{ backgroundColor: modalBackground }}
+      backgroundStyle={{ backgroundColor: mediumgray }}
+      handleIndicatorStyle={{ backgroundColor: light }}
     >
-        <View style={styles.contentContainer}>
-          {post && (
-            <View>
-              <Text style={styles.containerHeadline}>
-                {post.spotifyAlbumName ? (
-                  `Spotify Album: ${post.spotifyAlbumName}` 
-                ) : post.spotifyTrackName ? (
-                  `Spotify Track: ${post.spotifyTrackName}`
-                ) : post.scTrackTitle ? ( 
-                  `SoundCloud Track: ${post.scTrackTitle}`
-                ) : (
-                  'Post Title' 
-                )}
-              </Text>
-            </View>
-          )}
-          <View style={styles.iconRow}>
-            <TouchableOpacity>
-              <FontAwesomeIcon icon={musicIcon} size={24} color={dark} /> 
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <FontAwesomeIcon icon={shareIcon} size={24} color={dark} /> 
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <FontAwesomeIcon icon={heartIcon} size={24} color={dark} />
-            </TouchableOpacity>
+      <View style={styles.contentContainer}>
+        {post && (
+          <View>
+            <Text style={styles.containerHeadline}>
+              {post.spotifyAlbumName ? (
+                `Spotify Album: ${post.spotifyAlbumName}` 
+              ) : post.spotifyTrackName ? (
+                `Spotify Track: ${post.spotifyTrackName}`
+              ) : post.scTrackTitle ? ( 
+                `SoundCloud Track: ${post.scTrackTitle}`
+              ) : (
+                'Post Title' 
+              )}
+            </Text>
           </View>
+        )}
+        <View style={styles.iconRow}>
+          <TouchableOpacity>
+            <FontAwesomeIcon icon={musicIcon} size={24} color={light} /> 
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <FontAwesomeIcon icon={shareIcon} size={24} color={light} /> 
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <FontAwesomeIcon icon={heartIcon} size={24} color={light} />
+          </TouchableOpacity>
         </View>
+      </View>
     </BottomSheetModal>
   );
 });
@@ -73,6 +74,7 @@ const styles = StyleSheet.create({
   containerHeadline: {
     fontSize: 16,
     paddingLeft: 10,
+    color: light,
   },
   iconRow: {
     flexDirection: 'row',

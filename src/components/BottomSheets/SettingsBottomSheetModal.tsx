@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faGear, faUser, faBell, faEye, faLock } from '@fortawesome/free-solid-svg-icons';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { dark, gray, lgray, light, modalBackground } from "../colorModes";
+import { dark, gray, lgray, light, mediumgray, error } from "../colorModes";
 
 export type Ref = BottomSheetModal;
 
@@ -78,39 +78,39 @@ const SettingsBottomSheet = forwardRef<Ref>((props, ref) => {
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
-      backgroundStyle={{ backgroundColor: modalBackground }}
-
+      backgroundStyle={{ backgroundColor: mediumgray }}
+      handleIndicatorStyle={{ backgroundColor: light }}
     >
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.containerHeadline}>Settings</Text>
 
         <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('GeneralSettings')}>
-          <FontAwesomeIcon icon={faGear as IconProp} size={24} color={dark}/>
+          <FontAwesomeIcon icon={faGear as IconProp} size={24} color={light}/>
           <Text style={styles.optionText}>General</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('AccountSettings')}>
-          <FontAwesomeIcon icon={faUser as IconProp} size={24} color={dark}/>
+          <FontAwesomeIcon icon={faUser as IconProp} size={24} color={light}/>
           <Text style={styles.optionText}>Account</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('NotificationsSettings')}>
-          <FontAwesomeIcon icon={faBell as IconProp} size={24} color={dark}/>
+          <FontAwesomeIcon icon={faBell as IconProp} size={24} color={light}/>
           <Text style={styles.optionText}>Notifications</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('SpotifyAccountSettings')}>
-          <FontAwesomeIcon icon={faSpotify as IconProp} size={24} color={dark}/>
+          <FontAwesomeIcon icon={faSpotify as IconProp} size={24} color={light}/>
           <Text style={styles.optionText}>Spotify Account</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('AccessibilitySettings')}>
-          <FontAwesomeIcon icon={faEye as IconProp} size={24}color={dark}/>
+          <FontAwesomeIcon icon={faEye as IconProp} size={24}color={light}/>
           <Text style={styles.optionText}>Accessibility</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.optionContainer} onPress={() => handleNavigate('PrivacySettings')}>
-          <FontAwesomeIcon icon={faLock as IconProp} size={24} color={dark}/>
+          <FontAwesomeIcon icon={faLock as IconProp} size={24} color={light}/>
           <Text style={styles.optionText}>Privacy</Text>
         </TouchableOpacity>
 
@@ -133,17 +133,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: light,
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
-    borderBottomColor: lgray,
+    borderBottomColor: gray,
     borderBottomWidth: 1,
   },
   optionText: {
     fontSize: 18,
     marginLeft: 15,
+    color: light,
   },
   logoutOptionContainer: {
     alignItems: 'center',
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
     paddingTop: 15,
   },
   logoutText: {
-    color: 'red',
+    color: error,
     textAlign: 'center',
     fontSize: 18,
   },

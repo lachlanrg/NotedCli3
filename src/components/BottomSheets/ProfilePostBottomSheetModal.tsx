@@ -3,7 +3,7 @@ import React, { useMemo, forwardRef, useCallback, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal, useBottomSheetModal } from "@gorhom/bottom-sheet";
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { dark, light, error, modalBackground } from "../colorModes";
+import { dark, light, error, modalBackground, mediumgray, lgray } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMusic, faPenToSquare, faRetweet } from '@fortawesome/free-solid-svg-icons';
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
@@ -203,7 +203,8 @@ const ProfilePostBottomSheetModal = forwardRef<BottomSheetModal, ProfilePostBott
       snapPoints={snapPoints}
       enablePanDownToClose={true}
       backdropComponent={renderBackDrop}
-      backgroundStyle={{ backgroundColor: modalBackground }}
+      backgroundStyle={{ backgroundColor: mediumgray }}
+      handleIndicatorStyle={{ backgroundColor: light }}
     >
       <View style={styles.contentContainer}>
         {item ? (
@@ -251,23 +252,23 @@ const styles = StyleSheet.create({
   },
   itemType: {
     fontSize: 14,
-    color: '#888',
+    color: lgray,
     marginBottom: 4,
   },
   itemTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: dark,
+    color: light,
   },
   repostText: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#888',
+    color: lgray,
     marginTop: 5,
   },
   boldUsername: {
     fontWeight: 'bold',
-    color: '#888',
+    color: light,
   },
   actionContainer: {
     flexDirection: 'row',
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   actionText: {
     marginTop: 8,
     fontSize: 12,
-    color: dark,
+    color: light,
     textAlign: 'center',
   },
   noItemText: {
