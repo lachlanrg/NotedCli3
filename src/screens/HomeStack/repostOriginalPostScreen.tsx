@@ -131,10 +131,14 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
         variables: {
           filter: {
             postId: { eq: post.id },
+            _deleted: { ne: true }, // Add this line to exclude deleted comments
           },
         },
       });
-      setCommentCounts({ [post.id]: response.data.listComments.items.length });
+      const nonDeletedComments = response.data.listComments.items.filter(
+        (comment: any) => !comment._deleted
+      );
+      setCommentCounts({ [post.id]: nonDeletedComments.length });
     } catch (error) {
       console.error('Error fetching comment counts:', error);
     }

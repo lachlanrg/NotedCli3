@@ -1,15 +1,18 @@
 import React, { useMemo, forwardRef, useCallback, useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList, KeyboardAvoidingView, TextInput } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard, Platform, FlatList, KeyboardAvoidingView, TextInput, Modal, findNodeHandle, UIManager, Dimensions } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
-import { dark, gray, lgray, light, mediumgray, placeholder } from "../colorModes";
+import { dark, gray, lgray, light, mediumgray, placeholder, error } from "../colorModes";
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import * as queries from '../../graphql/queries';
 import * as mutations from '../../graphql/mutations';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
-import { faHeart as faHeartSolid, faReply, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons"
+import { faHeart as faHeartSolid, faReply, faChevronDown, faChevronUp, faFlag, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
+import { mediumImpact } from "../../utils/hapticFeedback";
+import { deleteComment } from '../../graphql/mutations';
 
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -49,6 +52,7 @@ type Comment = {
     username: string;
   } | null;
   repostCommentsId?: string | null;
+  _deleted?: boolean | null; // Update this line
 };
 
 type Post = {
@@ -72,6 +76,8 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
+  const [longPressedComment, setLongPressedComment] = useState<Comment | null>(null);
+  const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     currentAuthenticatedUser();
@@ -185,6 +191,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       const filter = { 
         postId: 'originalPost' in selectedPost ? undefined : { eq: selectedPost.id },
         repostId: 'originalPost' in selectedPost ? { eq: selectedPost.id } : undefined,
+        _deleted: { ne: true }, // Add this line to filter out deleted comments
       };
 
       const response = await client.graphql({
@@ -201,11 +208,13 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         // Create a map of comments by their IDs
         const commentMap = new Map<string, Comment>();
         allComments.forEach(comment => {
-          commentMap.set(comment.id, {
-            ...comment,
-            likedBy: comment.likedBy || null,
-            replies: [],
-          });
+          if (comment._deleted !== true) { // Change this line
+            commentMap.set(comment.id, {
+              ...comment,
+              likedBy: comment.likedBy || null,
+              replies: [],
+            });
+          }
         });
 
         // Organize comments into a tree structure
@@ -329,66 +338,203 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
     });
   };
 
+  const handleLongPress = (comment: Comment, event: any) => {
+    mediumImpact();
+    const nodeHandle = findNodeHandle(event.target);
+    if (nodeHandle) {
+      UIManager.measure(nodeHandle, (x, y, width, height, pageX, pageY) => {
+        setModalPosition({ top: pageY + height, left: pageX });
+        setLongPressedComment(comment);
+      });
+    }
+  };
+
+  const closeOptionsModal = () => {
+    setLongPressedComment(null);
+  };
+
+  const handleDeleteComment = async (comment: Comment) => {
+    try {
+      const client = generateClient();
+
+      // Function to recursively delete a comment and its replies
+      const deleteCommentAndReplies = async (commentToDelete: Comment) => {
+        // Delete all replies first
+        if (commentToDelete.replies && commentToDelete.replies.length > 0) {
+          for (const reply of commentToDelete.replies) {
+            await deleteCommentAndReplies(reply);
+          }
+        }
+
+        // Delete the comment itself
+        await client.graphql({
+          query: deleteComment,
+          variables: { input: { id: commentToDelete.id, _version: commentToDelete._version } },
+        });
+      };
+
+      // Start the deletion process
+      await deleteCommentAndReplies(comment);
+
+      console.log('Comment and all its replies deleted successfully');
+
+      // Remove the comment and its replies from the local state
+      setComments(prevComments => {
+        const removeCommentAndReplies = (comments: Comment[]): Comment[] => {
+          return comments.filter(c => {
+            if (c.id === comment.id) {
+              return false; // Remove this comment
+            }
+            if (c.replies) {
+              c.replies = removeCommentAndReplies(c.replies);
+            }
+            return true;
+          });
+        };
+        return removeCommentAndReplies(prevComments);
+      });
+
+      closeOptionsModal();
+    } catch (error) {
+      console.error('Error deleting comment and its replies:', error);
+      // You might want to show an error message to the user here
+    }
+  };
+
+  const CommentOptionsModal = ({ comment }: { comment: Comment }) => {
+    const isCommentOwner = comment.userPostsId === userInfo?.userId;
+
+    return (
+      <Modal
+        transparent={true}
+        visible={!!longPressedComment}
+        onRequestClose={closeOptionsModal}
+        animationType="fade"
+      >
+        <TouchableOpacity style={styles.modalOverlay} onPress={closeOptionsModal}>
+          <View style={[styles.optionsModalWrapper, { top: modalPosition.top, left: modalPosition.left }]}>
+            <View style={styles.optionsModal}>
+              <TouchableOpacity style={styles.optionItem} onPress={() => {
+                setReplyingTo(comment);
+                closeOptionsModal();
+              }}>
+                <FontAwesomeIcon icon={faReply} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Reply</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.optionItem} onPress={() => {
+                // Handle report option
+                closeOptionsModal();
+              }}>
+                <FontAwesomeIcon icon={faFlag} style={styles.optionIcon} />
+                <Text style={styles.optionText}>Report</Text>
+              </TouchableOpacity>
+              {isCommentOwner && (
+                <TouchableOpacity 
+                  style={[styles.optionItem, styles.lastOptionItem, styles.deleteOption]} 
+                  onPress={() => handleDeleteComment(comment)}
+                >
+                  <FontAwesomeIcon icon={faTrash} style={styles.optionIcon} color={error}/>
+                  <Text style={[styles.optionText, { color: error }]}>Delete</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
+
+  const renderReply = (reply: Comment, parentComment: Comment) => {
+    if (reply._deleted) return null; // Add this line to skip rendering deleted replies
+
+    return (
+      <LongPressGestureHandler
+        key={reply.id}
+        onHandlerStateChange={({ nativeEvent }) => {
+          if (nativeEvent.state === State.ACTIVE) {
+            handleLongPress(reply, nativeEvent);
+          }
+        }}
+        minDurationMs={800}
+      >
+        <View style={styles.replyItem}>
+          <View style={styles.commentContent}>
+            <Text style={styles.commentUser}>{reply.username}</Text>
+            <Text style={styles.commentText}>{reply.content}</Text>
+          </View>
+          <View style={styles.likeContainer}>
+            <TouchableOpacity onPress={() => toggleLike(reply.id)}>
+              <FontAwesomeIcon
+                icon={reply.likedBy?.includes(userInfo?.userId) ? likedIcon : unLikedIcon}
+                style={styles.heartIcon}
+                color={reply.likedBy?.includes(userInfo?.userId) ? 'red' : light}
+              />
+            </TouchableOpacity>
+            <Text style={styles.likesCount}>{reply.likesCount > 0 ? reply.likesCount : '\u00A0'}</Text>
+          </View>
+        </View>
+      </LongPressGestureHandler>
+    );
+  };
+
   const renderComment = ({ item }: { item: Comment }) => {
+    if (item._deleted) return null; // Add this line to skip rendering deleted comments
+
     const isLiked = item.likedBy ? item.likedBy.includes(userInfo?.userId) : false;
     const hasReplies = item.replies && item.replies.length > 0;
     const isExpanded = expandedComments.has(item.id);
 
-    // Sort replies by creation date, most recent first
-    const sortedReplies = item.replies?.sort((a, b) => 
-      new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
-    ) || [];
+    // Sort replies by creation date, most recent first, and filter out deleted replies
+    const sortedReplies = item.replies
+      ?.filter(reply => !reply._deleted)
+      .sort((a, b) => 
+        new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime()
+      ) || [];
 
     return (
       <View style={styles.commentContainer}>
-        <View style={styles.commentItem}>
-          <View style={styles.commentContent}>
-            <Text style={styles.commentUser}>{item.username}</Text>
-            <Text style={styles.commentText}>{item.content}</Text>
+        <LongPressGestureHandler
+          onHandlerStateChange={({ nativeEvent }) => {
+            if (nativeEvent.state === State.ACTIVE) {
+              handleLongPress(item, nativeEvent);
+            }
+          }}
+          minDurationMs={800}
+        >
+          <View>
+            <View style={styles.commentItem}>
+              <View style={styles.commentContent}>
+                <Text style={styles.commentUser}>{item.username}</Text>
+                <Text style={styles.commentText}>{item.content}</Text>
+              </View>
+              <View style={styles.likeContainer}>
+                <TouchableOpacity onPress={() => toggleLike(item.id)}>
+                  <FontAwesomeIcon
+                    icon={isLiked ? likedIcon : unLikedIcon}
+                    style={styles.heartIcon}
+                    color={isLiked ? 'red' : light}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.likesCount}>{item.likesCount > 0 ? item.likesCount : '\u00A0'}</Text>
+              </View>
+            </View>
+            <View style={styles.commentActions}>
+              <TouchableOpacity onPress={() => setReplyingTo(item)}>
+                <Text style={styles.actionText}>Reply</Text>
+              </TouchableOpacity>
+              {hasReplies && (
+                <TouchableOpacity onPress={() => toggleCommentExpansion(item.id)} style={styles.viewRepliesButton}>
+                  <Text style={styles.actionText}>
+                    {isExpanded ? 'Hide replies' : `View ${sortedReplies.length} ${sortedReplies.length === 1 ? 'reply' : 'replies'}`}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-          <View style={styles.likeContainer}>
-            <TouchableOpacity onPress={() => toggleLike(item.id)}>
-              <FontAwesomeIcon
-                icon={isLiked ? likedIcon : unLikedIcon}
-                style={styles.heartIcon}
-                color={isLiked ? 'red' : light}
-              />
-            </TouchableOpacity>
-            <Text style={styles.likesCount}>{item.likesCount > 0 ? item.likesCount : '\u00A0'}</Text>
-          </View>
-        </View>
-        <View style={styles.commentActions}>
-          <TouchableOpacity onPress={() => setReplyingTo(item)}>
-            <Text style={styles.actionText}>Reply</Text>
-          </TouchableOpacity>
-          {hasReplies && (
-            <TouchableOpacity onPress={() => toggleCommentExpansion(item.id)} style={styles.viewRepliesButton}>
-              <Text style={styles.actionText}>
-                {isExpanded ? 'Hide replies' : `View ${sortedReplies.length} ${sortedReplies.length === 1 ? 'reply' : 'replies'}`}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        </LongPressGestureHandler>
         {isExpanded && hasReplies && (
           <View style={styles.repliesContainer}>
-            {sortedReplies.map((reply) => (
-              <View key={reply.id} style={styles.replyItem}>
-                <View style={styles.commentContent}>
-                  <Text style={styles.commentUser}>{reply.username}</Text>
-                  <Text style={styles.commentText}>{reply.content}</Text>
-                </View>
-                <View style={styles.likeContainer}>
-                  <TouchableOpacity onPress={() => toggleLike(reply.id)}>
-                    <FontAwesomeIcon
-                      icon={reply.likedBy?.includes(userInfo?.userId) ? likedIcon : unLikedIcon}
-                      style={styles.heartIcon}
-                      color={reply.likedBy?.includes(userInfo?.userId) ? 'red' : light}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.likesCount}>{reply.likesCount > 0 ? reply.likesCount : '\u00A0'}</Text>
-                </View>
-              </View>
-            ))}
+            {sortedReplies.map((reply) => renderReply(reply, item))}
           </View>
         )}
       </View>
@@ -455,6 +601,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             </View>
           </View>
         </KeyboardAvoidingView>
+        {longPressedComment && <CommentOptionsModal comment={longPressedComment} />}
       </View>
     </BottomSheetModal>
   );
@@ -597,6 +744,57 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     padding: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  optionsModalWrapper: {
+    position: 'absolute',
+    backgroundColor: 'rgba(40, 40, 40, 0.95)',
+    borderRadius: 12,
+    width: Dimensions.get('window').width * 0.6,
+    maxWidth: 250,
+    marginTop: 5,
+    marginLeft: 10,
+  },
+  optionsModal: {
+    backgroundColor: 'rgb(40, 40, 40)',
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+    overflow: 'hidden',
+  },
+  optionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  lastOptionItem: {
+    borderBottomWidth: 0,
+  },
+  optionIcon: {
+    marginRight: 16,
+    color: light,
+    fontSize: 20,
+  },
+  optionText: {
+    color: light,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  deleteOption: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
 });
 

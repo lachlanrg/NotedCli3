@@ -388,10 +388,14 @@ const HomeScreen: React.FC = () => {
               filter: {
                 postId: 'originalPost' in post ? undefined : { eq: post.id },
                 repostId: 'originalPost' in post ? { eq: post.id } : undefined,
+                _deleted: { ne: true }, // Add this line to exclude deleted comments
               },
             },
           });
-          return [post.id, response.data.listComments.items.length];
+          const nonDeletedComments = response.data.listComments.items.filter(
+            (comment: any) => !comment._deleted
+          );
+          return [post.id, nonDeletedComments.length];
         })
       );
       setCommentCounts(Object.fromEntries(counts));
