@@ -23,6 +23,7 @@ type EagerUser = {
   readonly reposts?: (Repost | null)[] | null;
   readonly spotifyRecentlyPlayedTrack?: (SpotifyRecentlyPlayedTrack | null)[] | null;
   readonly recentlyPlayedDisabled?: boolean | null;
+  readonly spotifyTokens?: (SpotifyTokens | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -44,6 +45,7 @@ type LazyUser = {
   readonly reposts: AsyncCollection<Repost>;
   readonly spotifyRecentlyPlayedTrack: AsyncCollection<SpotifyRecentlyPlayedTrack>;
   readonly recentlyPlayedDisabled?: boolean | null;
+  readonly spotifyTokens: AsyncCollection<SpotifyTokens>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -372,4 +374,44 @@ export declare type SpotifyRecentlyPlayedTrack = LazyLoading extends LazyLoading
 
 export declare const SpotifyRecentlyPlayedTrack: (new (init: ModelInit<SpotifyRecentlyPlayedTrack>) => SpotifyRecentlyPlayedTrack) & {
   copyOf(source: SpotifyRecentlyPlayedTrack, mutator: (draft: MutableModel<SpotifyRecentlyPlayedTrack>) => MutableModel<SpotifyRecentlyPlayedTrack> | void): SpotifyRecentlyPlayedTrack;
+}
+
+type EagerSpotifyTokens = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SpotifyTokens, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user?: User | null;
+  readonly userId: string;
+  readonly spotifyUserId: string;
+  readonly spotifyAccessToken: string;
+  readonly spotifyRefreshToken: string;
+  readonly tokenExpiration: number;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly userSpotifyTokensId?: string | null;
+}
+
+type LazySpotifyTokens = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SpotifyTokens, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user: AsyncItem<User | undefined>;
+  readonly userId: string;
+  readonly spotifyUserId: string;
+  readonly spotifyAccessToken: string;
+  readonly spotifyRefreshToken: string;
+  readonly tokenExpiration: number;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly userSpotifyTokensId?: string | null;
+}
+
+export declare type SpotifyTokens = LazyLoading extends LazyLoadingDisabled ? EagerSpotifyTokens : LazySpotifyTokens
+
+export declare const SpotifyTokens: (new (init: ModelInit<SpotifyTokens>) => SpotifyTokens) & {
+  copyOf(source: SpotifyTokens, mutator: (draft: MutableModel<SpotifyTokens>) => MutableModel<SpotifyTokens> | void): SpotifyTokens;
 }

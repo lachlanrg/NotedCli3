@@ -11,6 +11,7 @@ type User @model @auth(rules: [{allow: public}]) {
   reposts: [Repost] @hasMany 
   spotifyRecentlyPlayedTrack: [SpotifyRecentlyPlayedTrack] @hasMany
   recentlyPlayedDisabled: Boolean
+  spotifyTokens: [SpotifyTokens] @hasMany
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {
@@ -114,4 +115,14 @@ type SpotifyRecentlyPlayedTrack @model @auth(rules: [{allow: public}]) {
   albumImageUrl: String
   playedAt: AWSDateTime!
   spotifyUri: String
+}
+
+type SpotifyTokens @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  user: User @belongsTo
+  userId: ID!
+  spotifyUserId: ID!
+  spotifyAccessToken: String!
+  spotifyRefreshToken: String!
+  tokenExpiration: Float!
 }

@@ -50,6 +50,11 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -104,6 +109,11 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -158,6 +168,11 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -1396,4 +1411,112 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
 ` as GeneratedSubscription<
   APITypes.OnDeleteSpotifyRecentlyPlayedTrackSubscriptionVariables,
   APITypes.OnDeleteSpotifyRecentlyPlayedTrackSubscription
+>;
+export const onCreateSpotifyTokens = /* GraphQL */ `subscription OnCreateSpotifyTokens(
+  $filter: ModelSubscriptionSpotifyTokensFilterInput
+) {
+  onCreateSpotifyTokens(filter: $filter) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateSpotifyTokensSubscriptionVariables,
+  APITypes.OnCreateSpotifyTokensSubscription
+>;
+export const onUpdateSpotifyTokens = /* GraphQL */ `subscription OnUpdateSpotifyTokens(
+  $filter: ModelSubscriptionSpotifyTokensFilterInput
+) {
+  onUpdateSpotifyTokens(filter: $filter) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateSpotifyTokensSubscriptionVariables,
+  APITypes.OnUpdateSpotifyTokensSubscription
+>;
+export const onDeleteSpotifyTokens = /* GraphQL */ `subscription OnDeleteSpotifyTokens(
+  $filter: ModelSubscriptionSpotifyTokensFilterInput
+) {
+  onDeleteSpotifyTokens(filter: $filter) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteSpotifyTokensSubscriptionVariables,
+  APITypes.OnDeleteSpotifyTokensSubscription
 >;
