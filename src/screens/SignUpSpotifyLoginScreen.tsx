@@ -7,6 +7,9 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSpotify } from '../context/SpotifyContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { generateClient } from 'aws-amplify/api';
+import { getCurrentUser } from '@aws-amplify/auth';
+import { createSpotifyTokens } from '../graphql/mutations';
 
 const SCOPES = [
   'user-read-private',
@@ -26,7 +29,16 @@ type SignUpSpotifyLoginScreenProps = {
 };
 
 const SignUpSpotifyLoginScreen: React.FC<SignUpSpotifyLoginScreenProps> = ({ navigation }) => {
-  const { setSpotifyUser, setSpotifyToken } = useSpotify();
+  // const { setSpotifyUser, setSpotifyToken } = useSpotify();
+  const spotifyContext = useSpotify();
+
+  if (!spotifyContext) {
+    // Handle the case where context is undefined
+    return null; // or some loading/error component
+  }
+
+  const { setSpotifyUser, setSpotifyToken } = spotifyContext;
+
 
 
   useEffect(() => {
@@ -134,6 +146,9 @@ const SignUpSpotifyLoginScreen: React.FC<SignUpSpotifyLoginScreenProps> = ({ nav
       await AsyncStorage.setItem('spotifyTokenExpiration', (Date.now() + expiresIn * 1000).toString());
       await AsyncStorage.setItem('spotifyUser', JSON.stringify(userInfo));
 
+      const { userId } = await getCurrentUser();
+      await saveSpotifyTokensToDynamoDB(userId, accessToken, refreshToken, expiresIn, userInfo.id);
+      
       console.log('Spotify User Info:', userInfo);
       navigation.navigate('Main');
     } catch (error) {
@@ -185,6 +200,26 @@ const SignUpSpotifyLoginScreen: React.FC<SignUpSpotifyLoginScreenProps> = ({ nav
       }
     } catch (error) {
       console.error('Error checking existing token:', error);
+    }
+  };
+
+  const saveSpotifyTokensToDynamoDB = async (userId: string, accessToken: string, refreshToken: string, expiresIn: number, spotifyUserId: string) => {
+    const tokenExpiration = Date.now() + expiresIn * 1000;
+      
+    try {
+      const client = generateClient();
+      const input = {
+        userId,
+        spotifyUserId,
+        spotifyAccessToken: accessToken,
+        spotifyRefreshToken: refreshToken,
+        tokenExpiration
+      };
+  
+      await client.graphql({ query: createSpotifyTokens, variables: { input } });
+      console.log('Spotify tokens saved successfully to DynamoDB with data:', input);
+    } catch (error) {
+      console.error('Error saving Spotify tokens to DynamoDB:', error);
     }
   };
 

@@ -53,6 +53,11 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -110,6 +115,11 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -167,6 +177,11 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -1441,4 +1456,115 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
 ` as GeneratedMutation<
   APITypes.DeleteSpotifyRecentlyPlayedTrackMutationVariables,
   APITypes.DeleteSpotifyRecentlyPlayedTrackMutation
+>;
+export const createSpotifyTokens = /* GraphQL */ `mutation CreateSpotifyTokens(
+  $input: CreateSpotifyTokensInput!
+  $condition: ModelSpotifyTokensConditionInput
+) {
+  createSpotifyTokens(input: $input, condition: $condition) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateSpotifyTokensMutationVariables,
+  APITypes.CreateSpotifyTokensMutation
+>;
+export const updateSpotifyTokens = /* GraphQL */ `mutation UpdateSpotifyTokens(
+  $input: UpdateSpotifyTokensInput!
+  $condition: ModelSpotifyTokensConditionInput
+) {
+  updateSpotifyTokens(input: $input, condition: $condition) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateSpotifyTokensMutationVariables,
+  APITypes.UpdateSpotifyTokensMutation
+>;
+export const deleteSpotifyTokens = /* GraphQL */ `mutation DeleteSpotifyTokens(
+  $input: DeleteSpotifyTokensInput!
+  $condition: ModelSpotifyTokensConditionInput
+) {
+  deleteSpotifyTokens(input: $input, condition: $condition) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteSpotifyTokensMutationVariables,
+  APITypes.DeleteSpotifyTokensMutation
 >;

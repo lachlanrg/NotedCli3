@@ -38,6 +38,12 @@
       },
       "api": {
         "notedaws": {}
+      },
+      "function": {
+        "SpotifyRecentlyPlayedLambda": {
+          "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
+          "s3Key": "amplify-builds/SpotifyRecentlyPlayedLambda-644b364e4d525a797855-build.zip"
+        }
       }
     }
   }

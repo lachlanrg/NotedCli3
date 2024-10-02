@@ -50,6 +50,11 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       __typename
     }
     recentlyPlayedDisabled
+    spotifyTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -1008,4 +1013,104 @@ export const spotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPla
 ` as GeneratedQuery<
   APITypes.SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAtQueryVariables,
   APITypes.SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlayedAtQuery
+>;
+export const getSpotifyTokens = /* GraphQL */ `query GetSpotifyTokens($id: ID!) {
+  getSpotifyTokens(id: $id) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    spotifyUserId
+    spotifyAccessToken
+    spotifyRefreshToken
+    tokenExpiration
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userSpotifyTokensId
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetSpotifyTokensQueryVariables,
+  APITypes.GetSpotifyTokensQuery
+>;
+export const listSpotifyTokens = /* GraphQL */ `query ListSpotifyTokens(
+  $filter: ModelSpotifyTokensFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listSpotifyTokens(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      userId
+      spotifyUserId
+      spotifyAccessToken
+      spotifyRefreshToken
+      tokenExpiration
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userSpotifyTokensId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListSpotifyTokensQueryVariables,
+  APITypes.ListSpotifyTokensQuery
+>;
+export const syncSpotifyTokens = /* GraphQL */ `query SyncSpotifyTokens(
+  $filter: ModelSpotifyTokensFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncSpotifyTokens(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      userId
+      spotifyUserId
+      spotifyAccessToken
+      spotifyRefreshToken
+      tokenExpiration
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userSpotifyTokensId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncSpotifyTokensQueryVariables,
+  APITypes.SyncSpotifyTokensQuery
 >;

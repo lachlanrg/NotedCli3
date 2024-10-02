@@ -85,6 +85,7 @@ export type User = {
   reposts?: ModelRepostConnection | null,
   spotifyRecentlyPlayedTrack?: ModelSpotifyRecentlyPlayedTrackConnection | null,
   recentlyPlayedDisabled?: boolean | null,
+  spotifyTokens?: ModelSpotifyTokensConnection | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
@@ -274,6 +275,30 @@ export type SpotifyRecentlyPlayedTrack = {
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
+};
+
+export type ModelSpotifyTokensConnection = {
+  __typename: "ModelSpotifyTokensConnection",
+  items:  Array<SpotifyTokens | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
+};
+
+export type SpotifyTokens = {
+  __typename: "SpotifyTokens",
+  id: string,
+  user?: User | null,
+  userId: string,
+  spotifyUserId: string,
+  spotifyAccessToken: string,
+  spotifyRefreshToken: string,
+  tokenExpiration: number,
+  createdAt: string,
+  updatedAt: string,
+  _version: number,
+  _deleted?: boolean | null,
+  _lastChangedAt: number,
+  userSpotifyTokensId?: string | null,
 };
 
 export type UpdateUserInput = {
@@ -660,6 +685,60 @@ export type DeleteSpotifyRecentlyPlayedTrackInput = {
   _version?: number | null,
 };
 
+export type CreateSpotifyTokensInput = {
+  id?: string | null,
+  userId: string,
+  spotifyUserId: string,
+  spotifyAccessToken: string,
+  spotifyRefreshToken: string,
+  tokenExpiration: number,
+  _version?: number | null,
+  userSpotifyTokensId?: string | null,
+};
+
+export type ModelSpotifyTokensConditionInput = {
+  userId?: ModelIDInput | null,
+  spotifyUserId?: ModelIDInput | null,
+  spotifyAccessToken?: ModelStringInput | null,
+  spotifyRefreshToken?: ModelStringInput | null,
+  tokenExpiration?: ModelFloatInput | null,
+  and?: Array< ModelSpotifyTokensConditionInput | null > | null,
+  or?: Array< ModelSpotifyTokensConditionInput | null > | null,
+  not?: ModelSpotifyTokensConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  userSpotifyTokensId?: ModelIDInput | null,
+};
+
+export type ModelFloatInput = {
+  ne?: number | null,
+  eq?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  between?: Array< number | null > | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+};
+
+export type UpdateSpotifyTokensInput = {
+  id: string,
+  userId?: string | null,
+  spotifyUserId?: string | null,
+  spotifyAccessToken?: string | null,
+  spotifyRefreshToken?: string | null,
+  tokenExpiration?: number | null,
+  _version?: number | null,
+  userSpotifyTokensId?: string | null,
+};
+
+export type DeleteSpotifyTokensInput = {
+  id: string,
+  _version?: number | null,
+};
+
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -823,6 +902,22 @@ export enum ModelSortDirection {
 }
 
 
+export type ModelSpotifyTokensFilterInput = {
+  id?: ModelIDInput | null,
+  userId?: ModelIDInput | null,
+  spotifyUserId?: ModelIDInput | null,
+  spotifyAccessToken?: ModelStringInput | null,
+  spotifyRefreshToken?: ModelStringInput | null,
+  tokenExpiration?: ModelFloatInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  and?: Array< ModelSpotifyTokensFilterInput | null > | null,
+  or?: Array< ModelSpotifyTokensFilterInput | null > | null,
+  not?: ModelSpotifyTokensFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
+  userSpotifyTokensId?: ModelIDInput | null,
+};
+
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
@@ -841,6 +936,7 @@ export type ModelSubscriptionUserFilterInput = {
   userCommentsId?: ModelSubscriptionIDInput | null,
   userRepostsId?: ModelSubscriptionIDInput | null,
   userSpotifyRecentlyPlayedTrackId?: ModelSubscriptionIDInput | null,
+  userSpotifyTokensId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionIDInput = {
@@ -1006,6 +1102,32 @@ export type ModelSubscriptionSpotifyRecentlyPlayedTrackFilterInput = {
   _deleted?: ModelBooleanInput | null,
 };
 
+export type ModelSubscriptionSpotifyTokensFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  userId?: ModelSubscriptionIDInput | null,
+  spotifyUserId?: ModelSubscriptionIDInput | null,
+  spotifyAccessToken?: ModelSubscriptionStringInput | null,
+  spotifyRefreshToken?: ModelSubscriptionStringInput | null,
+  tokenExpiration?: ModelSubscriptionFloatInput | null,
+  createdAt?: ModelSubscriptionStringInput | null,
+  updatedAt?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionSpotifyTokensFilterInput | null > | null,
+  or?: Array< ModelSubscriptionSpotifyTokensFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
+export type ModelSubscriptionFloatInput = {
+  ne?: number | null,
+  eq?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  between?: Array< number | null > | null,
+  in?: Array< number | null > | null,
+  notIn?: Array< number | null > | null,
+};
+
 export type CreateUserMutationVariables = {
   input: CreateUserInput,
   condition?: ModelUserConditionInput | null,
@@ -1054,6 +1176,11 @@ export type CreateUserMutation = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -1110,6 +1237,11 @@ export type UpdateUserMutation = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -1166,6 +1298,11 @@ export type DeleteUserMutation = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -2419,6 +2556,114 @@ export type DeleteSpotifyRecentlyPlayedTrackMutation = {
   } | null,
 };
 
+export type CreateSpotifyTokensMutationVariables = {
+  input: CreateSpotifyTokensInput,
+  condition?: ModelSpotifyTokensConditionInput | null,
+};
+
+export type CreateSpotifyTokensMutation = {
+  createSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
+  } | null,
+};
+
+export type UpdateSpotifyTokensMutationVariables = {
+  input: UpdateSpotifyTokensInput,
+  condition?: ModelSpotifyTokensConditionInput | null,
+};
+
+export type UpdateSpotifyTokensMutation = {
+  updateSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
+  } | null,
+};
+
+export type DeleteSpotifyTokensMutationVariables = {
+  input: DeleteSpotifyTokensInput,
+  condition?: ModelSpotifyTokensConditionInput | null,
+};
+
+export type DeleteSpotifyTokensMutation = {
+  deleteSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
+  } | null,
+};
+
 export type GetUserQueryVariables = {
   id: string,
 };
@@ -2466,6 +2711,11 @@ export type GetUserQuery = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3387,6 +3637,100 @@ export type SpotifyRecentlyPlayedTracksByUserSpotifyRecentlyPlayedTrackIdAndPlay
   } | null,
 };
 
+export type GetSpotifyTokensQueryVariables = {
+  id: string,
+};
+
+export type GetSpotifyTokensQuery = {
+  getSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
+  } | null,
+};
+
+export type ListSpotifyTokensQueryVariables = {
+  filter?: ModelSpotifyTokensFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListSpotifyTokensQuery = {
+  listSpotifyTokens?:  {
+    __typename: "ModelSpotifyTokensConnection",
+    items:  Array< {
+      __typename: "SpotifyTokens",
+      id: string,
+      userId: string,
+      spotifyUserId: string,
+      spotifyAccessToken: string,
+      spotifyRefreshToken: string,
+      tokenExpiration: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SyncSpotifyTokensQueryVariables = {
+  filter?: ModelSpotifyTokensFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+  lastSync?: number | null,
+};
+
+export type SyncSpotifyTokensQuery = {
+  syncSpotifyTokens?:  {
+    __typename: "ModelSpotifyTokensConnection",
+    items:  Array< {
+      __typename: "SpotifyTokens",
+      id: string,
+      userId: string,
+      spotifyUserId: string,
+      spotifyAccessToken: string,
+      spotifyRefreshToken: string,
+      tokenExpiration: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscriptionVariables = {
   filter?: ModelSubscriptionUserFilterInput | null,
 };
@@ -3434,6 +3778,11 @@ export type OnCreateUserSubscription = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3489,6 +3838,11 @@ export type OnUpdateUserSubscription = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3544,6 +3898,11 @@ export type OnDeleteUserSubscription = {
       startedAt?: number | null,
     } | null,
     recentlyPlayedDisabled?: boolean | null,
+    spotifyTokens?:  {
+      __typename: "ModelSpotifyTokensConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -4776,5 +5135,110 @@ export type OnDeleteSpotifyRecentlyPlayedTrackSubscription = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+  } | null,
+};
+
+export type OnCreateSpotifyTokensSubscriptionVariables = {
+  filter?: ModelSubscriptionSpotifyTokensFilterInput | null,
+};
+
+export type OnCreateSpotifyTokensSubscription = {
+  onCreateSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
+  } | null,
+};
+
+export type OnUpdateSpotifyTokensSubscriptionVariables = {
+  filter?: ModelSubscriptionSpotifyTokensFilterInput | null,
+};
+
+export type OnUpdateSpotifyTokensSubscription = {
+  onUpdateSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
+  } | null,
+};
+
+export type OnDeleteSpotifyTokensSubscriptionVariables = {
+  filter?: ModelSubscriptionSpotifyTokensFilterInput | null,
+};
+
+export type OnDeleteSpotifyTokensSubscription = {
+  onDeleteSpotifyTokens?:  {
+    __typename: "SpotifyTokens",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    spotifyUserId: string,
+    spotifyAccessToken: string,
+    spotifyRefreshToken: string,
+    tokenExpiration: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userSpotifyTokensId?: string | null,
   } | null,
 };
