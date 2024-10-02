@@ -167,7 +167,8 @@ async function updateTokensInDynamoDB(userId, tokens) {
                 ':accessToken': tokens.access_token,
                 ':refreshToken': tokens.refresh_token || tokens.spotifyRefreshToken,
                 ':expiration': Date.now() + tokens.expires_in * 1000,
-                ':newVersion': currentVersion + 1
+                ':newVersion': currentVersion + 1,
+                ':currentVersion': currentVersion  // Add this line
             },
             ExpressionAttributeNames: {
                 '#version': '_version'

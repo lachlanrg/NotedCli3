@@ -50,7 +50,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const [recentlyPlayedDisabled, setRecentlyPlayedDisabled] = useState(false);
   const [recentlyPlayedTrack, setRecentlyPlayedTrack] = useState<SpotifyRecentlyPlayedTrack | null>(null);
   const spotifyContext = useSpotify();
-  const recentlyPlayed = spotifyContext?.recentlyPlayed || [];
 
   const flatListRef = useRef<FlatList>(null);
 
@@ -274,7 +273,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              {recentlyPlayed.length > 0 && !recentlyPlayedDisabled && recentlyPlayedTrack && ( 
+              {recentlyPlayedTrack && !recentlyPlayedDisabled && recentlyPlayedTrack && ( 
                 <GestureHandlerRootView>
                   <LongPressGestureHandler
                     onHandlerStateChange={({ nativeEvent }) => {
@@ -304,7 +303,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                         >
                           <View>
                             <Text style={styles.recentlyPlayedText}>
-                              {recentlyPlayed[0].track.name} - {recentlyPlayed[0].track.artists[0].name}
+                              {recentlyPlayedTrack.trackName} - {recentlyPlayedTrack.artistName} 
                             </Text>
                           </View>
                         </ScrollView>
