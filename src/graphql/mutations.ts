@@ -58,6 +58,9 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -120,6 +123,9 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -182,6 +188,9 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -206,6 +215,9 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -219,6 +231,9 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -251,6 +266,9 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -264,6 +282,9 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -296,6 +317,9 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -309,6 +333,9 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -341,6 +368,9 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -354,6 +384,9 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -388,6 +421,9 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -401,6 +437,9 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -435,6 +474,9 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -448,6 +490,9 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -488,6 +533,9 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -563,6 +611,9 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -638,6 +689,9 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -771,6 +825,9 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -899,6 +956,9 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1027,6 +1087,9 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1135,6 +1198,9 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1221,6 +1287,9 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1307,6 +1376,9 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1349,6 +1421,9 @@ export const createSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation CreateSp
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1389,6 +1464,9 @@ export const updateSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation UpdateSp
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1429,6 +1507,9 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1469,6 +1550,9 @@ export const createSpotifyTokens = /* GraphQL */ `mutation CreateSpotifyTokens(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1506,6 +1590,9 @@ export const updateSpotifyTokens = /* GraphQL */ `mutation UpdateSpotifyTokens(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1543,6 +1630,9 @@ export const deleteSpotifyTokens = /* GraphQL */ `mutation DeleteSpotifyTokens(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version

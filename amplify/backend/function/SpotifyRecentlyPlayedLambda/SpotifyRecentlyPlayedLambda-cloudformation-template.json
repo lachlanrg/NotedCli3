@@ -4,7 +4,7 @@
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
-      "Default": "rate(1 hour)",
+      "Default": "rate(10 minutes)",
       "Description": " Schedule Expression"
     },
     "deploymentBucketName": {

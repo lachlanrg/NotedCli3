@@ -108,10 +108,10 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
             
             const updateRPD = response.data.updateUser.recentlyPlayedDisabled;
             
-            console.log('Server returned publicProfile:', updateRPD);
+            console.log('Server returned RP Disabled:', updateRPD);
 
             setRPDstatus(updateRPD === true);
-            console.log('Profile visibility updated to:', updateRPD);
+            // console.log('Profile visibility updated to:', updateRPD);
         } catch (error) {
             console.error('Error updating profile visibility:', error);
             // Revert the UI state if the update failed
@@ -151,7 +151,7 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
                             <View>
                                 <Text style={styles.settingLabel}>Disable Recently Played</Text>
                                 <Text style={{color: lgray, fontSize: 12, fontStyle: 'italic'}}>
-                                    {RPDStatus ? 'Not displaying' : 'Currently displaying by default'}
+                                    {RPDStatus ? 'Currently disabled' : 'Currently enabled by default'}
                                 </Text>
                             </View>
                             <Switch

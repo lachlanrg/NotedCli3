@@ -166,6 +166,27 @@ export const schema = {
                         ]
                     }
                 },
+                "spotifyUri": {
+                    "name": "spotifyUri",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyImage": {
+                    "name": "spotifyImage",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "soundCloudUri": {
+                    "name": "soundCloudUri",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1352,5 +1373,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "52aafb34ceb15b26d0b8d0303ddf3cb6"
+    "version": "46e008965db7501ed950e0069808017e"
 };

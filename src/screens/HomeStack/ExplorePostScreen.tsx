@@ -178,10 +178,13 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
   };
 
   const renderSCTrackInfo = () => {
-    // console.log('Rendering SC Track Info, scData:', scData); // Debug log
     if (!scData) return null;
 
     const trackImageUrl = scData.artwork_url ? scData.artwork_url.replace('-large', '-t500x500') : null;
+
+    // Format play count and likes count with commas
+    const formattedPlayCount = scData.playback_count?.toLocaleString() || '0';
+    const formattedLikesCount = scData.likes_count?.toLocaleString() || '0';
 
     return (
       <ScrollView style={styles.content}>
@@ -202,15 +205,11 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
           )}
         </View>
         <Text style={styles.trackName}>{scData.title || 'Unknown Track'}</Text>
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('SearchSCUser', { userId: scData.user_id })}
-        >
-          <Text style={styles.artistName}>{scData.user?.username || 'Unknown Artist'}</Text>
-        </TouchableOpacity>
+        <Text style={styles.artistName}>{scData.user?.username || 'Unknown Artist'}</Text>
         <Text style={styles.text}>Genre: {scData.genre || 'Unknown'}</Text>
         <Text style={styles.text}>Release Date: {new Date(scData.created_at).toLocaleDateString()}</Text>
-        <Text style={styles.text}>Likes: {scData.likes_count}</Text>
-        <Text style={styles.text}>Plays: {scData.playback_count}</Text>
+        <Text style={styles.text}>Likes: {formattedLikesCount}</Text>
+        <Text style={styles.text}>Plays: {formattedPlayCount}</Text>
         {scData.permalink_url && (
           <TouchableOpacity 
             style={styles.buttonSC}

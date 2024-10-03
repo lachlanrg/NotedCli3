@@ -581,7 +581,9 @@ const HomeScreen: React.FC = () => {
         {isRepost && <View style={styles.bottomRepostSeparator} />}
 
         <View style={styles.postFooter}>
-          <Text style={styles.timestamp}>{formatRelativeTime(postContent.createdAt)}</Text>
+          <Text style={styles.timestamp}>
+            {formatRelativeTime(isRepost ? item.createdAt : postContent.createdAt)}
+          </Text>
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={() => handleLikePress(item.id, isRepost)}>
               <FontAwesomeIcon
@@ -949,6 +951,8 @@ const styles = StyleSheet.create({
   repostDate: {
     color: '#888',
     fontSize: 12,
+    marginTop: 4,
+    marginBottom: 8,
   },
   spotifyText: {
     color: 'white',
