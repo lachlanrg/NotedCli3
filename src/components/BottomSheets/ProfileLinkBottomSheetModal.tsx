@@ -375,11 +375,42 @@ const ProfileLinkBottomSheetModal = forwardRef<BottomSheetModal>((props, ref) =>
     };
 
     const handleAddSoundCloudAccount = () => {
+        const openSoundCloudApp = async () => {
+            const url = 'https://soundcloud.com';
+            const supported = await Linking.canOpenURL(url);
+
+            if (supported) {
+                await Linking.openURL(url);
+                // Set a timeout to show the input field after a short delay
+                setTimeout(() => setShowSoundCloudInput(true), 1000);
+            } else {
+                Alert.alert(
+                    "SoundCloud App Not Installed",
+                    "The SoundCloud app is not installed on your device. Would you like to open SoundCloud in your browser instead?",
+                    [
+                        { text: "Cancel", style: "cancel" },
+                        { 
+                            text: "Open in Browser", 
+                            onPress: () => {
+                                Linking.openURL('https://soundcloud.com/');
+                                // Set a timeout to show the input field after a short delay
+                                setTimeout(() => setShowSoundCloudInput(true), 1000);
+                            }
+                        }
+                    ]
+                );
+            }
+        };
+
         Alert.alert(
-            "How to Add SoundCloud Account",
+            "Connect SoundCloud Account",
             "1. Open SoundCloud App\n2. Navigate to your profile\n3. Select the 3 dots in the top right\n4. Choose 'Copy Link'\n5. Paste the link below",
             [
-                { text: "OK", onPress: () => setShowSoundCloudInput(true) }
+                {
+                    text: "Open SoundCloud",
+                    onPress: openSoundCloudApp
+                },
+                { text: "Ok", onPress: () => setShowSoundCloudInput(true) }
             ]
         );
     };
@@ -516,7 +547,7 @@ const ProfileLinkBottomSheetModal = forwardRef<BottomSheetModal>((props, ref) =>
                                     <TouchableOpacity 
                                         style={[
                                             styles.textButton, 
-                                            styles.connectButton,
+                                            styles.soundcloudConnectButton,
                                             !isValidSoundCloudLink && styles.disabledButton
                                         ]} 
                                         onPress={handleAddSoundCloudUri}
@@ -654,6 +685,9 @@ const styles = StyleSheet.create({
     },
     connectButton: {
         backgroundColor: spotifyGreen,
+    },
+    soundcloudConnectButton: {
+        backgroundColor: soundcloudOrange,
     },
     connectButtonText: {
         color: dark,

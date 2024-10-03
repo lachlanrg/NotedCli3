@@ -487,10 +487,11 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           </TouchableOpacity>
           <View style={styles.usernameContainer}>
             <Text style={styles.username}>{user.username}</Text>
-          </View>
-          <TouchableOpacity onPress={handleLinkPress} style={styles.linkButton}>
-            <FontAwesomeIcon icon={faLink} size={21} color={light} />
+            <TouchableOpacity onPress={handleLinkPress} style={styles.linkButton}>
+            <FontAwesomeIcon icon={faLink} size={24} color={light} />
           </TouchableOpacity>
+          </View>
+         
         </View>
 
         <ScrollView>
@@ -643,7 +644,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingBottom: 10,
     alignItems: 'center',
-    paddingTop: 24,
+    paddingTop: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
     borderBottomColor: gray,
@@ -654,6 +655,9 @@ const styles = StyleSheet.create({
   usernameContainer: {
     flex: 1,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingLeft: 10,
   },
   username: {
     fontSize: 24,
@@ -662,11 +666,11 @@ const styles = StyleSheet.create({
   },
   linkButton: {
     width: 40,
-    alignItems: 'flex-end',
+    marginLeft: 10,
   },
   profileContainer: {
     alignItems: 'center',
-    // padding: 10,
+    padding: 10,
   },
   email: {
     fontSize: 18,
@@ -809,8 +813,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'flex-start',
     flexDirection: 'row',
-    marginLeft: 10,
-    // marginBottom: 10,
   },
   recentlyPlayedContent: {
     flex: 1,
