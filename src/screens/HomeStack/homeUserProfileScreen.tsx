@@ -29,10 +29,11 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import UserSearchPostBottomSheetModal from '../../components/BottomSheets/UserSearchPostBottomSheetModal';
 import { formatNumber } from '../../utils/numberFormatter'; // Import the formatNumber function
 import LiveWaveform from '../../components/LiveWaveform';
-import { useSpotify } from '../../context/SpotifyContext';
 import { GestureHandlerRootView, LongPressGestureHandler, State } from 'react-native-gesture-handler';
 import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal';
 import { mediumImpact } from '../../utils/hapticFeedback';
+import { faLink } from '@fortawesome/free-solid-svg-icons'; // Add this import
+import UserSearchLinkBottomSheetModal from '../../components/BottomSheets/UserSearchLinkBottomSheetModal';
 
 
 const spotifyIcon = faSpotify as IconProp;
@@ -64,6 +65,8 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
 
   const [isLoading, setIsLoading] = useState(true);
   const [userFetched, setUserFetched] = useState(false);
+
+  const linkBottomSheetRef = useRef<BottomSheetModal>(null);
 
 
 
@@ -148,9 +151,12 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             },
           });
 
-          const recentlyPlayed = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items[0];
-          if (recentlyPlayed) {
-            setRecentlyPlayedTrack(recentlyPlayed);
+          const recentlyPlayedItems = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items;
+          if (recentlyPlayedItems && recentlyPlayedItems.length > 0) {
+            const mostRecentTrack = recentlyPlayedItems.reduce((latest, current) => {
+              return new Date(current._lastChangedAt) > new Date(latest._lastChangedAt) ? current : latest;
+            });
+            setRecentlyPlayedTrack(mostRecentTrack as any);
           }
 
           // Fetch recentlyPlayedDisabled status
@@ -471,153 +477,162 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
     rpBottomSheetRef.current?.present();
   };
 
+  const handleLinkPress = () => {
+    linkBottomSheetRef.current?.present();
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
-
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
-        </TouchableOpacity>
-          <Text style={styles.username}>{user.username}</Text>
-      </View>
-
-
-      <ScrollView>
-        <View style={styles.profileContainer}>
-          {/* Add following/followers count */}
-          <View style={styles.statsContainer}>
-            <TouchableOpacity 
-              style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
-              onPress={() => handleFollowListNavigation('following')}
-              disabled={!canViewFollowList}
-            >
-              <Text style={styles.statNumber}>{formatNumber(followingCount)}</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
-              onPress={() => handleFollowListNavigation('followers')}
-              disabled={!canViewFollowList}
-            >
-              <Text style={styles.statNumber}>{formatNumber(followersCount)}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </TouchableOpacity>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
-              <Text style={styles.statLabel}>Posts</Text>
-            </View>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <FontAwesomeIcon icon={faChevronLeft} size={18} color={light} />
+          </TouchableOpacity>
+          <View style={styles.usernameContainer}>
+            <Text style={styles.username}>{user.username}</Text>
+            <TouchableOpacity onPress={handleLinkPress} style={styles.linkButton}>
+            <FontAwesomeIcon icon={faLink} size={24} color={light} />
+          </TouchableOpacity>
           </View>
-          <View style={styles.followRequestContainer}>
-            <TouchableOpacity 
-              onPress={handleButtonPress} 
-              style={[styles.followButtonBase, getButtonStyle()]}
-            >
-              <Text style={getButtonTextStyle()}>{friendRequestStatus}</Text>
-            </TouchableOpacity>
-          </View>
-
-           {!isLoading && recentlyPlayedTrack && !recentlyPlayedDisabled && ( 
-              <GestureHandlerRootView>
-                  <LongPressGestureHandler
-                    onHandlerStateChange={({ nativeEvent }) => {
-                      if (nativeEvent.state === State.ACTIVE) {
-                        handleLongPress();
-                      }
-                    }}
-                    minDurationMs={800}
-                  >
-                    <Animated.View
-                      style={[
-                        styles.recentlyPlayedBox,
-                        { transform: [{ scale: scaleAnim }] },
-                        { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }
-                      ]}
-                    >
-                      <View style={styles.spotifyIcon}>
-                        <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
-                      </View>
-                      <View style={styles.recentlyPlayedContent}>
-                      <Text style={styles.rpTitle}>{user.username}'s Recently Played</Text>
-                        <ScrollView 
-                          horizontal={true} 
-                          showsHorizontalScrollIndicator={false} 
-                          style={styles.recentlyPlayedContent}
-                          contentContainerStyle={styles.recentlyPlayedContentContainer}
-                        >
-                          <View>
-                            <Text style={styles.recentlyPlayedText}>
-                              {recentlyPlayedTrack.trackName} - {recentlyPlayedTrack.artistName} 
-                            </Text>
-                          </View>
-                        </ScrollView>
-                      </View>
-                      <View style={styles.waveformContainer}>
-                        <LiveWaveform />
-                      </View>
-                    </Animated.View>
-                  </LongPressGestureHandler>
-                </GestureHandlerRootView>
-              )}
-
+         
         </View>
-         {/* Show posts only if following the user */}
-         {(friendRequestStatus === 'Following' || user.publicProfile) && (
-            <UserPostList userId={userId} onPostPress={handlePresentPostModalPress} />
-          )}
 
-        {/* Show "no posts" message if needed */}
-        {!(friendRequestStatus === 'Following' || user.publicProfile) && (
-          <View style={styles.noPostsContainer}>
-            <Text style={styles.noPostsText}>
-              {user.publicProfile
-                ? "This user hasn't posted yet."
-                : "Follow this user to see their posts."}
-            </Text>
-          </View>
-        )}
-        
-        </ScrollView>
-
-      {/* Modal to confirm cancellation/unfollow */}
-      <Modal 
-        animationType="none" 
-        transparent={true} 
-        visible={isModalVisible}
-        onRequestClose={() => {
-          setIsModalVisible(false);
-        }}
-      >
-      <View style={styles.modalBackgroundContainer}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>
-              {modalType === 'cancel'
-                ? 'Are you sure you want to cancel the friend request?'
-                : 'Are you sure you want to unfollow this user?'
-              }
-            </Text>
-            <View style={styles.modalButtonContainer}>
+        <ScrollView>
+          <View style={styles.profileContainer}>
+            <View style={styles.statsContainer}>
               <TouchableOpacity 
-                onPress={modalType === 'cancel' ? handleCancelRequest : handleUnfollow} 
-                style={[styles.modalButton, styles.modalButtonConfirm]}
+                style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
+                onPress={() => handleFollowListNavigation('following')}
+                disabled={!canViewFollowList}
               >
-                <Text style={styles.modalButtonText}>
-                  {modalType === 'cancel' ? 'Cancel Request' : 'Unfollow'}
-                </Text>
+                <Text style={styles.statNumber}>{formatNumber(followingCount)}</Text>
+                <Text style={styles.statLabel}>Following</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleModalClose} style={[styles.modalButton, styles.modalButtonCancel]}>
-                <Text style={styles.modalButtonText}>Close</Text>
+              <TouchableOpacity 
+                style={[styles.statItem, !canViewFollowList && styles.disabledStatItem]}
+                onPress={() => handleFollowListNavigation('followers')}
+                disabled={!canViewFollowList}
+              >
+                <Text style={styles.statNumber}>{formatNumber(followersCount)}</Text>
+                <Text style={styles.statLabel}>Followers</Text>
+              </TouchableOpacity>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
+                <Text style={styles.statLabel}>Posts</Text>
+              </View>
+            </View>
+            <View style={styles.followRequestContainer}>
+              <TouchableOpacity 
+                onPress={handleButtonPress} 
+                style={[styles.followButtonBase, getButtonStyle()]}
+              >
+                <Text style={getButtonTextStyle()}>{friendRequestStatus}</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
-        </View>
-      </Modal>
-      <UserSearchPostBottomSheetModal ref={postBottomSheetRef} post={selectedPost}/>
-      <RPBottomSheetModal ref={rpBottomSheetRef} userId={userId} />
 
-    </View>
+            {/* Spotify Recently Played - renders if there is a recentlyPlayedTarack available, user hasnt disabled, or following/public account*/}
+             {!isLoading && recentlyPlayedTrack && !recentlyPlayedDisabled && (friendRequestStatus === 'Following' || user.publicProfile) && ( 
+                <GestureHandlerRootView>
+                    <LongPressGestureHandler
+                      onHandlerStateChange={({ nativeEvent }) => {
+                        if (nativeEvent.state === State.ACTIVE) {
+                          handleLongPress();
+                        }
+                      }}
+                      minDurationMs={800}
+                    >
+                      <Animated.View
+                        style={[
+                          styles.recentlyPlayedBox,
+                          { transform: [{ scale: scaleAnim }] },
+                          { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }
+                        ]}
+                      >
+                        <View style={styles.spotifyIcon}>
+                          <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                        </View>
+                        <View style={styles.recentlyPlayedContent}>
+                        <Text style={styles.rpTitle}>{user.username}'s Recently Played</Text>
+                          <ScrollView 
+                            horizontal={true} 
+                            showsHorizontalScrollIndicator={false} 
+                            style={styles.recentlyPlayedContent}
+                            contentContainerStyle={styles.recentlyPlayedContentContainer}
+                          >
+                            <View>
+                              <Text style={styles.recentlyPlayedText}>
+                                {recentlyPlayedTrack.trackName} - {recentlyPlayedTrack.artistName} 
+                              </Text>
+                            </View>
+                          </ScrollView>
+                        </View>
+                        <View style={styles.waveformContainer}>
+                          <LiveWaveform />
+                        </View>
+                      </Animated.View>
+                    </LongPressGestureHandler>
+                  </GestureHandlerRootView>
+                )}
+
+          </View>
+           {/* Show posts only if following the user */}
+           {(friendRequestStatus === 'Following' || user.publicProfile) && (
+              <UserPostList userId={userId} onPostPress={handlePresentPostModalPress} />
+            )}
+
+          {/* Show "no posts" message if needed */}
+          {!(friendRequestStatus === 'Following' || user.publicProfile) && (
+            <View style={styles.noPostsContainer}>
+              <Text style={styles.noPostsText}>
+                {user.publicProfile
+                  ? "This user hasn't posted yet."
+                  : "Follow this user to see their posts."}
+              </Text>
+            </View>
+          )}
+          
+          </ScrollView>
+
+        {/* Modal to confirm cancellation/unfollow */}
+        <Modal 
+          animationType="none" 
+          transparent={true} 
+          visible={isModalVisible}
+          onRequestClose={() => {
+            setIsModalVisible(false);
+          }}
+        >
+        <View style={styles.modalBackgroundContainer}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalText}>
+                {modalType === 'cancel'
+                  ? 'Are you sure you want to cancel the friend request?'
+                  : 'Are you sure you want to unfollow this user?'
+                }
+              </Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity 
+                  onPress={modalType === 'cancel' ? handleCancelRequest : handleUnfollow} 
+                  style={[styles.modalButton, styles.modalButtonConfirm]}
+                >
+                  <Text style={styles.modalButtonText}>
+                    {modalType === 'cancel' ? 'Cancel Request' : 'Unfollow'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleModalClose} style={[styles.modalButton, styles.modalButtonCancel]}>
+                  <Text style={styles.modalButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          </View>
+        </Modal>
+        <UserSearchPostBottomSheetModal ref={postBottomSheetRef} post={selectedPost}/>
+        <RPBottomSheetModal ref={rpBottomSheetRef} userId={userId} />
+        <UserSearchLinkBottomSheetModal ref={linkBottomSheetRef} userId={userId} />
+
+      </View>
     </SafeAreaView>
   );
 };
@@ -632,26 +647,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingBottom: 10,
     alignItems: 'center',
-    paddingTop: 24,
+    paddingTop: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 2,
     borderBottomColor: gray,
   },
   backButton: {
+    width: 40,
   },
   usernameContainer: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingLeft: 10,
+  },
+  username: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: light,
+  },
+  linkButton: {
+    width: 40,
+    marginLeft: 10,
   },
   profileContainer: {
     alignItems: 'center',
-    // padding: 10,
-  },
-  username: {
-    flex: 1,
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingRight: 15,
-    color: light,
+    padding: 10,
   },
   email: {
     fontSize: 18,
@@ -794,8 +816,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'flex-start',
     flexDirection: 'row',
-    marginLeft: 10,
-    // marginBottom: 10,
   },
   recentlyPlayedContent: {
     flex: 1,
@@ -846,7 +866,7 @@ const styles = StyleSheet.create({
     color: light,
     fontSize: 18,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 300,
   },
 });
 

@@ -168,11 +168,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const handleNavigateToUserSearch = () => {
     navigation.navigate('UserSearch');
-    console.log("Navigating to UserSearch Screen");
   };
 
   const handleNotificationPress = () => {
-    console.log("Notification button pressed");
     navigation.navigate('Notifications');
   };
 
@@ -442,7 +440,6 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flex: 1,
-    marginRight: 10,
   },
   refreshIconContainer: {
     position: 'absolute',
@@ -459,7 +456,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     marginLeft: 10,
-    // marginBottom: 10,
+    marginBottom: 20,
   },
   recentlyPlayedContent: {
     flex: 1,

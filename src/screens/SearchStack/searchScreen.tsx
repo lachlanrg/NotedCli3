@@ -5,16 +5,12 @@ import {
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  KeyboardEvent, 
   Text, 
   ScrollView, 
   Image, 
   FlatList, 
-  ActivityIndicator,
   Animated,
-  Easing,
   TouchableWithoutFeedback, 
-  PanResponder, // Import PanResponder
   SafeAreaView,
 } from 'react-native';import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -23,14 +19,9 @@ import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 import { dark, gray, light, error, placeholder, lgray, dgray } from '../../components/colorModes';
 
 import { CLIENT_ID, CLIENT_SECRET } from '../../config';
-import { getImageSource } from '../../utils/image-utils'; 
-
-import { useNavigation } from '@react-navigation/native';
 import { NavigationProp } from '@react-navigation/native';
-import { RouteProp, ParamListBase } from '@react-navigation/native'; 
 
 // Importing item button log functions
-import { logArtistInfo } from '../../utils/itemButtonLog'
 import { SearchScreenStackParamList } from '../../components/types';
 
 import { useRecentSearches } from '../../components/recentSearchItems';

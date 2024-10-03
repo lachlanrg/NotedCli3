@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  FlatList,
 } from 'react-native';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
@@ -212,14 +213,15 @@ const styles = StyleSheet.create({
   },
   postContainer: {
     marginBottom: 20,
+    marginLeft: 10,
   },
   mediaContainer: {
     flexDirection: 'row',
     marginTop: 5,
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     borderRadius: 5,
   },
   mediaInfo: {
