@@ -11,6 +11,7 @@ import { Track } from '../../spotifyConfig/itemInterface';
 import useSCTrackById from '../../soundcloudConfig/getSCTrackById';
 import { scTrack } from '../../soundcloudConfig/itemInterface';
 import { getSCTrackPostCount, getSpotifyItemPostCount } from '../../utils/musicPostCounts';
+import { formatDate } from '../../utils/dateFormatter';
 
 type ExplorePostScreenRouteProp = RouteProp<HomeStackParamList, 'ExplorePost'>;
 
@@ -53,7 +54,7 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
               break;
           }
           setPostCount(count);
-          console.log('Fetched data:', data); // Debug log
+          // console.log('Fetched data:', data); // Debug log
         } catch (error) {
           console.error('Error fetching data:', error);
         } finally {
@@ -94,7 +95,7 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
           {spotifyData.artists ? spotifyData.artists.map((artist: any) => artist.name).join(', ') : 'Unknown Artist'}
         </Text>
         <Text style={styles.albumName}>{album.name || 'Unknown Album'}</Text>
-        <Text style={styles.text}>Release Date: {album.release_date || 'Unknown'}</Text>
+        <Text style={styles.text}>Release Date: {album.release_date ? formatDate(album.release_date) : 'Unknown'}</Text>
         <Text style={styles.text}>Track Number: {spotifyData.track_number || 'Unknown'}</Text>
         <Text style={styles.text}>
           Duration: {spotifyData.duration_ms ? `${Math.floor(spotifyData.duration_ms / 60000)}:${((spotifyData.duration_ms % 60000) / 1000).toFixed(0).padStart(2, '0')}` : 'Unknown'}
@@ -139,7 +140,7 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
         <Text style={styles.artistName}>
           {spotifyData.artists ? spotifyData.artists.map((artist: any) => artist.name).join(', ') : 'Unknown Artist'}
         </Text>
-        <Text style={styles.text}>Release Date: {spotifyData.release_date || 'Unknown'}</Text>
+        <Text style={styles.text}>Release Date: {spotifyData.release_date ? formatDate(spotifyData.release_date) : 'Unknown'}</Text>
         <Text style={styles.text}>Total Tracks: {spotifyData.total_tracks || 'Unknown'}</Text>
         <Text style={styles.text}>Album Type: {spotifyData.album_type || 'Unknown'}</Text>
         <Text style={styles.text}>Popularity: {spotifyData.popularity || 'Unknown'}</Text>
@@ -177,7 +178,7 @@ const ExplorePostScreen: React.FC<ExplorePostScreenProps> = ({ route }) => {
   };
 
   const renderSCTrackInfo = () => {
-    console.log('Rendering SC Track Info, scData:', scData); // Debug log
+    // console.log('Rendering SC Track Info, scData:', scData); // Debug log
     if (!scData) return null;
 
     const trackImageUrl = scData.artwork_url ? scData.artwork_url.replace('-large', '-t500x500') : null;

@@ -42,6 +42,7 @@ export type ProfileStackParamList = {
   AccessibilitySettings: undefined;
   PrivacySettings: undefined;
   FollowList: { userId: string; initialTab: 'following' | 'followers' };
+  ProfilePost: { post: any };
 };
 
 export type ExploreStackParamList = {

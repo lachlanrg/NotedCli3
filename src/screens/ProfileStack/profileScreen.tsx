@@ -210,6 +210,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     rpBottomSheetRef.current?.present();
   };
 
+  const handlePostPress = (post: any) => {
+    navigation.navigate('ProfilePost', { post });
+  };
+
+  const handlePostLongPress = (post: any) => {
+    setSelectedPost(post);
+    mediumImpact()
+    postBottomSheetRef.current?.present();
+  };
+
   const handlePresentPostModalPress = (item: any) => {
     setSelectedPost(item);
     postBottomSheetRef.current?.present();
@@ -322,7 +332,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             <UserPostList 
               key={refreshKey}
               userId={userInfo?.userId} 
-              onPostPress={handlePresentPostModalPress} 
+              onPostPress={handlePostPress}
+              onPostLongPress={handlePostLongPress}
               onPostsCountUpdate={handlePostsCountUpdate}
             />
           )}
