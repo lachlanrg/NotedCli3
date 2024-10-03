@@ -55,6 +55,9 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -76,6 +79,9 @@ export const listUsers = /* GraphQL */ `query ListUsers(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -107,6 +113,9 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -129,6 +138,9 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -142,6 +154,9 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -227,6 +242,9 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -240,6 +258,9 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -337,6 +358,9 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -580,6 +604,9 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -763,6 +790,9 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -867,6 +897,9 @@ export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRece
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1023,6 +1056,9 @@ export const getSpotifyTokens = /* GraphQL */ `query GetSpotifyTokens($id: ID!) 
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version

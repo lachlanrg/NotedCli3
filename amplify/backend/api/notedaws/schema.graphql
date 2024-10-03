@@ -12,6 +12,9 @@ type User @model @auth(rules: [{allow: public}]) {
   spotifyRecentlyPlayedTrack: [SpotifyRecentlyPlayedTrack] @hasMany
   recentlyPlayedDisabled: Boolean
   spotifyTokens: [SpotifyTokens] @hasMany
+  spotifyUri: String
+  spotifyImage: String
+  soundCloudUri: String
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {

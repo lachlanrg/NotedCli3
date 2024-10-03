@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCog, faEdit, faUserPlus, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faEdit, faUserPlus, faBell, faLink } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, gray, placeholder, dgray, lgray } from '../../components/colorModes';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -26,6 +26,7 @@ import { mediumImpact } from '../../utils/hapticFeedback';
 import { getUser, listSpotifyRecentlyPlayedTracks } from '../../graphql/queries';
 import { generateClient } from 'aws-amplify/api';
 import { SpotifyRecentlyPlayedTrack } from '../../models';
+import ProfileLinkBottomSheetModal from '../../components/BottomSheets/ProfileLinkBottomSheetModal';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -52,6 +53,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const spotifyContext = useSpotify();
 
   const flatListRef = useRef<FlatList>(null);
+  const profileLinkBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const handleTopPress = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
@@ -229,6 +231,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     settingsBottomSheetRef.current?.present();
   };
 
+  const handlePresentProfileLinkModalPress = () => {
+    profileLinkBottomSheetRef.current?.present();
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}> 
       <View style={[styles.container]}>
@@ -237,7 +243,17 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
         
         <View style={styles.header}>
-          <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
+          <View style={styles.usernameContainer}>
+            <Text style={styles.usernameWelcome}>{userInfo?.username}</Text>
+            <TouchableOpacity onPress={handlePresentProfileLinkModalPress}>
+              <FontAwesomeIcon 
+                icon={faLink} 
+                size={24} 
+                color={light} 
+                style={[styles.linkIcon, { transform: [{ rotate: '10deg' }] }]}
+              />
+            </TouchableOpacity>
+          </View>
           <View style={styles.icons}>
             <TouchableOpacity style={styles.bellIconButton} onPress={handleNotificationPress}>
               <FontAwesomeIcon icon={faBell} size={25} color={light} />
@@ -346,6 +362,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           onPostDelete={handlePostDeleted}
           onClose={resetSelectedPost}
         />
+        <ProfileLinkBottomSheetModal ref={profileLinkBottomSheetRef} />
       </View>
       <RPBottomSheetModal ref={rpBottomSheetRef} userId={userInfo?.userId} />
     </SafeAreaView>
@@ -361,16 +378,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // paddingTop: 20,
     paddingLeft: 20,
     paddingBottom: 20,
     paddingRight: 8,
+  },
+  usernameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   usernameWelcome: {
     fontSize: 24,
     fontWeight: 'bold',
     color: light,
-    justifyContent: 'flex-start', // username far left
+    marginRight: 10,
+  },
+  linkIcon: {
+    marginLeft: 5,
+    // The rotation is now handled inline in the component
   },
   icons: {
     justifyContent: 'flex-end', // icons far right

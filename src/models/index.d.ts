@@ -24,6 +24,9 @@ type EagerUser = {
   readonly spotifyRecentlyPlayedTrack?: (SpotifyRecentlyPlayedTrack | null)[] | null;
   readonly recentlyPlayedDisabled?: boolean | null;
   readonly spotifyTokens?: (SpotifyTokens | null)[] | null;
+  readonly spotifyUri?: string | null;
+  readonly spotifyImage?: string | null;
+  readonly soundCloudUri?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -46,6 +49,9 @@ type LazyUser = {
   readonly spotifyRecentlyPlayedTrack: AsyncCollection<SpotifyRecentlyPlayedTrack>;
   readonly recentlyPlayedDisabled?: boolean | null;
   readonly spotifyTokens: AsyncCollection<SpotifyTokens>;
+  readonly spotifyUri?: string | null;
+  readonly spotifyImage?: string | null;
+  readonly soundCloudUri?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

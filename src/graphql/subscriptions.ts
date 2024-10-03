@@ -55,6 +55,9 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -114,6 +117,9 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -173,6 +179,9 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       startedAt
       __typename
     }
+    spotifyUri
+    spotifyImage
+    soundCloudUri
     createdAt
     updatedAt
     _version
@@ -196,6 +205,9 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -209,6 +221,9 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -240,6 +255,9 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -253,6 +271,9 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -284,6 +305,9 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -297,6 +321,9 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -328,6 +355,9 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -341,6 +371,9 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -374,6 +407,9 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -387,6 +423,9 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -420,6 +459,9 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -433,6 +475,9 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -470,6 +515,9 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -542,6 +590,9 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -614,6 +665,9 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -744,6 +798,9 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -869,6 +926,9 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -994,6 +1054,9 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1099,6 +1162,9 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1182,6 +1248,9 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1265,6 +1334,9 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1306,6 +1378,9 @@ export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1345,6 +1420,9 @@ export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1384,6 +1462,9 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1423,6 +1504,9 @@ export const onCreateSpotifyTokens = /* GraphQL */ `subscription OnCreateSpotify
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1459,6 +1543,9 @@ export const onUpdateSpotifyTokens = /* GraphQL */ `subscription OnUpdateSpotify
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
@@ -1495,6 +1582,9 @@ export const onDeleteSpotifyTokens = /* GraphQL */ `subscription OnDeleteSpotify
       email
       publicProfile
       recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
       createdAt
       updatedAt
       _version
