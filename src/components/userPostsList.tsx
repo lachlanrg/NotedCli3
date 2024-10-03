@@ -20,19 +20,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 import { spotifyGreen, soundcloudOrange } from './colorModes';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ProfileStackParamList } from './types';
+import { formatDate } from '../utils/dateFormatter'; // Add this import
 
 Amplify.configure(awsmobile);
 
 interface UserPostListProps {
   userId: string; 
-  onPostPress: (post: any) => void;
   onPostsCountUpdate?: (count: number) => void; // Add this line
+  onPostPress?: (post: any) => void; // Add this line
+  onPostLongPress?: (post: any) => void; // Add this line
 }
 
 const soundcloudIcon = faSoundcloud as IconProp;
 const spotifyIcon = faSpotify as IconProp;
 
-const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPostsCountUpdate }) => {
+const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostsCountUpdate, onPostPress, onPostLongPress }) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const client = generateClient();
@@ -94,6 +100,20 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
     }
   }, [userId, fetchUserPosts]);
 
+  const handlePostPress = (post: any) => {
+    if (onPostPress) {
+      onPostPress(post);
+    } else {
+      navigation.navigate('ProfilePost', { post });
+    }
+  };
+
+  const handlePostLongPress = (post: any) => {
+    if (onPostLongPress) {
+      onPostLongPress(post);
+    }
+  };
+
   const renderPostItem = (item: any) => {
     const isRepost = 'originalPost' in item;
     const postToRender = isRepost ? item.originalPost : item;
@@ -105,8 +125,9 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
     return (
       <TouchableOpacity 
         key={item.id} 
-        onPress={() => onPostPress(item)}
-        activeOpacity={1} // Add this line to remove opacity change
+        onPress={() => handlePostPress(item)}
+        onLongPress={() => handlePostLongPress(item)}
+        activeOpacity={1}
       >
         <View style={styles.postContainer}>
           {isRepost && (
@@ -144,7 +165,13 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostPress, onPost
                    postToRender.spotifyTrackArtists}
                 </Text>
                 {isSpotifyAlbum && (
-                  <Text style={styles.date}>Total Tracks: {postToRender.spotifyAlbumTotalTracks}</Text>
+                  <Text style={styles.date}>Total Tracks: {postToRender.spotifyAlbumTotalTracks} • {formatDate(postToRender.spotifyAlbumReleaseDate)}</Text>
+                )}
+                {isSpotifyTrack && (
+                  <Text style={styles.date}>{formatDate(postToRender.spotifyTrackReleaseDate)}</Text>
+                )}
+                {isSoundCloud && (
+                  <Text style={styles.date}>{formatDate(postToRender.scTrackCreatedAt)}</Text>
                 )}
                 <Text style={styles.date}>{formatRelativeTime(postToRender.createdAt)}</Text>
               </View>

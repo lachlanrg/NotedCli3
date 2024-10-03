@@ -7,6 +7,7 @@ import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { createPost } from '../../graphql/mutations';
 import CustomError from '../../errorHandling/CustomError';
+import { formatDate } from '../../utils/dateFormatter';
 
 type PostSpotifyTrackScreenProps = NativeStackScreenProps<SearchScreenStackParamList, 'PostSpotifyTrack'>;
 
@@ -76,7 +77,7 @@ const PostSpotifyTrackScreen: React.FC<PostSpotifyTrackScreenProps> = ({ route, 
               </Text>
               <Text style={styles.trackArtist} numberOfLines={1}>{track.artists.map(artist => artist.name).join(', ')}</Text>
               <Text style={styles.trackAlbum} numberOfLines={1}>
-                {track.album.name}  •  {new Date(track.album.release_date).getMonth() + 1}-{new Date(track.album.release_date).getFullYear()}
+                {track.album.name}  •  {formatDate(track.album.release_date)}
               </Text>
               {track.explicit && (
                 <View style={styles.explicitLabelContainer}>

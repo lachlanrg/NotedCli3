@@ -14,16 +14,22 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { dark, light, gray, error, lgray, dgray, mediumgray } from '../../components/colorModes';
-import { faEdit, faSync, faTimes, faPaperPlane, faHeart as faHeartSolid, faArrowsRotate, faCompactDisc, faMusic, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartSolid, faArrowsRotate, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular, faComment } from '@fortawesome/free-regular-svg-icons'
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
+import { spotifyGreen, soundcloudOrange } from '../../components/colorModes';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { mediumImpact } from '../../utils/hapticFeedback';
+
+import { updatePost, updateRepost } from '../../graphql/mutations';
+import { listComments, listPosts, listFriendRequests } from '../../graphql/queries';
+import { listRepostsWithOriginalPost } from '../../utils/customQueries';
+
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
-import * as queries from '../../graphql/queries';
-import * as mutations from '../../graphql/mutations';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { formatRelativeTime } from '../../components/formatComponents';
@@ -32,10 +38,7 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { HomeStackParamList } from '../../components/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
-import { listRepostsWithOriginalPost } from '../../utils/customQueries';
 import { selectionChange } from '../../utils/hapticFeedback';
-import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
-import { spotifyGreen, soundcloudOrange } from '../../components/colorModes';
 
 
 Amplify.configure(awsconfig);
@@ -169,7 +172,7 @@ const HomeScreen: React.FC = () => {
       // 1. Fetch posts from followed users:
       const followingPostPromises = following.map(async (userId) => {
         const response = await client.graphql({
-          query: queries.listPosts,
+          query: listPosts,
           variables: {
             filter: {
               userPostsId: { eq: userId },
@@ -181,7 +184,7 @@ const HomeScreen: React.FC = () => {
 
       // 2. Fetch posts from the current user:
       const currentUserPostPromise = client.graphql({
-        query: queries.listPosts,
+        query: listPosts,
         variables: {
           filter: {
             userPostsId: { eq: userInfo?.userId },
@@ -267,6 +270,7 @@ const HomeScreen: React.FC = () => {
 
   const handleItemPress = (item: any) => {
     setSelectedPost(item);
+    mediumImpact();
     postBottomSheetRef.current?.present();
   };
 
@@ -303,7 +307,7 @@ const HomeScreen: React.FC = () => {
       let updatedItem;
       if (isRepost) {
         updatedItem = await client.graphql({
-          query: mutations.updateRepost,
+          query: updateRepost,
           variables: {
             input: {
               id: itemId,
@@ -315,7 +319,7 @@ const HomeScreen: React.FC = () => {
         });
       } else {
         updatedItem = await client.graphql({
-          query: mutations.updatePost,
+          query: updatePost,
           variables: {
             input: {
               id: itemId,
@@ -348,7 +352,7 @@ const HomeScreen: React.FC = () => {
     if (userInfo?.userId) {
       try {
         const response = await client.graphql({
-          query: queries.listFriendRequests,
+          query: listFriendRequests,
           variables: {
             filter: {
               userSentFriendRequestsId: { eq: userInfo.userId },
@@ -383,7 +387,7 @@ const HomeScreen: React.FC = () => {
       const counts = await Promise.all(
         posts.map(async (post) => {
           const response = await client.graphql({
-            query: queries.listComments,
+            query: listComments,
             variables: {
               filter: {
                 postId: 'originalPost' in post ? undefined : { eq: post.id },
@@ -407,6 +411,11 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     fetchCommentCounts();
   }, [fetchCommentCounts]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  };
 
   const renderPostItem = ({ item }: { item: any }) => {
     const isRepost = 'originalPost' in item;
@@ -494,13 +503,13 @@ const HomeScreen: React.FC = () => {
               </Text>
               {isSpotifyAlbum && (
                 <Text style={styles.mediaDetails}>
-                  {`${postContent.spotifyAlbumTotalTracks} tracks • ${postContent.spotifyAlbumReleaseDate}`}
+                  {`${postContent.spotifyAlbumTotalTracks} tracks • ${formatDate(postContent.spotifyAlbumReleaseDate)}`}
                 </Text>
               )}
               {isSpotifyTrack && (
                 <View>
                   <Text style={styles.mediaDetails}>
-                    {`${postContent.spotifyTrackReleaseDate} • ${Math.floor(
+                    {`${formatDate(postContent.spotifyTrackReleaseDate)} • ${Math.floor(
                       postContent.spotifyTrackDurationMs / 60000)}m ${((postContent.spotifyTrackDurationMs % 60000) / 1000).toFixed(0).padStart(2, '0')}s`}
                   </Text>
                   {postContent.spotifyTrackExplicit && (
@@ -512,7 +521,7 @@ const HomeScreen: React.FC = () => {
               )}
               {isSoundCloud && (
                 <Text style={styles.mediaDetails}>
-                  {`${new Date(postContent.scTrackCreatedAt).toLocaleDateString()}`}
+                  {`${formatDate(postContent.scTrackCreatedAt)}`}
                 </Text>
               )}
             </View>

@@ -4,11 +4,11 @@ import {
   Text, 
   StyleSheet,
   TextInput,
-  Button,
+  TouchableOpacity,
   Alert, 
   Image,
-  TouchableOpacity,
-  SafeAreaView
+  SafeAreaView,
+  ScrollView
 } from 'react-native';
 import { useNavigation, RouteProp } from '@react-navigation/native';
 import { generateClient } from 'aws-amplify/api';
@@ -19,13 +19,18 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { light, dark, gray, lgray } from '../../components/colorModes';
+import { dark, light, gray, lgray, mediumgray, spotifyGreen, soundcloudOrange } from '../../components/colorModes';
 import { Post } from '../../models';
+import { formatRelativeTime } from '../../components/formatComponents';
+import { formatDate } from '../../utils/dateFormatter'; // Add this import
 
 const client = generateClient();
 
 const xIcon = faX as IconProp;
+const spotifyIcon = faSpotify as IconProp;
+const soundcloudIcon = faSoundcloud as IconProp;
 
 type PostRepostScreenRouteProp = NativeStackScreenProps<HomeStackParamList, 'PostRepost'>;
 
@@ -36,179 +41,271 @@ const PostRepostScreen: React.FC<PostRepostScreenRouteProp> = ({ route }) => {
 
   const handleRepost = async () => {
     try {
-        const { userId, username } = await getCurrentUser();
-        const input = {
+      const { userId, username } = await getCurrentUser();
+      const input = {
         body: repostText,
         userRepostsId: userId,
         userOriginalPostId: post.userPostsId,
         username: username,
         postRepostsId: post.id,
         likesCount: 0,
-        };
-
-        await client.graphql({
-        query: mutations.createRepost,
-        variables: { input }
-        });
-
-        setRepostText('');
-        navigation.goBack()
-
-    } catch (error) {
-        console.error('Error creating repost:', error);
-        Alert.alert('Error', 'Could not repost. Please try again.');
-    }
-    };
-
-  // Function to determine what to render at the bottom
-  const renderPostContent = () => {
-    
-    const getImageUrl = (url: string | null | undefined) => {
-        return url ? { uri: url } : require('../../assets/placeholder.png');
       };
 
-    if (post.scTrackId) {
-      return ( 
-        // Render SoundCloud content
-        <View style={styles.trackInfoContainer}>
-           <Image source={getImageUrl(post.scTrackArtworkUrl)} style={styles.trackImage} />
-          <View style={styles.trackDetails}>
-            <Text style={styles.trackTitle}>
-              {post.scTrackTitle} 
-            </Text>
-            <Text style={styles.trackArtist}>
-              {post.scTrackUsername} 
-            </Text>
-          </View>
-        </View> 
-      )
-    } else if (post.spotifyAlbumId) {
-      return (
-        // Render Spotify Album content
-        <View style={styles.trackInfoContainer}>
-          <Image source={getImageUrl(post.spotifyAlbumImageUrl)} style={styles.trackImage} />
-          <View style={styles.trackDetails}>
-            <Text style={styles.trackTitle}>
-              {post.spotifyAlbumName} 
-            </Text>
-            <Text style={styles.trackArtist}>
-              {post.spotifyAlbumArtists} 
-            </Text>
-          </View>
-        </View> 
-      )
-    } else if (post.spotifyTrackId) {
-      return (
-        // Render Spotify Track content
-        <View style={styles.trackInfoContainer}>
-          <Image source={getImageUrl(post.spotifyTrackImageUrl )} style={styles.trackImage} />
-          <View style={styles.trackDetails}>
-            <Text style={styles.trackTitle}>
-              {post.spotifyTrackName} 
-            </Text>
-            <Text style={styles.trackArtist}>
-              {post.spotifyTrackArtists} 
-            </Text>
-          </View>
-        </View> 
-      )
-    } else {
-      // Render default content (for text-only posts or other types in the future)
-      return (
-        <View style={styles.trackInfoContainer}>
-          <Text>{post.body}</Text>
-        </View>
-      );
+      await client.graphql({
+        query: mutations.createRepost,
+        variables: { input }
+      });
+
+      setRepostText('');
+      navigation.goBack();
+    } catch (error) {
+      console.error('Error creating repost:', error);
+      Alert.alert('Error', 'Could not repost. Please try again.');
     }
   };
 
-  return (
-    <SafeAreaView style={styles.safeAreaContainer}> 
+  const renderPostContent = () => {
+    const isSoundCloud = post.scTrackId;
+    const isSpotifyAlbum = post.spotifyAlbumId;
+    const isSpotifyTrack = post.spotifyTrackId;
 
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <FontAwesomeIcon icon={xIcon} size={18} color={light} />
+    const getImageUrl = () => {
+      if (isSoundCloud && post.scTrackArtworkUrl) {
+        return post.scTrackArtworkUrl.replace('-large', '-t500x500');
+      }
+      return post.spotifyAlbumImageUrl || post.spotifyTrackImageUrl || '';
+    };
+
+    return (
+      <View style={styles.postContent}>
+        <TouchableOpacity>
+          <Text style={styles.username}>{post.username}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}> Repost</Text> 
-        <TouchableOpacity onPress={handleRepost}>
-          <Text style={styles.postButtonText}>Repost</Text>
-        </TouchableOpacity>
+        {post.body && (
+          <Text style={styles.bodyText}>{post.body}</Text>
+        )}
+        {(isSoundCloud || isSpotifyAlbum || isSpotifyTrack) && (
+          <View style={styles.mediaContainer}>
+            <Image
+              source={{ uri: getImageUrl() }}
+              style={styles.mediaImage}
+            />
+            <View style={styles.mediaInfo}>
+              <View style={styles.mediaTitleContainer}>
+                <FontAwesomeIcon 
+                  icon={isSoundCloud ? soundcloudIcon : spotifyIcon} 
+                  size={21} 
+                  color={isSoundCloud ? soundcloudOrange : spotifyGreen} 
+                  style={styles.mediaTypeIcon}
+                />
+                <Text style={styles.mediaTitle} numberOfLines={1} ellipsizeMode="tail">
+                  {isSoundCloud ? post.scTrackTitle :
+                   isSpotifyAlbum ? post.spotifyAlbumName :
+                   post.spotifyTrackName}
+                </Text>
+              </View>
+              <Text style={styles.mediaArtist} numberOfLines={1} ellipsizeMode="tail">
+                {isSoundCloud ? post.scTrackArtist :
+                 isSpotifyAlbum ? post.spotifyAlbumArtists :
+                 post.spotifyTrackArtists}
+              </Text>
+              {isSpotifyAlbum && post.spotifyAlbumTotalTracks && post.spotifyAlbumReleaseDate && (
+                <Text style={styles.mediaDetails}>
+                  {`${post.spotifyAlbumTotalTracks} tracks • ${formatDate(post.spotifyAlbumReleaseDate)}`}
+                </Text>
+              )}
+              {isSpotifyTrack && post.spotifyTrackReleaseDate && post.spotifyTrackDurationMs && (
+                <View>
+                  <Text style={styles.mediaDetails}>
+                    {`${formatDate(post.spotifyTrackReleaseDate)} • ${Math.floor(
+                      post.spotifyTrackDurationMs / 60000)}m ${((post.spotifyTrackDurationMs % 60000) / 1000).toFixed(0).padStart(2, '0')}s`}
+                  </Text>
+                  {post.spotifyTrackExplicit && (
+                    <View style={styles.explicitLabelContainer}>
+                      <Text style={styles.explicitLabel}>Explicit</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+              {isSoundCloud && post.scTrackCreatedAt && (
+                <Text style={styles.mediaDetails}>
+                  {formatDate(post.scTrackCreatedAt)}
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
+        <Text style={styles.timestamp}>{formatRelativeTime(post.createdAt)}</Text>
       </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Add your thoughts..."
-        value={repostText}
-        onChangeText={setRepostText}
-        multiline
-        maxLength={600}
-      />
+    );
+  };
 
-      {/* Render the original post content */}
-      {renderPostContent()}
-    </View>
+  return (
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <FontAwesomeIcon icon={xIcon} size={18} color={light} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Repost</Text>
+          <TouchableOpacity 
+            onPress={handleRepost} 
+            style={styles.headerButton}
+          >
+            <Text style={styles.postButtonText}>
+              Repost
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView style={styles.scrollView}>
+          <TextInput
+            style={styles.input}
+            placeholder="Add your thoughts or leave blank..."
+            placeholderTextColor={lgray}
+            value={repostText}
+            onChangeText={setRepostText}
+            multiline
+            maxLength={600}
+          />
+          <View style={styles.separator} />
+          <View style={styles.originalPostContainer}>
+            {renderPostContent()}
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: dark,
+  },
   container: {
     flex: 1,
-    backgroundColor: dark, // Background color
+    backgroundColor: dark,
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
+    paddingVertical: 15,
     backgroundColor: dark,
     justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,  // Add this line
+    borderBottomColor: mediumgray,  // Add this line
+  },
+  headerButton: {
+    width: 60, // Adjust this value as needed
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    paddingRight: 10,
     color: light,
+    flex: 1,
+    textAlign: 'center',
   },
   postButtonText: {
     color: 'lightblue',
     fontWeight: 'bold',
-    justifyContent: 'flex-end',
+    textAlign: 'right',
+  },
+  disabledPostButton: {
+    color: gray,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    color: light, 
+    color: light,
+    fontSize: 16,
+    padding: 15,
+    minHeight: 50,
+    textAlignVertical: 'top',
+    marginTop: 20,
   },
-  // Track Information styles (reused from your example)
-  trackInfoContainer: {
-    flexDirection: 'row',
-    padding: 20,
-    alignItems: 'center', 
+  separator: {
+    height: 1,
+    backgroundColor: mediumgray,
+    marginHorizontal: 15,
   },
-  trackImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8, 
-    marginRight: 15,
+  originalPostContainer: {
+    padding: 15,
+    marginLeft: 20,
   },
-  trackDetails: {
-    flex: 1, 
+  postContent: {
+    marginBottom: 10,
   },
-  trackTitle: {
-    fontSize: 18,
+  username: {
+    color: light,
     fontWeight: 'bold',
-    color: light, 
+    fontSize: 16,
+    marginBottom: 5,
   },
-  trackArtist: {
-    color: lgray, 
+  bodyText: {
+    color: light,
+    fontSize: 14,
+    marginBottom: 10,
   },
-  safeAreaContainer: {
+  mediaContainer: {
+    flexDirection: 'row',
+    marginTop: 10,
+    backgroundColor: '#2a2a2a',
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  mediaImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 4,
+  },
+  mediaInfo: {
     flex: 1,
-    backgroundColor: dark, // or your background color
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  mediaTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  mediaTypeIcon: {
+    marginRight: 6,
+  },
+  mediaTitle: {
+    color: light,
+    fontSize: 16,
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  mediaArtist: {
+    color: lgray,
+    fontSize: 12,
+  },
+  mediaDetails: {
+    color: lgray,  // Change this from gray to lgray
+    fontSize: 11,
+    marginTop: 4,
+  },
+  explicitLabelContainer: {
+    backgroundColor: '#444',
+    borderRadius: 2,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginTop: 4,
+    alignSelf: 'flex-start',
+  },
+  explicitLabel: {
+    color: light,
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  timestamp: {
+    color: lgray,  // Change this from gray to lgray
+    fontSize: 12,
+    marginTop: 10,
   },
 });
 

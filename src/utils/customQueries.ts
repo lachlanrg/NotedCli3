@@ -70,8 +70,42 @@ export const listRepostsWithOriginalPost = /* GraphQL */ `query ListRepostsWithO
       __typename
     }
   }
-  ` as GeneratedQuery<
-    APITypes.ListRepostsQueryVariables,
-    APITypes.ListRepostsQuery
-  >;
-  
+` as GeneratedQuery<
+  APITypes.ListRepostsQueryVariables,
+  APITypes.ListRepostsQuery
+>;
+
+export const getSpotifyItemPostAndRepostCount = /* GraphQL */ `
+  query GetSpotifyItemPostAndRepostCount($spotifyAlbumId: ID, $spotifyTrackId: ID) {
+    listPosts(filter: {
+      or: [
+        { spotifyAlbumId: { eq: $spotifyAlbumId } },
+        { spotifyTrackId: { eq: $spotifyTrackId } }
+      ]
+    }) {
+      items {
+        id
+        reposts {
+          items {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const getSCTrackPostAndRepostCount = /* GraphQL */ `
+  query GetSCTrackPostAndRepostCount($scTrackId: ID) {
+    listPosts(filter: { scTrackId: { eq: $scTrackId } }) {
+      items {
+        id
+        reposts {
+          items {
+            id
+          }
+        }
+      }
+    }
+  }
+`;

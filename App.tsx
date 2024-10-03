@@ -46,6 +46,7 @@ import SearchSpotifyAlbumScreen from './src/screens/SearchStack/searchSpotifyAlb
 import SearchSpotifyTrackScreen from './src/screens/SearchStack/searchSpotifyTrackScreen';
 import SearchSpotifyArtistScreen from './src/screens/SearchStack/searchSpotifyArtistScreen';
 import SearchSCTrackScreen from './src/screens/SearchStack/searchSCTrackScreen';
+import ProfilePostScreen from './src/screens/ProfileStack/profilePostScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -119,6 +120,7 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="AccessibilitySettings" component={AccessibilitySettingsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="FollowList" component={FollowListScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="ProfilePost" component={ProfilePostScreen} options={{ headerShown: false }} />
     </ProfileStack.Navigator>
   );
 };
@@ -224,4 +226,3 @@ const App = () => {
 };
 
 export default App;
-

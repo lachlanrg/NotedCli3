@@ -64,6 +64,15 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
         return item && typeof item === 'object' && 'kind' in item && item.kind === 'track';
     };
 
+    const getPostButtonColor = () => {
+        if (isSpotifyTrack(item) || isSpotifyAlbum(item)) {
+            return '#1DB954'; // Spotify green
+        } else if (isSoundCloudTrack(item)) {
+            return '#FF5500'; // SoundCloud orange
+        }
+        return '#1DB954'; // Default to Spotify green
+    };
+
     const handlePostPress = () => {
         if (item) {
             if (isSpotifyTrack(item)) {
@@ -135,7 +144,10 @@ const SearchPostBottomSheetModal = forwardRef<BottomSheetModal, SearchPostBottom
                         /> 
                     </TouchableOpacity>
                     {!isSpotifyArtist(item) && (
-                        <TouchableOpacity style={styles.postButton} onPress={handlePostPress}>
+                        <TouchableOpacity 
+                            style={[styles.postButton, { backgroundColor: getPostButtonColor() }]} 
+                            onPress={handlePostPress}
+                        >
                             <Text style={styles.postButtonText}>Post</Text>
                         </TouchableOpacity>
                     )}
@@ -157,8 +169,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
       },
     searchButton: {
-        borderWidth: 1,
-        borderColor: lgray,
+        // borderWidth: 1,
+        // borderColor: lgray,
         paddingVertical: 10,
         paddingHorizontal: 28,
         borderRadius: 20,
@@ -178,7 +190,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     postButton: {
-        backgroundColor: '#1DB954',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 20,

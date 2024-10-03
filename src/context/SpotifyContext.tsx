@@ -54,13 +54,20 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
 
         if (timeUntilExpiration < 5 * 60 * 1000) {
           console.log('Token about to expire. Refreshing...');
-          await refreshSpotifyToken();
+          const newToken = await refreshSpotifyToken();
+          if (newToken) {
+            console.log('Token refreshed successfully');
+          } else {
+            console.log('Failed to refresh token');
+          }
         }
 
         // Schedule the next check
-        setTimeout(scheduleRefreshToken, Math.max(timeUntilExpiration - 5 * 60 * 1000, 60 * 1000));
+        const nextCheckTime = Math.max(timeUntilExpiration - 5 * 60 * 1000, 60 * 1000);
+        console.log(`Next token check scheduled in ${nextCheckTime / 1000} seconds`);
+        setTimeout(scheduleRefreshToken, nextCheckTime);
       } catch (error) {
-        console.log('Error scheduling refresh:', error);
+        console.error('Error scheduling refresh:', error);
         setTimeout(scheduleRefreshToken, 5 * 60 * 1000); // Retry after 5 mins on error
       }
     };
@@ -68,6 +75,11 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
     if (spotifyToken) {
       scheduleRefreshToken(); 
     }
+
+    // Cleanup function to clear the timeout when the component unmounts
+    return () => {
+      clearTimeout(scheduleRefreshToken as unknown as number);
+    };
   }, [spotifyToken]); 
 
   const refreshSpotifyToken = async () => {

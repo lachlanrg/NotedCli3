@@ -9,6 +9,7 @@ import { faChevronLeft, faShare } from '@fortawesome/free-solid-svg-icons';
 import { Album } from '../../spotifyConfig/itemInterface';
 import useSpotifyItemById from '../../spotifyConfig/getSpotifyItemById';
 import { getSpotifyItemPostCount } from '../../utils/musicPostCounts';
+import { formatDate } from '../../utils/dateFormatter';
 
 type SearchSpotifyAlbumScreenRouteProp = RouteProp<SearchScreenStackParamList, 'SearchSpotifyAlbum'>;
 
@@ -95,7 +96,7 @@ const SearchSpotifyAlbumScreen: React.FC<Props> = ({ route }) => {
             </Text>
           </TouchableOpacity>
         )}
-        <Text style={styles.text}>Release Date: {spotifyData.release_date || 'Unknown'}</Text>
+        <Text style={styles.text}>Release Date: {spotifyData.release_date ? formatDate(spotifyData.release_date) : 'Unknown'}</Text>
         <Text style={styles.text}>Total Tracks: {spotifyData.total_tracks || 'Unknown'}</Text>
         {/* <Text style={styles.text}>Album Type: {spotifyData.album_type || 'Unknown'}</Text> */}
         <Text style={styles.text}>Popularity: {spotifyData.popularity || 'Unknown'}</Text>
