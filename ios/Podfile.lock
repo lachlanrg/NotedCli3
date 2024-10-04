@@ -1,6 +1,10 @@
 PODS:
-  - AmplifyRTNCore (1.0.28):
+  - AmplifyRTNCore (1.1.6):
     - React-Core
+  - AmplifyRTNPushNotification (1.2.31):
+    - AmplifyUtilsNotifications
+    - React-Core
+  - AmplifyUtilsNotifications (1.1.1)
   - AppAuth (1.7.5):
     - AppAuth/Core (= 1.7.5)
     - AppAuth/ExternalUserAgent (= 1.7.5)
@@ -1077,7 +1081,7 @@ PODS:
     - React-jsi (= 0.73.5)
     - React-logger (= 0.73.5)
     - React-perflogger (= 0.73.5)
-  - RNCAsyncStorage (1.23.1):
+  - RNCAsyncStorage (1.24.0):
     - React-Core
   - RNGestureHandler (2.18.1):
     - glog
@@ -1123,6 +1127,7 @@ PODS:
 
 DEPENDENCIES:
   - "AmplifyRTNCore (from `../node_modules/@aws-amplify/react-native`)"
+  - "AmplifyRTNPushNotification (from `../node_modules/@aws-amplify/rtn-push-notification`)"
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -1191,6 +1196,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - AmplifyUtilsNotifications
     - AppAuth
     - fmt
     - libevent
@@ -1200,6 +1206,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   AmplifyRTNCore:
     :path: "../node_modules/@aws-amplify/react-native"
+  AmplifyRTNPushNotification:
+    :path: "../node_modules/@aws-amplify/rtn-push-notification"
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -1327,7 +1335,9 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AmplifyRTNCore: a274cd13fb1bde5fdbad50aeb25b7b40776ec122
+  AmplifyRTNCore: fed43e0ab4504c7ae49291204c3c704da4963255
+  AmplifyRTNPushNotification: 23a72fd162931df06ccbe9095471fbbda3f3a9b8
+  AmplifyUtilsNotifications: b30b9e3172ae6c2c7344a64b22de649d4fcf6659
   AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
@@ -1384,7 +1394,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: 814b644a5f456c7df1fba7bcd9914707152527c6
   React-utils: 987a4526a2fc0acdfaf87888adfe0bf9d0452066
   ReactCommon: 2947b0bffd82ea0e58ca7928881152d4c6dae9af
-  RNCAsyncStorage: 826b603ae9c0f88b5ac4e956801f755109fa4d5c
+  RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNGestureHandler: 1155b1898ceddefeebf77792927360d44fe11e77
   RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
   RNReactNativeHapticFeedback: bf604f2da947838513394d411364300d6e62e878

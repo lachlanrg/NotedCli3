@@ -187,6 +187,22 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "userDeviceTokens": {
+                    "name": "userDeviceTokens",
+                    "isArray": true,
+                    "type": {
+                        "model": "UserDeviceToken"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "userUserDeviceTokensId"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1368,10 +1384,108 @@ export const schema = {
                     }
                 }
             ]
+        },
+        "UserDeviceToken": {
+            "name": "UserDeviceToken",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "user": {
+                    "name": "user",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "userUserDeviceTokensId"
+                        ]
+                    }
+                },
+                "userId": {
+                    "name": "userId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "deviceTokens": {
+                    "name": "deviceTokens",
+                    "isArray": true,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": false
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "userUserDeviceTokensId": {
+                    "name": "userUserDeviceTokensId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "UserDeviceTokens",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byUserId",
+                        "fields": [
+                            "userId"
+                        ]
+                    }
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     },
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "46e008965db7501ed950e0069808017e"
+    "version": "ad33587cf5e9c0a332a0beac5d18e573"
 };

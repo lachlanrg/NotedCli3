@@ -1,4 +1,10 @@
 {
+  "analytics": {
+    "notedaws": {
+      "providerPlugin": "awscloudformation",
+      "service": "Pinpoint"
+    }
+  },
   "api": {
     "notedaws": {
       "dependsOn": [],
@@ -58,9 +64,46 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "sendNotificationsoundcred": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "notifications": {
+    "notedaws": {
+      "channels": [
+        "APNS"
+      ],
+      "service": "Pinpoint"
     }
   },
   "parameters": {
+    "AMPLIFY_analytics_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_analytics_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "analytics",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
     "AMPLIFY_function_SpotifyRecentlyPlayedLambda_deploymentBucketName": {
       "usedBy": [
         {
@@ -74,6 +117,46 @@
         {
           "category": "function",
           "resourceName": "SpotifyRecentlyPlayedLambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendNotificationsoundcred_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendNotificationsoundcred"
+        }
+      ]
+    },
+    "AMPLIFY_function_sendNotificationsoundcred_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "sendNotificationsoundcred"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Id": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Name": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
+        }
+      ]
+    },
+    "AMPLIFY_notifications_Pinpoint_Region": {
+      "usedBy": [
+        {
+          "category": "notifications",
+          "resourceName": "Pinpoint"
         }
       ]
     }

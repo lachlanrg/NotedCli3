@@ -39,6 +39,9 @@ import { HomeStackParamList } from '../../components/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import HomePostBottomSheetModal from '../../components/BottomSheets/HomePostBottomSheetModal';
 import { selectionChange } from '../../utils/hapticFeedback';
+import { sendNotification } from '../../notifications/sendNotification';
+import * as queries from '../../graphql/queries';
+import { sendPostLikeNotification } from '../../notifications/sendPostLikeNotification';
 
 
 Amplify.configure(awsconfig);
@@ -277,33 +280,46 @@ const HomeScreen: React.FC = () => {
   const handleLikePress = async (itemId: string, isRepost: boolean = false) => {
     selectionChange();
     try {
-      const { userId } = await getCurrentUser();
+      const { userId, username } = await getCurrentUser();
       const client = generateClient();
-  
+
       if (!userInfo) {
         console.error("User not logged in!");
         return;
       }
-  
+
       const itemToUpdate = posts.find((post) => post.id === itemId);
       if (!itemToUpdate) {
         console.error("Post not found!");
         return;
       }
-  
+
       const isLiked = (itemToUpdate.likedBy || []).includes(userInfo?.userId || "");
-  
+
       let updatedLikedBy = Array.isArray(itemToUpdate.likedBy)
         ? itemToUpdate.likedBy
         : []; 
-  
+
       if (!isLiked) {
         updatedLikedBy = [...updatedLikedBy, userId];
       } else {
         updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
       }
       const updatedLikesCount = updatedLikedBy.length;
-  
+
+      // Update UI immediately
+      setPosts(prevPosts => prevPosts.map(post => {
+        if (post.id === itemId) {
+          return {
+            ...post,
+            likedBy: updatedLikedBy,
+            likesCount: updatedLikesCount
+          };
+        }
+        return post;
+      }));
+
+      // Update database
       let updatedItem;
       if (isRepost) {
         updatedItem = await client.graphql({
@@ -330,7 +346,8 @@ const HomeScreen: React.FC = () => {
           },
         });
       }
-  
+
+      // Update posts state with the response from the server
       setPosts(prevPosts => prevPosts.map(post => {
         if (post.id === itemId) {
           if ('updatePost' in updatedItem.data) {
@@ -341,12 +358,25 @@ const HomeScreen: React.FC = () => {
         }
         return post;
       }));
+
+      // Send notification asynchronously if the post was liked
+      if (!isLiked) {
+        const postUserId = isRepost ? itemToUpdate.userRepostsId : itemToUpdate.userPostsId;
+        sendPostLikeNotification(itemId, postUserId, username || 'A user')
+          .catch(error => console.error("Error sending like notification:", error));
+      }
+
     } catch (error) {
       console.error("Error updating post:", error);
+      // Revert UI changes if there was an error
+      setPosts(prevPosts => prevPosts.map(post => {
+        if (post.id === itemId) {
+          return posts.find(p => p.id === itemId) || post;
+        }
+        return post;
+      }));
     }
   };
-  
-  
 
   const fetchFollowing = useCallback(async () => {
     if (userInfo?.userId) {

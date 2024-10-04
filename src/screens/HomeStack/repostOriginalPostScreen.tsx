@@ -20,6 +20,8 @@ import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { listComments } from '../../graphql/queries'; // Ensure you have the correct import for listComments
 import { Linking } from 'react-native';
 import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
+import { sendPostLikeNotification } from '../../notifications/sendPostLikeNotification';
+import { selectionChange } from '../../utils/hapticFeedback';
 
 const commentIcon = faComment as IconProp;
 const unLikedIcon = faHeartRegular as IconProp;
@@ -55,8 +57,9 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
   }
 
   const handleLikePress = async (postId: string) => {
+    selectionChange();
     try {
-      const { userId } = await getCurrentUser();
+      const { userId, username } = await getCurrentUser();
       const client = generateClient();
 
       if (!userInfo) {
@@ -99,6 +102,12 @@ const RepostOriginalPostScreen: React.FC<RepostOriginalPostScreenRouteProp> = ({
         likesCount: updatedLikesCount,
         _version: updatedPostData.data.updatePost._version,
       });
+
+      // Send notification if the post was liked
+      if (!isLiked) {
+        sendPostLikeNotification(postId, postToUpdate.userPostsId, username || 'A user')
+          .catch(error => console.error("Error sending like notification:", error));
+      }
     } catch (error) {
       console.error("Error updating post:", error);
     }

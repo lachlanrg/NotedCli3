@@ -61,6 +61,11 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
     spotifyUri
     spotifyImage
     soundCloudUri
+    userDeviceTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -126,6 +131,11 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
     spotifyUri
     spotifyImage
     soundCloudUri
+    userDeviceTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -191,6 +201,11 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
     spotifyUri
     spotifyImage
     soundCloudUri
+    userDeviceTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -1657,4 +1672,115 @@ export const deleteSpotifyTokens = /* GraphQL */ `mutation DeleteSpotifyTokens(
 ` as GeneratedMutation<
   APITypes.DeleteSpotifyTokensMutationVariables,
   APITypes.DeleteSpotifyTokensMutation
+>;
+export const createUserDeviceToken = /* GraphQL */ `mutation CreateUserDeviceToken(
+  $input: CreateUserDeviceTokenInput!
+  $condition: ModelUserDeviceTokenConditionInput
+) {
+  createUserDeviceToken(input: $input, condition: $condition) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    deviceTokens
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userUserDeviceTokensId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateUserDeviceTokenMutationVariables,
+  APITypes.CreateUserDeviceTokenMutation
+>;
+export const updateUserDeviceToken = /* GraphQL */ `mutation UpdateUserDeviceToken(
+  $input: UpdateUserDeviceTokenInput!
+  $condition: ModelUserDeviceTokenConditionInput
+) {
+  updateUserDeviceToken(input: $input, condition: $condition) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    deviceTokens
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userUserDeviceTokensId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateUserDeviceTokenMutationVariables,
+  APITypes.UpdateUserDeviceTokenMutation
+>;
+export const deleteUserDeviceToken = /* GraphQL */ `mutation DeleteUserDeviceToken(
+  $input: DeleteUserDeviceTokenInput!
+  $condition: ModelUserDeviceTokenConditionInput
+) {
+  deleteUserDeviceToken(input: $input, condition: $condition) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    deviceTokens
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userUserDeviceTokensId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteUserDeviceTokenMutationVariables,
+  APITypes.DeleteUserDeviceTokenMutation
 >;
