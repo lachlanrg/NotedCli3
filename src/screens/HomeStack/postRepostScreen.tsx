@@ -25,6 +25,7 @@ import { dark, light, gray, lgray, mediumgray, spotifyGreen, soundcloudOrange } 
 import { Post } from '../../models';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { formatDate } from '../../utils/dateFormatter'; // Add this import
+import { sendRepostNotification } from '../../notifications/sendRepostNotification';
 
 const client = generateClient();
 
@@ -51,13 +52,19 @@ const PostRepostScreen: React.FC<PostRepostScreenRouteProp> = ({ route }) => {
         likesCount: 0,
       };
 
-      await client.graphql({
+      const response = await client.graphql({
         query: mutations.createRepost,
         variables: { input }
       });
 
       setRepostText('');
       navigation.goBack();
+
+      // Send notification after the repost is complete and navigation has occurred
+      if (response.data && response.data.createRepost) {
+        sendRepostNotification(post.id, post.userPostsId, username)
+          .catch(error => console.error("Error sending repost notification:", error));
+      }
     } catch (error) {
       console.error('Error creating repost:', error);
       Alert.alert('Error', 'Could not repost. Please try again.');
