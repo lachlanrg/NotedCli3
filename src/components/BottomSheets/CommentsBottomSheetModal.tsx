@@ -13,6 +13,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 import { mediumImpact } from "../../utils/hapticFeedback";
 import { deleteComment } from '../../graphql/mutations';
+import { sendCommentLikeNotification } from '../../notifications/sendCommentLikeNotification';
 
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -318,6 +319,12 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           
           return updateCommentInTree(prevComments);
         });
+
+        // Send notification if the comment was liked
+        if (!isLiked) {
+          sendCommentLikeNotification(commentId, commentToUpdate.userPostsId, userInfo.username)
+            .catch(error => console.error("Error sending comment like notification:", error));
+        }
       } else {
         console.warn("No data returned from updateComment mutation:", updatedComment);
       }
