@@ -16,6 +16,7 @@ import { dark, light, gray, lgray, dgray } from '../../components/colorModes';
 import { fetchUsernameById } from '../../components/getUserUsername'; 
 import { useNotification } from '../../context/NotificationContext';
 import { sendNotification } from '../../notifications/sendNotification';
+import { sendApprovalNotification } from '../../notifications/sendApprovalNotification';
 
 Amplify.configure(awsconfig);
 
@@ -77,12 +78,40 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
       });
 
       if (response.data.updateFriendRequest) {
+        // Immediately update the UI and refetch friend requests
         fetchFriendRequests(currentAuthUserInfo.userId);
+
+        // Send approval notification asynchronously
+        sendApprovalNotificationAsync(friendRequest);
       } else {
         console.error('Failed to approve friend request:', response.errors);
       }
     } catch (error) {
       console.error('Error approving friend request:', error);
+    }
+  };
+
+  const sendApprovalNotificationAsync = async (friendRequest: FriendRequest) => {
+    try {
+      // Fetch the current user's username
+      const currentUserResponse = await client.graphql({
+        query: queries.getUser,
+        variables: { id: currentAuthUserInfo.userId }
+      });
+
+      const currentUser = currentUserResponse.data.getUser;
+      if (currentUser && currentUser.username) {
+        const currentUsername = currentUser.username;
+
+        // Send approval notification
+        if (friendRequest.userSentFriendRequestsId) {
+          await sendApprovalNotification(friendRequest.userSentFriendRequestsId, currentUsername);
+        }
+      } else {
+        console.error('Current user or username not found');
+      }
+    } catch (error) {
+      console.error('Error sending approval notification:', error);
     }
   };
 

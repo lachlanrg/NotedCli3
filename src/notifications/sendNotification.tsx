@@ -6,9 +6,14 @@ interface NotificationPayload {
   title: string;
 }
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const sendNotification = async (payload: NotificationPayload): Promise<void> => {
   try {
-    console.log('Sending payload:', JSON.stringify(payload));
+    console.log('Preparing to send payload:', JSON.stringify(payload));
+
+    // Add a 1-second delay
+    await delay(2000);
 
     const response = await fetch('https://8r28f54x6b.execute-api.ap-southeast-2.amazonaws.com/dev/send-notification', {
       method: 'POST',

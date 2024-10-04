@@ -31,6 +31,7 @@ import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal
 import { mediumImpact } from '../../utils/hapticFeedback';
 import { faLink } from '@fortawesome/free-solid-svg-icons'; // Add this import
 import UserSearchLinkBottomSheetModal from '../../components/BottomSheets/UserSearchLinkBottomSheetModal';
+import { sendRequestNotification } from '../../notifications/sendRequestNotification';
 
 
 const spotifyIcon = faSpotify as IconProp;
@@ -264,6 +265,9 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           console.log('Automatically followed successfully!');
           setFriendRequestStatus('Following');
           setExistingFriendRequest(response.data.updateFriendRequest);
+          
+          // Send notification for public profile follow
+          sendRequestNotification(user.id, currentAuthUserInfo.username, false);
         } else {
           console.error('Failed to follow:', response.errors);
         }
@@ -285,6 +289,9 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
             console.log('Automatically followed successfully!');
             setFriendRequestStatus('Following');
             setExistingFriendRequest(response.data.createFriendRequest);
+            
+            // Send notification for public profile follow
+            sendRequestNotification(user.id, currentAuthUserInfo.username, false);
           } else {
             console.error('Failed to follow:', response.errors);
           }
@@ -310,9 +317,12 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           });
   
           if (response.data.updateFriendRequest) {
-            console.log('Friend Request sent successfully!', response.data.updateFriendRequest);
+            console.log('Friend Request sent successfully!');
             setFriendRequestStatus('Requested');
             setExistingFriendRequest(response.data.updateFriendRequest);
+            
+            // Send notification for private profile request
+            sendRequestNotification(user.id, currentAuthUserInfo.username, true);
           } else {
             console.error('Failed to send friend request:', response.errors);
           }
@@ -333,6 +343,9 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
             console.log('Friend Request created successfully!', response.data.createFriendRequest);
             setFriendRequestStatus('Requested');
             setExistingFriendRequest(response.data.createFriendRequest);
+            
+            // Send notification for private profile request
+            sendRequestNotification(user.id, currentAuthUserInfo.username, true);
           } else {
             console.error('Failed to create friend request:', response.errors);
           }
@@ -394,7 +407,7 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
         });
   
         if (response.data.updateFriendRequest) {
-          console.log('Unfollowed successfully!', response.data.updateFriendRequest);
+          console.log('Unfollowed successfully!');
           setFriendRequestStatus('Follow'); 
           setExistingFriendRequest(response.data.updateFriendRequest);
           setIsModalVisible(false); // Close the modal when the "Cancel" button is pressed
