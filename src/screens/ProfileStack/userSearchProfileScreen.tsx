@@ -487,8 +487,12 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
     rpBottomSheetRef.current?.present();
   };
 
+  const canViewProfile = user?.publicProfile || friendRequestStatus === 'Following';
+
   const handleLinkPress = () => {
-    linkBottomSheetRef.current?.present();
+    if (canViewProfile) {
+      linkBottomSheetRef.current?.present();
+    }
   };
 
   return (
@@ -500,11 +504,14 @@ const UserSearchProfileScreen: React.FC<UserSearchProfileScreenProps> = ({ route
           </TouchableOpacity>
           <View style={styles.usernameContainer}>
             <Text style={styles.username}>{user.username}</Text>
-            <TouchableOpacity onPress={handleLinkPress} style={styles.linkButton}>
-            <FontAwesomeIcon icon={faLink} size={24} color={light} />
-          </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={handleLinkPress} 
+              style={[styles.linkButton, !canViewProfile && styles.disabledButton]}
+              disabled={!canViewProfile}
+            >
+              <FontAwesomeIcon icon={faLink} size={24} color={canViewProfile ? light : dgray} />
+            </TouchableOpacity>
           </View>
-         
         </View>
 
         <ScrollView>
@@ -877,6 +884,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 300,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
 
