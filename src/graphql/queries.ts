@@ -58,6 +58,11 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
     spotifyUri
     spotifyImage
     soundCloudUri
+    userDeviceTokens {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -1149,4 +1154,133 @@ export const syncSpotifyTokens = /* GraphQL */ `query SyncSpotifyTokens(
 ` as GeneratedQuery<
   APITypes.SyncSpotifyTokensQueryVariables,
   APITypes.SyncSpotifyTokensQuery
+>;
+export const getUserDeviceToken = /* GraphQL */ `query GetUserDeviceToken($id: ID!) {
+  getUserDeviceToken(id: $id) {
+    id
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    userId
+    deviceTokens
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    userUserDeviceTokensId
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetUserDeviceTokenQueryVariables,
+  APITypes.GetUserDeviceTokenQuery
+>;
+export const listUserDeviceTokens = /* GraphQL */ `query ListUserDeviceTokens(
+  $filter: ModelUserDeviceTokenFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listUserDeviceTokens(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      userId
+      deviceTokens
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userUserDeviceTokensId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListUserDeviceTokensQueryVariables,
+  APITypes.ListUserDeviceTokensQuery
+>;
+export const syncUserDeviceTokens = /* GraphQL */ `query SyncUserDeviceTokens(
+  $filter: ModelUserDeviceTokenFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncUserDeviceTokens(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      userId
+      deviceTokens
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userUserDeviceTokensId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncUserDeviceTokensQueryVariables,
+  APITypes.SyncUserDeviceTokensQuery
+>;
+export const userDeviceTokensByUserId = /* GraphQL */ `query UserDeviceTokensByUserId(
+  $userId: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelUserDeviceTokenFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  userDeviceTokensByUserId(
+    userId: $userId
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      deviceTokens
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userUserDeviceTokensId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.UserDeviceTokensByUserIdQueryVariables,
+  APITypes.UserDeviceTokensByUserIdQuery
 >;

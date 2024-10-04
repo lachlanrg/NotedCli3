@@ -13,13 +13,18 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { dark, gray, light, soundcloudOrange, spotifyGreen } from '../../components/colorModes';
 import { generateClient } from 'aws-amplify/api';
-import { updatePost } from '../../graphql/mutations';
+import { updatePost, updateRepost } from '../../graphql/mutations';
 import CustomBottomSheet from '../../components/BottomSheets/CommentsBottomSheetModal';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { listComments } from '../../graphql/queries'; // Ensure you have the correct import for listComments
 import { Linking } from 'react-native';
 import { faSpotify, faSoundcloud } from '@fortawesome/free-brands-svg-icons';
 import { formatDate } from '../../utils/dateFormatter';
+import { selectionChange } from '../../utils/hapticFeedback';
+import { sendPostLikeNotification } from '../../notifications/sendPostLikeNotification';
+import { UpdatePostMutation, UpdateRepostMutation } from '../../API';  // Make sure to import these types from your generated API file
+import { Post, Repost } from '../../API';  // Adjust the import path as needed
+import { getPost, getRepost } from '../../graphql/queries';  // Add this import
 
 type ProfilePostScreenProps = NativeStackScreenProps<ProfileStackParamList, 'ProfilePost'>;
 
@@ -37,11 +42,13 @@ const ProfilePostScreen: React.FC<ProfilePostScreenProps> = ({ route }) => {
     const [updatedPost, setUpdatedPost] = useState(post);
     const [selectedPost, setSelectedPost] = useState<any | null>(null);
     const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
+    const [isLoading, setIsLoading] = useState(true);
 
   React.useEffect(() => {
     currentAuthenticatedUser();
+    fetchPostData();
     fetchCommentCounts();
-  }, [post]);
+  }, []);
 
   async function currentAuthenticatedUser() {
     try {
@@ -54,53 +61,114 @@ const ProfilePostScreen: React.FC<ProfilePostScreenProps> = ({ route }) => {
     }
   }
 
-  const handleLikePress = async (postId: string) => {
+  const fetchPostData = async () => {
+    setIsLoading(true);
     try {
-      const { userId } = await getCurrentUser();
+      const client = generateClient();
+      let fetchedPost;
+
+      if (isRepost(post)) {
+        const repostData = await client.graphql({
+          query: getRepost,
+          variables: { id: post.id },
+        });
+        fetchedPost = repostData.data.getRepost;
+      } else {
+        const postData = await client.graphql({
+          query: getPost,
+          variables: { id: post.id },
+        });
+        fetchedPost = postData.data.getPost;
+      }
+
+      setUpdatedPost(fetchedPost);
+    } catch (error) {
+      console.error("Error fetching post data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLikePress = async (itemId: string) => {
+    selectionChange();
+    try {
+      const { userId, username } = await getCurrentUser();
       const client = generateClient();
 
       if (!userInfo) {
         console.error("User not logged in!");
         return;
       }
-      const postToUpdate = updatedPost;
-      if (!postToUpdate) {
-        console.error("Post not found!");
-        return;
-      }
-      const isLiked = (postToUpdate.likedBy || []).includes(userInfo?.userId || "");
 
-      let updatedLikedBy = Array.isArray(postToUpdate.likedBy)
-        ? postToUpdate.likedBy
-        : []; // Start with an empty array if null or not an array
+      const isLiked = (updatedPost.likedBy || []).includes(userInfo?.userId || "");
+
+      let updatedLikedBy = Array.isArray(updatedPost.likedBy)
+        ? [...updatedPost.likedBy]
+        : [];
 
       if (!isLiked) {
-        updatedLikedBy = [...updatedLikedBy, userId];
+        updatedLikedBy.push(userId);
       } else {
         updatedLikedBy = updatedLikedBy.filter((id: string) => id !== userId);
       }
       const updatedLikesCount = updatedLikedBy.length;
-      const updatedPostData = await client.graphql({
-        query: updatePost,
+
+      const isRepost = 'originalPost' in updatedPost;
+      const mutation = isRepost ? updateRepost : updatePost;
+
+      const updatedItemData = await client.graphql({
+        query: mutation,
         variables: {
           input: {
-            id: postId,
+            id: itemId,
             likedBy: updatedLikedBy,
             likesCount: updatedLikesCount,
-            _version: postToUpdate._version, // Important for optimistic locking
+            _version: updatedPost._version,
           },
         },
       });
 
-      // Update the _version field in the updatedPost state
-      setUpdatedPost({
-        ...postToUpdate,
-        likedBy: updatedLikedBy,
-        likesCount: updatedLikesCount,
-        _version: updatedPostData.data.updatePost._version,
+      // Type guard functions
+      function isUpdateRepostMutation(data: any): data is { data: { updateRepost: Repost } } {
+        return 'updateRepost' in data.data;
+      }
+
+      function isUpdatePostMutation(data: any): data is { data: { updatePost: Post } } {
+        return 'updatePost' in data.data;
+      }
+
+      // Update the state
+      setUpdatedPost((prevPost: Post | Repost) => {
+        if (isUpdateRepostMutation(updatedItemData)) {
+          return {
+            ...prevPost,
+            ...updatedItemData.data.updateRepost,
+            likedBy: updatedLikedBy,
+            likesCount: updatedLikesCount,
+          } as Repost;
+        } else if (isUpdatePostMutation(updatedItemData)) {
+          return {
+            ...prevPost,
+            ...updatedItemData.data.updatePost,
+            likedBy: updatedLikedBy,
+            likesCount: updatedLikesCount,
+          } as Post;
+        } else {
+          // This should never happen, but TypeScript needs this case
+          console.error("Unexpected data structure from mutation");
+          return prevPost;
+        }
       });
+
+      // Send notification if the item was liked
+      if (!isLiked) {
+        const postUserId = isRepost ? updatedPost.userRepostsId : updatedPost.userPostsId;
+        sendPostLikeNotification(itemId, postUserId, username || 'A user')
+          .catch(error => console.error("Error sending like notification:", error));
+      }
+
     } catch (error) {
-      console.error("Error updating post:", error);
+      console.error("Error updating item:", error);
     }
   };
 
@@ -114,9 +182,10 @@ const ProfilePostScreen: React.FC<ProfilePostScreenProps> = ({ route }) => {
 
   const getImageUrl = (url: string | null | undefined) => {
     if (url) {
-      if (post.scTrackId) {
-        // For SoundCloud tracks, replace '-large' with '-t500x500'
-        return { uri: url.replace('-large', '-t500x500') };
+      if (displayPost.scTrackId) {
+        // For SoundCloud tracks, replace the size in the URL to get the highest quality
+        const highQualityUrl = url.replace('-large', '-t500x500');
+        return { uri: highQualityUrl };
       }
       return { uri: url };
     }
@@ -170,6 +239,18 @@ const ProfilePostScreen: React.FC<ProfilePostScreenProps> = ({ route }) => {
       Linking.openURL(displayPost.scTrackPermalinkUrl);
     }
   };
+
+  useEffect(() => {
+    // console.log('Display post:', displayPost);
+  }, [displayPost]);
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
@@ -268,11 +349,15 @@ const ProfilePostScreen: React.FC<ProfilePostScreenProps> = ({ route }) => {
                   size={24}
                   color={(updatedPost.likedBy || []).includes(userInfo?.userId) ? 'red' : '#fff'}
                 />
-                <Text style={styles.actionText}>{updatedPost.likesCount || ''}</Text>
+                {updatedPost.likesCount > 0 && (
+                  <Text style={styles.actionText}>{updatedPost.likesCount}</Text>
+                )}
               </TouchableOpacity>
               <TouchableOpacity style={styles.actionButton} onPress={() => handlePresentModalPress(post)}>
                 <FontAwesomeIcon icon={commentIcon} size={24} color="#fff" />
-                <Text style={styles.actionText}>{commentCounts[post.id] || 0}</Text>
+                {(commentCounts[post.id] || 0) > 0 && (
+                  <Text style={styles.actionText}>{commentCounts[post.id]}</Text>
+                )}
               </TouchableOpacity>
               <TouchableOpacity style={styles.actionButton}>
                 <FontAwesomeIcon icon={repostIcon} size={24} color="#fff" transform={{ rotate: 160 }} />
@@ -438,6 +523,14 @@ const styles = StyleSheet.create({
   repostBody: {
     color: '#ccc',
     fontSize: 16,
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 18,
   },
 });
 

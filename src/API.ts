@@ -95,6 +95,7 @@ export type User = {
   spotifyUri?: string | null,
   spotifyImage?: string | null,
   soundCloudUri?: string | null,
+  userDeviceTokens?: ModelUserDeviceTokenConnection | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
@@ -308,6 +309,27 @@ export type SpotifyTokens = {
   _deleted?: boolean | null,
   _lastChangedAt: number,
   userSpotifyTokensId?: string | null,
+};
+
+export type ModelUserDeviceTokenConnection = {
+  __typename: "ModelUserDeviceTokenConnection",
+  items:  Array<UserDeviceToken | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
+};
+
+export type UserDeviceToken = {
+  __typename: "UserDeviceToken",
+  id: string,
+  user?: User | null,
+  userId: string,
+  deviceTokens: Array< string | null >,
+  createdAt: string,
+  updatedAt: string,
+  _version: number,
+  _deleted?: boolean | null,
+  _lastChangedAt: number,
+  userUserDeviceTokensId?: string | null,
 };
 
 export type UpdateUserInput = {
@@ -751,6 +773,39 @@ export type DeleteSpotifyTokensInput = {
   _version?: number | null,
 };
 
+export type CreateUserDeviceTokenInput = {
+  id?: string | null,
+  userId: string,
+  deviceTokens: Array< string | null >,
+  _version?: number | null,
+  userUserDeviceTokensId?: string | null,
+};
+
+export type ModelUserDeviceTokenConditionInput = {
+  userId?: ModelIDInput | null,
+  deviceTokens?: ModelStringInput | null,
+  and?: Array< ModelUserDeviceTokenConditionInput | null > | null,
+  or?: Array< ModelUserDeviceTokenConditionInput | null > | null,
+  not?: ModelUserDeviceTokenConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  userUserDeviceTokensId?: ModelIDInput | null,
+};
+
+export type UpdateUserDeviceTokenInput = {
+  id: string,
+  userId?: string | null,
+  deviceTokens?: Array< string | null > | null,
+  _version?: number | null,
+  userUserDeviceTokensId?: string | null,
+};
+
+export type DeleteUserDeviceTokenInput = {
+  id: string,
+  _version?: number | null,
+};
+
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -933,6 +988,19 @@ export type ModelSpotifyTokensFilterInput = {
   userSpotifyTokensId?: ModelIDInput | null,
 };
 
+export type ModelUserDeviceTokenFilterInput = {
+  id?: ModelIDInput | null,
+  userId?: ModelIDInput | null,
+  deviceTokens?: ModelStringInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  and?: Array< ModelUserDeviceTokenFilterInput | null > | null,
+  or?: Array< ModelUserDeviceTokenFilterInput | null > | null,
+  not?: ModelUserDeviceTokenFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
+  userUserDeviceTokensId?: ModelIDInput | null,
+};
+
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
@@ -955,6 +1023,7 @@ export type ModelSubscriptionUserFilterInput = {
   userRepostsId?: ModelSubscriptionIDInput | null,
   userSpotifyRecentlyPlayedTrackId?: ModelSubscriptionIDInput | null,
   userSpotifyTokensId?: ModelSubscriptionIDInput | null,
+  userUserDeviceTokensId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionIDInput = {
@@ -1146,6 +1215,17 @@ export type ModelSubscriptionFloatInput = {
   notIn?: Array< number | null > | null,
 };
 
+export type ModelSubscriptionUserDeviceTokenFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  userId?: ModelSubscriptionIDInput | null,
+  deviceTokens?: ModelSubscriptionStringInput | null,
+  createdAt?: ModelSubscriptionStringInput | null,
+  updatedAt?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionUserDeviceTokenFilterInput | null > | null,
+  or?: Array< ModelSubscriptionUserDeviceTokenFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
 export type CreateUserMutationVariables = {
   input: CreateUserInput,
   condition?: ModelUserConditionInput | null,
@@ -1202,6 +1282,11 @@ export type CreateUserMutation = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -1266,6 +1351,11 @@ export type UpdateUserMutation = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -1330,6 +1420,11 @@ export type DeleteUserMutation = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -2772,6 +2867,114 @@ export type DeleteSpotifyTokensMutation = {
   } | null,
 };
 
+export type CreateUserDeviceTokenMutationVariables = {
+  input: CreateUserDeviceTokenInput,
+  condition?: ModelUserDeviceTokenConditionInput | null,
+};
+
+export type CreateUserDeviceTokenMutation = {
+  createUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
+export type UpdateUserDeviceTokenMutationVariables = {
+  input: UpdateUserDeviceTokenInput,
+  condition?: ModelUserDeviceTokenConditionInput | null,
+};
+
+export type UpdateUserDeviceTokenMutation = {
+  updateUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
+export type DeleteUserDeviceTokenMutationVariables = {
+  input: DeleteUserDeviceTokenInput,
+  condition?: ModelUserDeviceTokenConditionInput | null,
+};
+
+export type DeleteUserDeviceTokenMutation = {
+  deleteUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
 export type GetUserQueryVariables = {
   id: string,
 };
@@ -2827,6 +3030,11 @@ export type GetUserQuery = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3875,6 +4083,122 @@ export type SyncSpotifyTokensQuery = {
   } | null,
 };
 
+export type GetUserDeviceTokenQueryVariables = {
+  id: string,
+};
+
+export type GetUserDeviceTokenQuery = {
+  getUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
+export type ListUserDeviceTokensQueryVariables = {
+  filter?: ModelUserDeviceTokenFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListUserDeviceTokensQuery = {
+  listUserDeviceTokens?:  {
+    __typename: "ModelUserDeviceTokenConnection",
+    items:  Array< {
+      __typename: "UserDeviceToken",
+      id: string,
+      userId: string,
+      deviceTokens: Array< string | null >,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userUserDeviceTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SyncUserDeviceTokensQueryVariables = {
+  filter?: ModelUserDeviceTokenFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+  lastSync?: number | null,
+};
+
+export type SyncUserDeviceTokensQuery = {
+  syncUserDeviceTokens?:  {
+    __typename: "ModelUserDeviceTokenConnection",
+    items:  Array< {
+      __typename: "UserDeviceToken",
+      id: string,
+      userId: string,
+      deviceTokens: Array< string | null >,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userUserDeviceTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type UserDeviceTokensByUserIdQueryVariables = {
+  userId: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelUserDeviceTokenFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type UserDeviceTokensByUserIdQuery = {
+  userDeviceTokensByUserId?:  {
+    __typename: "ModelUserDeviceTokenConnection",
+    items:  Array< {
+      __typename: "UserDeviceToken",
+      id: string,
+      userId: string,
+      deviceTokens: Array< string | null >,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userUserDeviceTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscriptionVariables = {
   filter?: ModelSubscriptionUserFilterInput | null,
 };
@@ -3930,6 +4254,11 @@ export type OnCreateUserSubscription = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -3993,6 +4322,11 @@ export type OnUpdateUserSubscription = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -4056,6 +4390,11 @@ export type OnDeleteUserSubscription = {
     spotifyUri?: string | null,
     spotifyImage?: string | null,
     soundCloudUri?: string | null,
+    userDeviceTokens?:  {
+      __typename: "ModelUserDeviceTokenConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
@@ -5474,5 +5813,110 @@ export type OnDeleteSpotifyTokensSubscription = {
     _deleted?: boolean | null,
     _lastChangedAt: number,
     userSpotifyTokensId?: string | null,
+  } | null,
+};
+
+export type OnCreateUserDeviceTokenSubscriptionVariables = {
+  filter?: ModelSubscriptionUserDeviceTokenFilterInput | null,
+};
+
+export type OnCreateUserDeviceTokenSubscription = {
+  onCreateUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
+export type OnUpdateUserDeviceTokenSubscriptionVariables = {
+  filter?: ModelSubscriptionUserDeviceTokenFilterInput | null,
+};
+
+export type OnUpdateUserDeviceTokenSubscription = {
+  onUpdateUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
+export type OnDeleteUserDeviceTokenSubscriptionVariables = {
+  filter?: ModelSubscriptionUserDeviceTokenFilterInput | null,
+};
+
+export type OnDeleteUserDeviceTokenSubscription = {
+  onDeleteUserDeviceToken?:  {
+    __typename: "UserDeviceToken",
+    id: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
+    userId: string,
+    deviceTokens: Array< string | null >,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    userUserDeviceTokensId?: string | null,
   } | null,
 };

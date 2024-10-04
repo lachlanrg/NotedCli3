@@ -15,6 +15,7 @@ import { formatRelativeTime } from '../../components/formatComponents';
 import { dark, light, gray, lgray, dgray } from '../../components/colorModes';
 import { fetchUsernameById } from '../../components/getUserUsername'; 
 import { useNotification } from '../../context/NotificationContext';
+import { sendNotification } from '../../notifications/sendNotification';
 
 Amplify.configure(awsconfig);
 
@@ -102,40 +103,14 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     fetchUsernames();
   }, [friendRequests]); 
 
-  const sendNotification = async () => {
-    try {
-      const payload = {
-        deviceToken: "84844bde225c32584f881d97cdb03ad47efe373639f5540f3a82180e96f04f73",
-        message: "This is a test notification",
-        title: "Test Notification"
-      };
+  const handleSendTestNotification = async () => {
+    const payload = {
+      deviceToken: "84844bde225c32584f881d97cdb03ad47efe373639f5540f3a82180e96f04f73",
+      message: "This is a test notification",
+      title: "Test Notification"
+    };
 
-      console.log('Sending payload:', JSON.stringify(payload));
-
-      const response = await fetch('https://8r28f54x6b.execute-api.ap-southeast-2.amazonaws.com/dev/send-notification', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-      
-      const responseText = await response.text();
-      console.log('Raw response:', responseText);
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('Error parsing response:', parseError);
-        data = { error: 'Invalid JSON response' };
-      }
-
-      console.log('Response from server:', data);
-      console.log('Notification sent:', data);
-    } catch (error) {
-      console.error('Error sending notification:', error);
-    }
+    await sendNotification(payload);
   };
 
   const renderItem = ({ item }: { item: FriendRequest }) => {
@@ -194,7 +169,7 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
           )}
           ListFooterComponent={renderFooter}
         />
-        <TouchableOpacity onPress={sendNotification} style={styles.sendNotificationButton}>
+        <TouchableOpacity onPress={handleSendTestNotification} style={styles.sendNotificationButton}>
           <Text style={styles.sendNotificationButtonText}>Send Test Notification</Text>
         </TouchableOpacity>
       </View>

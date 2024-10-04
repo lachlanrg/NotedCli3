@@ -27,6 +27,7 @@ type EagerUser = {
   readonly spotifyUri?: string | null;
   readonly spotifyImage?: string | null;
   readonly soundCloudUri?: string | null;
+  readonly userDeviceTokens?: (UserDeviceToken | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -52,6 +53,7 @@ type LazyUser = {
   readonly spotifyUri?: string | null;
   readonly spotifyImage?: string | null;
   readonly soundCloudUri?: string | null;
+  readonly userDeviceTokens: AsyncCollection<UserDeviceToken>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -420,4 +422,38 @@ export declare type SpotifyTokens = LazyLoading extends LazyLoadingDisabled ? Ea
 
 export declare const SpotifyTokens: (new (init: ModelInit<SpotifyTokens>) => SpotifyTokens) & {
   copyOf(source: SpotifyTokens, mutator: (draft: MutableModel<SpotifyTokens>) => MutableModel<SpotifyTokens> | void): SpotifyTokens;
+}
+
+type EagerUserDeviceToken = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<UserDeviceToken, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user?: User | null;
+  readonly userId: string;
+  readonly deviceTokens: (string | null)[];
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly userUserDeviceTokensId?: string | null;
+}
+
+type LazyUserDeviceToken = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<UserDeviceToken, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly user: AsyncItem<User | undefined>;
+  readonly userId: string;
+  readonly deviceTokens: (string | null)[];
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly userUserDeviceTokensId?: string | null;
+}
+
+export declare type UserDeviceToken = LazyLoading extends LazyLoadingDisabled ? EagerUserDeviceToken : LazyUserDeviceToken
+
+export declare const UserDeviceToken: (new (init: ModelInit<UserDeviceToken>) => UserDeviceToken) & {
+  copyOf(source: UserDeviceToken, mutator: (draft: MutableModel<UserDeviceToken>) => MutableModel<UserDeviceToken> | void): UserDeviceToken;
 }
