@@ -14,6 +14,7 @@ import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
 import { mediumImpact } from "../../utils/hapticFeedback";
 import { deleteComment } from '../../graphql/mutations';
 import { sendCommentLikeNotification } from '../../notifications/sendCommentLikeNotification';
+import { sendCommentNotification } from '../../notifications/sendCommentNotification';
 
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -59,11 +60,13 @@ type Comment = {
 type Post = {
   id: string;
   comments: Comment[];
+  userPostsId: string;
 };
 
 type Repost = {
   id: string;
   originalPost: Post;
+  userRepostsId: string;
 };
 type Props = {
   selectedPost: Post | Repost | null;
@@ -175,6 +178,16 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
             return [newCommentData, ...prevComments];
           }
         });
+
+        // Send notification only for parent comments
+        if (!replyingTo) {
+          const recipientUserId = 'originalPost' in selectedPost 
+            ? selectedPost.originalPost.userPostsId 
+            : selectedPost.userPostsId;
+          
+          sendCommentNotification(recipientUserId, username, newComment)
+            .catch(error => console.error("Error sending comment notification:", error));
+        }
       }
 
       setReplyingTo(null);
