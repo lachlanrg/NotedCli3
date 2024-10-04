@@ -15,6 +15,7 @@ type User @model @auth(rules: [{allow: public}]) {
   spotifyUri: String
   spotifyImage: String
   soundCloudUri: String
+  userDeviceTokens: [UserDeviceToken] @hasMany
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {
@@ -128,4 +129,11 @@ type SpotifyTokens @model @auth(rules: [{allow: public}]) {
   spotifyAccessToken: String!
   spotifyRefreshToken: String!
   tokenExpiration: Float!
+}
+
+type UserDeviceToken @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  user: User @belongsTo
+  userId: ID! @index(name: "byUserId")
+  deviceTokens: [String]!
 }

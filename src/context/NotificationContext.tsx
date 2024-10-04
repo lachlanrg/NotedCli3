@@ -17,6 +17,9 @@ import {
   IdentifyUserInput
 } from 'aws-amplify/push-notifications';
 import { getCurrentUser, GetCurrentUserOutput } from 'aws-amplify/auth';
+import { generateClient } from 'aws-amplify/api';
+import * as queries from '../graphql/queries';
+import * as mutations from '../graphql/mutations';
 
 interface NotificationContextType {
   deviceToken: string | null;
@@ -37,6 +40,55 @@ export const useNotification = () => {
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [deviceToken, setDeviceToken] = useState<string | null>(null);
   const [launchNotification, setLaunchNotification] = useState<GetLaunchNotificationOutput | null>(null);
+
+  const client = generateClient();
+
+  const updateUserDeviceToken = async (userId: string, token: string) => {
+    try {
+      // Query for existing UserDeviceToken entry
+      const response = await client.graphql({
+        query: queries.userDeviceTokensByUserId,
+        variables: { userId: userId }
+      });
+
+      const items = response.data.userDeviceTokensByUserId.items;
+
+      if (items.length > 0) {
+        // Update existing entry
+        const existingEntry = items[0];
+        if (!existingEntry.deviceTokens.includes(token)) {
+          const updatedTokens = [...existingEntry.deviceTokens, token];
+          await client.graphql({
+            query: mutations.updateUserDeviceToken,
+            variables: {
+              input: {
+                id: existingEntry.id,
+                deviceTokens: updatedTokens,
+                _version: existingEntry._version
+              }
+            }
+          });
+          console.log('Updated UserDeviceToken entry');
+        } else {
+          console.log('Device token already exists for this user');
+        }
+      } else {
+        // Create new entry
+        await client.graphql({
+          query: mutations.createUserDeviceToken,
+          variables: {
+            input: {
+              userId: userId,
+              deviceTokens: [token]
+            }
+          }
+        });
+        console.log('Created new UserDeviceToken entry');
+      }
+    } catch (error) {
+      console.error('Error updating UserDeviceToken:', error);
+    }
+  };
 
   const setupTokenListenerAndIdentifyUser = () => {
     const myTokenReceivedHandler: OnTokenReceivedInput = async (token) => {
@@ -62,6 +114,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
           await identifyUser(identifyUserInput);
           console.log('User identified to Amazon Pinpoint', { userId, username, token });
+
+          // Update UserDeviceToken
+          await updateUserDeviceToken(userId, token);
         } else {
           console.log('User not authenticated or missing required information');
         }
