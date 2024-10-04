@@ -1,0 +1,17 @@
+{
+    "Addresses": {
+      "84844bde225c32584f881d97cdb03ad47efe373639f5540f3a82180e96f04f73": {
+        "ChannelType": "APNS"
+      }
+    },
+    "MessageConfiguration": {
+      "APNSMessage": {
+        "Action": "OPEN_APP",
+        "Body": "This is a sample message",
+        "Priority": "normal",
+        "SilentPush": false,
+        "Title": "My sample message",
+        "TimeToLive": 30
+      }
+    }
+  }

@@ -1,0 +1,11 @@
+[
+  {
+    "Effect": "Allow",
+    "Action": [
+      "mobiletargeting:SendMessages"
+    ],
+    "Resource": [
+      "arn:aws:mobiletargeting:ap-southeast-2:223985317176:apps/9c27c4a602f64a11b1690e58fbc0ae18/*"
+    ]
+  }
+]

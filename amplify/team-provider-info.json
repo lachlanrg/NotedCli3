@@ -43,6 +43,25 @@
         "SpotifyRecentlyPlayedLambda": {
           "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
           "s3Key": "amplify-builds/SpotifyRecentlyPlayedLambda-564648366f4c6f565276-build.zip"
+        },
+        "sendNotificationsoundcred": {
+          "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
+          "s3Key": "amplify-builds/sendNotificationsoundcred-4c57725273796877585a-build.zip"
+        }
+      },
+      "analytics": {
+        "notedaws": {},
+        "Pinpoint": {
+          "Name": "notedaws-stagingtwo",
+          "Id": "af0704447286453ab9b7931c447b11f0",
+          "Region": "ap-southeast-2"
+        }
+      },
+      "notifications": {
+        "Pinpoint": {
+          "Name": "notedaws-stagingtwo",
+          "Id": "af0704447286453ab9b7931c447b11f0",
+          "Region": "ap-southeast-2"
         }
       }
     }

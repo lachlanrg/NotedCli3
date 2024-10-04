@@ -1,0 +1,21 @@
+{
+  "appName": "notedaws",
+  "roleName": "pinpointLambdaRole92ce3c23",
+  "cloudformationPolicyName": "cloudformationPolicy92ce3c23",
+  "cloudWatchPolicyName": "cloudWatchPolicy92ce3c23",
+  "pinpointPolicyName": "pinpointPolicy92ce3c23",
+  "authPolicyName": "pinpoint_amplify_92ce3c23",
+  "unauthPolicyName": "pinpoint_amplify_92ce3c23",
+  "authRoleName": {
+    "Ref": "AuthRoleName"
+  },
+  "unauthRoleName": {
+    "Ref": "UnauthRoleName"
+  },
+  "authRoleArn": {
+    "Fn::GetAtt": [
+      "AuthRole",
+      "Arn"
+    ]
+  }
+}

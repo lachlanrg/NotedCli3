@@ -64,6 +64,11 @@ import { ProfileStackParamList } from './src/components/types';
 import { HomeStackParamList } from './src/components/types';
 import { ExploreStackParamList } from './src/components/types';
 
+import { initializePushNotifications } from 'aws-amplify/push-notifications';
+import { NotificationProvider } from './src/context/NotificationContext';
+
+
+initializePushNotifications();
 
 (Amplify as any).configure(awsconfig);
 
@@ -182,6 +187,7 @@ const App = () => {
   const navigationRef = useRef(null);
 
   return (
+    <NotificationProvider>
     <SpotifyProvider>
       <SafeAreaProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -222,6 +228,7 @@ const App = () => {
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </SpotifyProvider>
+    </NotificationProvider>
   );
 };
 
