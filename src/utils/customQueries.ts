@@ -16,6 +16,8 @@ export const listRepostsWithOriginalPost = /* GraphQL */ `query ListRepostsWithO
         userRepostsId
         userOriginalPostId
         username
+        likedBy
+        likesCount
         createdAt
         updatedAt
         _version
