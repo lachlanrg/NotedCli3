@@ -15,6 +15,7 @@ import { mediumImpact } from "../../utils/hapticFeedback";
 import { deleteComment } from '../../graphql/mutations';
 import { sendCommentLikeNotification } from '../../notifications/sendCommentLikeNotification';
 import { sendCommentNotification } from '../../notifications/sendCommentNotification';
+import { globalEventEmitter } from '../../utils/EventEmitter';
 
 const unLikedIcon = faHeartRegular as IconProp;
 const likedIcon = faHeartSolid as IconProp;
@@ -70,9 +71,10 @@ type Repost = {
 };
 type Props = {
   selectedPost: Post | Repost | null;
+  postId: string;
 };
 
-const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
+const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost, postId }, ref) => {
   const snapPoints = useMemo(() => ['80%'], []);
   const [newComment, setNewComment] = useState('');
   const [userInfo, setUserInfo] = React.useState<any>(null);
@@ -179,6 +181,10 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
           }
         });
 
+        // Emit an event to update the comment count
+        globalEventEmitter.emit('commentAdded', postId);
+        setReplyingTo(null);
+
         // Send notification only for parent comments
         if (!replyingTo) {
           const recipientUserId = 'originalPost' in selectedPost 
@@ -190,7 +196,6 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
         }
       }
 
-      setReplyingTo(null);
     } catch (error) {
       console.error('Error adding comment:', error);
     } finally {
@@ -415,6 +420,9 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost }, ref) => {
       });
 
       closeOptionsModal();
+
+      // Emit an event to update the comment count
+      globalEventEmitter.emit('commentDeleted', postId);
     } catch (error) {
       console.error('Error deleting comment and its replies:', error);
       // You might want to show an error message to the user here

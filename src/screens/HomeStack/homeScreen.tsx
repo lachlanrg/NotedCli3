@@ -46,6 +46,7 @@ import { LazyPost, LazyRepost, Post, Repost } from '../../models';
 import { HomeScreenData } from '../../utils/homeScreenInitializer';
 import { fetchPosts as fetchPostsUtil } from '../../utils/postFetcher';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { globalEventEmitter } from '../../utils/EventEmitter';
 
 Amplify.configure(awsconfig);
 
@@ -193,7 +194,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
         }
 
         // Update the existing entry with the new userId
-        console.log(`Updating SeenPost for itemId: ${itemId} with new userId: ${userId}`);
+        // console.log(`Updating SeenPost for itemId: ${itemId} with new userId: ${userId}`);
         await client.graphql({
           query: updateSeenPost, // Ensure you have this mutation defined
           variables: {
@@ -205,7 +206,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
         });
       } else {
         // Create a new entry if none exists
-        console.log(`Creating new SeenPost for itemId: ${itemId} with userId: ${userId}`);
+        // console.log(`Creating new SeenPost for itemId: ${itemId} with userId: ${userId}`);
         await client.graphql({
           query: createSeenPost,
           variables: { 
@@ -427,6 +428,33 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
   useEffect(() => {
     fetchCommentCounts();
   }, [fetchCommentCounts]);
+
+  useEffect(() => {
+    const commentAddedListener = globalEventEmitter.on('commentAdded', (postId: string) => {
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, commentCount: (post.commentCount || 0) + 1 }
+            : post
+        )
+      );
+    });
+
+    const commentDeletedListener = globalEventEmitter.on('commentDeleted', (postId: string) => {
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.id === postId 
+            ? { ...post, commentCount: Math.max((post.commentCount || 0) - 1, 0) }
+            : post
+        )
+      );
+    });
+
+    return () => {
+      commentAddedListener();
+      commentDeletedListener();
+    };
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -665,7 +693,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
           onViewableItemsChanged={handleViewableItemsChanged}
         />
 
-        <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} />
+        <CustomBottomSheet 
+          ref={bottomSheetRef} 
+          selectedPost={selectedPost} 
+          postId={selectedPost?.id || ''}
+        />
         <HomePostBottomSheetModal ref={postBottomSheetRef} item={selectedPost} />
 
       </View>
