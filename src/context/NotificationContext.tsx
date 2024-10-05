@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { View } from 'react-native';
 import {
   getPermissionStatus,
   requestPermissions,
@@ -20,11 +21,13 @@ import { getCurrentUser, GetCurrentUserOutput } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/api';
 import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
+import PopdownNotification from '../components/PopdownNotification';
 
 interface NotificationContextType {
   deviceToken: string | null;
   handlePermissions: () => Promise<void>;
   launchNotification: GetLaunchNotificationOutput | null;
+  activeNotification: { title: string; message: string; isComment: boolean } | null;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -40,6 +43,7 @@ export const useNotification = () => {
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [deviceToken, setDeviceToken] = useState<string | null>(null);
   const [launchNotification, setLaunchNotification] = useState<GetLaunchNotificationOutput | null>(null);
+  const [activeNotification, setActiveNotification] = useState<{ title: string; message: string; isComment: boolean } | null>(null);
 
   const client = generateClient();
 
@@ -166,7 +170,41 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const setupForegroundNotificationListener = () => {
     const handleForegroundNotification: OnNotificationReceivedInForegroundInput = (notification) => {
       console.log('Received notification in foreground:', notification);
-      // Handle the foreground notification here (e.g., show an alert, update UI)
+      
+      const notificationType = notification.data && notification.data.type;
+      let title = notification.title || '';
+      let message = notification.body || '';
+      let isComment = false;
+
+      if (notificationType === 'comment') {
+        isComment = true;
+        message = title;
+        title = ''; // Optional: Set a generic title for all comments
+      } else if (notificationType === 'like') {
+        title = '';
+      } else if (notificationType === 'follow_request') {
+        // For follow requests, we'll use the title as the main message
+        message = title;
+        title = ''; // Clear the title as we want to display the full message
+      } else if (notificationType === 'repost') {
+        // For reposts, we'll use the title as the main message
+        message = title;
+        title = ''; // Clear the title as we want to display the full message
+      } else if (notificationType === 'approval') {
+        // For approvals, we'll use the title as the main message
+        message = title;
+        title = ''; // Clear the title as we want to display the full message
+      } else if (notificationType === 'comment_like') {
+        // For comment likes, we'll use the title as the main message
+        message = title;
+        title = ''; // Clear the title as we want to display the full message
+      }
+      
+      setActiveNotification({
+        title: title,
+        message: message,
+        isComment: isComment
+      });
     };
 
     foregroundNotificationListener = onNotificationReceivedInForeground(handleForegroundNotification);
@@ -214,9 +252,20 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     <NotificationContext.Provider value={{ 
       deviceToken, 
       handlePermissions, 
-      launchNotification
+      launchNotification,
+      activeNotification
     }}>
-      {children}
+      <View style={{ flex: 1 }}>
+        {children}
+        {activeNotification && (
+          <PopdownNotification
+            title={activeNotification.title}
+            message={activeNotification.message}
+            isComment={activeNotification.isComment}
+            onDismiss={() => setActiveNotification(null)}
+          />
+        )}
+      </View>
     </NotificationContext.Provider>
   );
 };

@@ -32,7 +32,10 @@ export const sendCommentNotification = async (
           const payload = {
             deviceToken: deviceToken,
             title: `${commenterUsername} commented on your post`,
-            message: truncatedCommentBody
+            message: truncatedCommentBody,
+            data: {
+              type: 'comment'
+            }
           };
 
           await sendNotification(payload);

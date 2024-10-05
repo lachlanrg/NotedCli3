@@ -22,8 +22,11 @@ export const sendPostLikeNotification = async (postId: string, postUserId: strin
         if (deviceToken) {  // Check if deviceToken is not null or undefined
           const payload = {
             deviceToken: deviceToken,
-            title: "New Like",
-            message: `${likerUsername} liked your post!`
+            title: "New Like", // This won't be displayed for likes
+            message: `${likerUsername} liked your post!`,
+            data: {
+              type: 'like'
+            }
           };
 
           await sendNotification(payload);

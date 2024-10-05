@@ -17,13 +17,18 @@ export const sendCommentLikeNotification = async (commentId: string, commentUser
     if (userDeviceTokens.length > 0) {
       const deviceTokens = userDeviceTokens[0].deviceTokens;
 
+      const notificationMessage = `${likerUsername} liked your comment!`;
+
       // Send a notification to each valid device token
       for (const deviceToken of deviceTokens) {
         if (deviceToken) {  // Check if deviceToken is not null or undefined
           const payload = {
             deviceToken: deviceToken,
-            title: "New Comment Like",
-            message: `${likerUsername} liked your comment!`
+            title: notificationMessage,
+            message: '', // We'll leave this empty as we want to display the title as the main message
+            data: {
+              type: 'comment_like'
+            }
           };
 
           await sendNotification(payload);
