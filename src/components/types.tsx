@@ -5,14 +5,15 @@ import { User } from '../models';
 import { scTrack } from '../soundcloudConfig/itemInterface';
 import { Post } from '../API';
 import { Track } from '../spotifyConfig/itemInterface';
+import { HomeScreenData } from '../utils/homeScreenInitializer';
 
 export type HomeStackParamList = {
-  Home: undefined;
-  HomeUserProfile: { userId: string }; 
-  PostRepost: {post: Post};
-  RepostOriginalPost: {post: Post};
+  Home: { initialData?: HomeScreenData };
+  HomeUserProfile: { userId: string };
+  PostRepost: { post: Post };
+  RepostOriginalPost: { post: Post };
   FollowList: { userId: string; initialTab: 'following' | 'followers' };
-  Profile: undefined
+  Profile: undefined;
   ExplorePost: { id: string, type: string };
 };
 

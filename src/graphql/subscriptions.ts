@@ -1733,3 +1733,57 @@ export const onDeleteUserDeviceToken = /* GraphQL */ `subscription OnDeleteUserD
   APITypes.OnDeleteUserDeviceTokenSubscriptionVariables,
   APITypes.OnDeleteUserDeviceTokenSubscription
 >;
+export const onCreateSeenPost = /* GraphQL */ `subscription OnCreateSeenPost($filter: ModelSubscriptionSeenPostFilterInput) {
+  onCreateSeenPost(filter: $filter) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateSeenPostSubscriptionVariables,
+  APITypes.OnCreateSeenPostSubscription
+>;
+export const onUpdateSeenPost = /* GraphQL */ `subscription OnUpdateSeenPost($filter: ModelSubscriptionSeenPostFilterInput) {
+  onUpdateSeenPost(filter: $filter) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateSeenPostSubscriptionVariables,
+  APITypes.OnUpdateSeenPostSubscription
+>;
+export const onDeleteSeenPost = /* GraphQL */ `subscription OnDeleteSeenPost($filter: ModelSubscriptionSeenPostFilterInput) {
+  onDeleteSeenPost(filter: $filter) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteSeenPostSubscriptionVariables,
+  APITypes.OnDeleteSeenPostSubscription
+>;

@@ -1284,3 +1284,116 @@ export const userDeviceTokensByUserId = /* GraphQL */ `query UserDeviceTokensByU
   APITypes.UserDeviceTokensByUserIdQueryVariables,
   APITypes.UserDeviceTokensByUserIdQuery
 >;
+export const getSeenPost = /* GraphQL */ `query GetSeenPost($id: ID!) {
+  getSeenPost(id: $id) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetSeenPostQueryVariables,
+  APITypes.GetSeenPostQuery
+>;
+export const listSeenPosts = /* GraphQL */ `query ListSeenPosts(
+  $filter: ModelSeenPostFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listSeenPosts(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      itemId
+      userIds
+      itemType
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListSeenPostsQueryVariables,
+  APITypes.ListSeenPostsQuery
+>;
+export const syncSeenPosts = /* GraphQL */ `query SyncSeenPosts(
+  $filter: ModelSeenPostFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncSeenPosts(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      itemId
+      userIds
+      itemType
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncSeenPostsQueryVariables,
+  APITypes.SyncSeenPostsQuery
+>;
+export const seenPostsByItemId = /* GraphQL */ `query SeenPostsByItemId(
+  $itemId: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelSeenPostFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  seenPostsByItemId(
+    itemId: $itemId
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      itemId
+      userIds
+      itemType
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SeenPostsByItemIdQueryVariables,
+  APITypes.SeenPostsByItemIdQuery
+>;

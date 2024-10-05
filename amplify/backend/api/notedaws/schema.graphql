@@ -137,3 +137,10 @@ type UserDeviceToken @model @auth(rules: [{allow: public}]) {
   userId: ID! @index(name: "byUserId")
   deviceTokens: [String]!
 }
+
+type SeenPost @model @auth(rules: [{ allow: public }]) {
+  id: ID!
+  itemId: ID! @index(name: "byItemId")
+  userIds: [ID!]!
+  itemType: String!
+}

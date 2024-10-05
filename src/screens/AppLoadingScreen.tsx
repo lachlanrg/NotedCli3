@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { fetchAuthSession } from '@aws-amplify/auth';
+import { initializeHomeScreenData, HomeScreenData } from '../utils/homeScreenInitializer';
 
 type AppLoadingScreenProps = {
   navigation: NavigationProp<any>;
@@ -10,19 +11,27 @@ type AppLoadingScreenProps = {
 
 const AppLoadingScreen: React.FC<AppLoadingScreenProps> = ({ navigation }) => {
   useEffect(() => {
-    const checkUserSession = async () => {
+    const checkUserSessionAndInitialize = async () => {
       try {
         const session = await fetchAuthSession();
         const { accessToken, idToken } = session.tokens ?? {};
         if (accessToken && idToken) {
-          // Navigate to Main stack if tokens are valid
-          navigation.navigate('Main');
-          console.log("Access Token Valid with ID: ", accessToken.payload.sub)
-          console.log("ID Token Valid with ID: ", idToken.payload.sub)
+          // Initialize HomeScreen data
+          const homeScreenData: HomeScreenData = await initializeHomeScreenData();
+          // Navigate to Main stack with initialized data
+          navigation.navigate('Main', { 
+            screen: 'HomeTab', 
+            params: { 
+              screen: 'Home', 
+              params: { initialData: homeScreenData } 
+            } 
+          });
+          console.log("Access Token Valid with ID: ", accessToken.payload.sub);
+          console.log("ID Token Valid with ID: ", idToken.payload.sub);
         } else {
           // Navigate to Login screen if no valid session
           navigation.navigate('Login');
-          console.log("Access Token invalid: ", accessToken)
+          console.log("Access Token invalid: ", accessToken);
         }
       } catch (err) {
         console.log('No valid session found:', err);
@@ -30,7 +39,7 @@ const AppLoadingScreen: React.FC<AppLoadingScreenProps> = ({ navigation }) => {
       }
     };
 
-    checkUserSession();
+    checkUserSessionAndInitialize();
   }, [navigation]);
 
   return (
