@@ -367,7 +367,7 @@ const ProfilePostScreen: React.FC<ProfilePostScreenProps> = ({ route }) => {
         </ScrollView>
       </View>
 
-      <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} />
+      <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} postId={post.id} />
     </SafeAreaView>
   );
 };

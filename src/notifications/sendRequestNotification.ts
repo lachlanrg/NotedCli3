@@ -22,8 +22,7 @@ export const sendRequestNotification = async (
       const deviceTokens = userDeviceTokens[0].deviceTokens;
 
       // Determine the notification message based on the account type
-      const notificationTitle = isPrivateAccount ? "New Follow Request" : "New Follower";
-      const notificationMessage = isPrivateAccount
+      const notificationTitle = isPrivateAccount
         ? `${senderUsername} requested to follow you`
         : `${senderUsername} is now following you`;
 
@@ -33,13 +32,16 @@ export const sendRequestNotification = async (
           const payload = {
             deviceToken: deviceToken,
             title: notificationTitle,
-            message: notificationMessage
+            message: '', // We'll leave this empty as we want to display the title as the main message
+            data: {
+              type: 'follow_request'
+            }
           };
 
           await sendNotification(payload);
         }
       }
-      console.log('Request/Follow notification sent successfully');
+    //   console.log('Request/Follow notification sent successfully');
     } else {
       console.log('No device tokens found for the user');
     }

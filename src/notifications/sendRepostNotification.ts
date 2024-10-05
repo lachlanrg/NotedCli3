@@ -17,13 +17,18 @@ export const sendRepostNotification = async (postId: string, postUserId: string,
     if (userDeviceTokens.length > 0) {
       const deviceTokens = userDeviceTokens[0].deviceTokens;
 
+      const notificationMessage = `${reposterUsername} reposted your post!`;
+
       // Send a notification to each valid device token
       for (const deviceToken of deviceTokens) {
         if (deviceToken) {  // Check if deviceToken is not null or undefined
           const payload = {
             deviceToken: deviceToken,
-            title: "New Repost",
-            message: `${reposterUsername} reposted your post!`
+            title: notificationMessage,
+            message: '', // We'll leave this empty as we want to display the title as the main message
+            data: {
+              type: 'repost'
+            }
           };
 
           await sendNotification(payload);

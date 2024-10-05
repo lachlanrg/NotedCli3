@@ -20,7 +20,6 @@ export const sendApprovalNotification = async (
     if (userDeviceTokens.length > 0) {
       const deviceTokens = userDeviceTokens[0].deviceTokens;
 
-      const notificationTitle = "Follow Request Approved";
       const notificationMessage = `${approverUsername} approved your follow request`;
 
       // Send a notification to each valid device token
@@ -28,8 +27,11 @@ export const sendApprovalNotification = async (
         if (deviceToken) {  // Check if deviceToken is not null or undefined
           const payload = {
             deviceToken: deviceToken,
-            title: notificationTitle,
-            message: notificationMessage
+            title: notificationMessage,
+            message: '', // We'll leave this empty as we want to display the title as the main message
+            data: {
+              type: 'approval'
+            }
           };
 
           await sendNotification(payload);
