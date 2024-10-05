@@ -24,8 +24,8 @@ import { spotifyGreen, soundcloudOrange } from '../../components/colorModes';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { mediumImpact } from '../../utils/hapticFeedback';
 
-import { updatePost, updateRepost } from '../../graphql/mutations';
-import { listComments, listPosts, listFriendRequests } from '../../graphql/queries';
+import { createSeenPost, updatePost, updateRepost, updateSeenPost } from '../../graphql/mutations';
+import { listComments, listPosts, listFriendRequests, listSeenPosts } from '../../graphql/queries';
 import { listRepostsWithOriginalPost } from '../../utils/customQueries';
 
 import { Amplify } from 'aws-amplify';
@@ -42,7 +42,10 @@ import { selectionChange } from '../../utils/hapticFeedback';
 import { sendNotification } from '../../notifications/sendNotification';
 import * as queries from '../../graphql/queries';
 import { sendPostLikeNotification } from '../../notifications/sendPostLikeNotification';
-
+import { LazyPost, LazyRepost, Post, Repost } from '../../models';
+import { HomeScreenData } from '../../utils/homeScreenInitializer';
+import { fetchPosts as fetchPostsUtil } from '../../utils/postFetcher';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 Amplify.configure(awsconfig);
 
@@ -78,31 +81,35 @@ const isWithinLastWeek = (dateString: string) => {
   return date > oneWeekAgo;
 };
 
-const HomeScreen: React.FC = () => {
+type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, 'Home'>;
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ route }) => {
+  const { initialData } = route.params;
   const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
-  const [posts, setPosts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useState<any[]>(initialData?.posts || []);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const client = generateClient();
   const [refreshing, setRefreshing] = useState(false);
   const showRefreshIcon = useRef(new Animated.Value(0)).current;
   const flatListRef = useRef<FlatList>(null);
 
   const [likedPosts, setLikedPosts] = useState<{ postId: string, likeId: string }[]>([]);
-  const [userInfo, setUserId] = React.useState<any>(null);
+  const [userInfo, setUserInfo] = useState<any>(initialData?.userInfo);
   const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
 
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
 
-  const [following, setFollowing] = useState<string[]>([]);
+  const [following, setFollowing] = useState<string[]>(initialData?.following || []);
   const postBottomSheetRef = useRef<BottomSheetModal>(null);
-  // const { spotifyUser } = useSpotify();
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(initialData?.currentUserId ?? null);
 
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const [displayedPosts, setDisplayedPosts] = useState<any[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const [seenPostIds, setSeenPostIds] = useState<string[]>(initialData?.seenPostIds || []);
 
   const INITIAL_BATCH_SIZE = 5;
   const BATCH_SIZE = 5;
@@ -146,122 +153,101 @@ const HomeScreen: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    currentAuthenticatedUser();
-    fetchCurrentUser();
-  }, []);
-
-  async function currentAuthenticatedUser() {
-    try {
-      const { userId } = await getCurrentUser();
-      setUserId({ userId });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const fetchCurrentUser = async () => {
-    try {
-      const { userId } = await getCurrentUser();
-      setCurrentUserId(userId);
-    } catch (error) {
-      console.error('Error fetching current user:', error);
-    }
-  };
-
-  const fetchPosts = useCallback(async () => {
+  const refreshPosts = useCallback(async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch posts from followed users:
-      const followingPostPromises = following.map(async (userId) => {
-        const response = await client.graphql({
-          query: listPosts,
-          variables: {
-            filter: {
-              userPostsId: { eq: userId },
-            },
-          },
-        });
-        return response.data.listPosts.items;
-      });
-
-      // 2. Fetch posts from the current user:
-      const currentUserPostPromise = client.graphql({
-        query: listPosts,
-        variables: {
-          filter: {
-            userPostsId: { eq: userInfo?.userId },
-          },
-        },
-      }).then(response => response.data.listPosts.items);
-
-      // 3. Fetch reposts from followed users
-      const followingRepostPromises = following.map(async (userId) => {
-        const response = await client.graphql({
-          query: listRepostsWithOriginalPost, // Use the custom query here
-          variables: {
-            filter: {
-              userRepostsId: { eq: userId },
-            },
-          },
-        });
-        return response.data.listReposts.items;
-      });
-
-      // 4. Fetch reposts from the current user:
-      const currentUserRepostPromise = client.graphql({
-        query: listRepostsWithOriginalPost, // Use the custom query here
-        variables: {
-          filter: {
-            userRepostsId: { eq: userInfo?.userId },
-          },
-        },
-      }).then(response => response.data.listReposts.items);
-
-      // 5. Wait for all post and repost requests:
-      const [
-        allPosts,
-        ...allReposts
-      ] = await Promise.all([
-        ...followingPostPromises,
-        currentUserPostPromise,
-        ...followingRepostPromises,
-        currentUserRepostPromise,
-      ]);
-
-      // 6. Combine, flatten, and sort:
-      const flattenedPosts = allPosts.flat();
-      const flattenedReposts = allReposts.flat();
-
-      // // 7. Filter out deleted posts and reposts after fetching
-      const filteredPosts = flattenedPosts.filter(post => !post._deleted);
-      const filteredReposts = flattenedReposts.filter(repost => !repost._deleted);
-
-      // 8. Combine posts and reposts
-      const allContent = [...filteredPosts, ...filteredReposts];
-
-      // 9. Sort by createdAt
-      const sortedContent = allContent.sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-      setPosts(sortedContent);
-
+      const newPosts = await fetchPostsUtil(following, currentUserId, seenPostIds);
+      setPosts(newPosts);
     } catch (error) {
       console.error('Error fetching posts and reposts:', error);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
     }
-  }, [following, userInfo?.userId]);
+  }, [following, currentUserId, seenPostIds]);
 
-  // useEffect(() => {
-  //   fetchPosts();
-  // }, [fetchPosts]);
+  async function markPostAsSeen(itemId: string, itemType: 'Post' | 'Repost') {
+    try {
+      const { userId } = await getCurrentUser();
+
+      // Check if the post is already marked as seen in the local state
+      if (seenPostIds.includes(itemId)) {
+        return; // Exit if already seen
+      }
+
+      // Check if the post is already marked as seen in the database
+      const existingEntryResponse = await client.graphql({
+        query: listSeenPosts,
+        variables: {
+          filter: {
+            itemId: { eq: itemId },
+          },
+        },
+      });
+
+      const existingEntries = existingEntryResponse.data.listSeenPosts.items;
+      if (existingEntries.length > 0) {
+        const existingEntry = existingEntries[0];
+        if (existingEntry.userIds.includes(userId)) {
+          return; // Exit if already seen by this user
+        }
+
+        // Update the existing entry with the new userId
+        console.log(`Updating SeenPost for itemId: ${itemId} with new userId: ${userId}`);
+        await client.graphql({
+          query: updateSeenPost, // Ensure you have this mutation defined
+          variables: {
+            input: {
+              id: existingEntry.id,
+              userIds: [...existingEntry.userIds, userId],
+            },
+          },
+        });
+      } else {
+        // Create a new entry if none exists
+        console.log(`Creating new SeenPost for itemId: ${itemId} with userId: ${userId}`);
+        await client.graphql({
+          query: createSeenPost,
+          variables: { 
+            input: { 
+              itemId: itemId,
+              userIds: [userId],
+              itemType: itemType, 
+            } 
+          },
+        });
+      }
+
+      // Optimistically update the local state
+      setSeenPostIds((prevSeenIds) => [...prevSeenIds, itemId]);
+
+    } catch (error) {
+      console.error("Error marking post/repost as seen:", error);
+      // Revert the optimistic update if there's an error
+      setSeenPostIds((prevSeenIds) => prevSeenIds.filter(id => id !== itemId));
+    }
+  }
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 99, // Adjusted threshold to 99%
+    minimumViewTime: 1000, // 1 second minimum view time
+  }).current;
+
+  const handleViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: any[] }) => {
+    const newlyVisibleItems = viewableItems.filter(
+      (viewableItem) => !seenPostIds.includes(viewableItem.item.id)
+    );
+
+    newlyVisibleItems.forEach((viewableItem) => {
+      const isRepost = 'originalPost' in viewableItem.item; 
+      markPostAsSeen(viewableItem.item.id, isRepost ? 'Repost' : 'Post'); 
+    });
+  }).current;
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchPosts();
-  }, [fetchPosts]);
+    refreshPosts();
+  }, [refreshPosts]);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     Animated.timing(showRefreshIcon, {
@@ -400,7 +386,7 @@ const HomeScreen: React.FC = () => {
         console.error('Error fetching following:', error);
       }
     }
-  }, [userInfo?.userId]);
+  }, [userInfo?.userId]); 
 
   useEffect(() => {
     fetchFollowing(); 
@@ -408,7 +394,7 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     if (following.length > 0) {
-      fetchPosts();
+      refreshPosts();
     }
   }, [following]);
 
@@ -675,6 +661,8 @@ const HomeScreen: React.FC = () => {
           onEndReached={loadMorePosts}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
+          viewabilityConfig={viewabilityConfig}
+          onViewableItemsChanged={handleViewableItemsChanged}
         />
 
         <CustomBottomSheet ref={bottomSheetRef} selectedPost={selectedPost} />
@@ -1039,6 +1027,12 @@ const styles = StyleSheet.create({
   loaderContainer: {
     paddingVertical: 20,
     alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#121212',
   },
 });
 

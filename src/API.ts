@@ -806,6 +806,52 @@ export type DeleteUserDeviceTokenInput = {
   _version?: number | null,
 };
 
+export type CreateSeenPostInput = {
+  id?: string | null,
+  itemId: string,
+  userIds: Array< string >,
+  itemType: string,
+  _version?: number | null,
+};
+
+export type ModelSeenPostConditionInput = {
+  itemId?: ModelIDInput | null,
+  userIds?: ModelIDInput | null,
+  itemType?: ModelStringInput | null,
+  and?: Array< ModelSeenPostConditionInput | null > | null,
+  or?: Array< ModelSeenPostConditionInput | null > | null,
+  not?: ModelSeenPostConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+};
+
+export type SeenPost = {
+  __typename: "SeenPost",
+  id: string,
+  itemId: string,
+  userIds: Array< string >,
+  itemType: string,
+  createdAt: string,
+  updatedAt: string,
+  _version: number,
+  _deleted?: boolean | null,
+  _lastChangedAt: number,
+};
+
+export type UpdateSeenPostInput = {
+  id: string,
+  itemId?: string | null,
+  userIds?: Array< string > | null,
+  itemType?: string | null,
+  _version?: number | null,
+};
+
+export type DeleteSeenPostInput = {
+  id: string,
+  _version?: number | null,
+};
+
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -999,6 +1045,26 @@ export type ModelUserDeviceTokenFilterInput = {
   not?: ModelUserDeviceTokenFilterInput | null,
   _deleted?: ModelBooleanInput | null,
   userUserDeviceTokensId?: ModelIDInput | null,
+};
+
+export type ModelSeenPostFilterInput = {
+  id?: ModelIDInput | null,
+  itemId?: ModelIDInput | null,
+  userIds?: ModelIDInput | null,
+  itemType?: ModelStringInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  and?: Array< ModelSeenPostFilterInput | null > | null,
+  or?: Array< ModelSeenPostFilterInput | null > | null,
+  not?: ModelSeenPostFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
+export type ModelSeenPostConnection = {
+  __typename: "ModelSeenPostConnection",
+  items:  Array<SeenPost | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
 };
 
 export type ModelSubscriptionUserFilterInput = {
@@ -1223,6 +1289,18 @@ export type ModelSubscriptionUserDeviceTokenFilterInput = {
   updatedAt?: ModelSubscriptionStringInput | null,
   and?: Array< ModelSubscriptionUserDeviceTokenFilterInput | null > | null,
   or?: Array< ModelSubscriptionUserDeviceTokenFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
+export type ModelSubscriptionSeenPostFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  itemId?: ModelSubscriptionIDInput | null,
+  userIds?: ModelSubscriptionIDInput | null,
+  itemType?: ModelSubscriptionStringInput | null,
+  createdAt?: ModelSubscriptionStringInput | null,
+  updatedAt?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionSeenPostFilterInput | null > | null,
+  or?: Array< ModelSubscriptionSeenPostFilterInput | null > | null,
   _deleted?: ModelBooleanInput | null,
 };
 
@@ -2975,6 +3053,66 @@ export type DeleteUserDeviceTokenMutation = {
   } | null,
 };
 
+export type CreateSeenPostMutationVariables = {
+  input: CreateSeenPostInput,
+  condition?: ModelSeenPostConditionInput | null,
+};
+
+export type CreateSeenPostMutation = {
+  createSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type UpdateSeenPostMutationVariables = {
+  input: UpdateSeenPostInput,
+  condition?: ModelSeenPostConditionInput | null,
+};
+
+export type UpdateSeenPostMutation = {
+  updateSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type DeleteSeenPostMutationVariables = {
+  input: DeleteSeenPostInput,
+  condition?: ModelSeenPostConditionInput | null,
+};
+
+export type DeleteSeenPostMutation = {
+  deleteSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
 export type GetUserQueryVariables = {
   id: string,
 };
@@ -4193,6 +4331,106 @@ export type UserDeviceTokensByUserIdQuery = {
       _deleted?: boolean | null,
       _lastChangedAt: number,
       userUserDeviceTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type GetSeenPostQueryVariables = {
+  id: string,
+};
+
+export type GetSeenPostQuery = {
+  getSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type ListSeenPostsQueryVariables = {
+  filter?: ModelSeenPostFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListSeenPostsQuery = {
+  listSeenPosts?:  {
+    __typename: "ModelSeenPostConnection",
+    items:  Array< {
+      __typename: "SeenPost",
+      id: string,
+      itemId: string,
+      userIds: Array< string >,
+      itemType: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SyncSeenPostsQueryVariables = {
+  filter?: ModelSeenPostFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+  lastSync?: number | null,
+};
+
+export type SyncSeenPostsQuery = {
+  syncSeenPosts?:  {
+    __typename: "ModelSeenPostConnection",
+    items:  Array< {
+      __typename: "SeenPost",
+      id: string,
+      itemId: string,
+      userIds: Array< string >,
+      itemType: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SeenPostsByItemIdQueryVariables = {
+  itemId: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelSeenPostFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type SeenPostsByItemIdQuery = {
+  seenPostsByItemId?:  {
+    __typename: "ModelSeenPostConnection",
+    items:  Array< {
+      __typename: "SeenPost",
+      id: string,
+      itemId: string,
+      userIds: Array< string >,
+      itemType: string,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -5918,5 +6156,62 @@ export type OnDeleteUserDeviceTokenSubscription = {
     _deleted?: boolean | null,
     _lastChangedAt: number,
     userUserDeviceTokensId?: string | null,
+  } | null,
+};
+
+export type OnCreateSeenPostSubscriptionVariables = {
+  filter?: ModelSubscriptionSeenPostFilterInput | null,
+};
+
+export type OnCreateSeenPostSubscription = {
+  onCreateSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type OnUpdateSeenPostSubscriptionVariables = {
+  filter?: ModelSubscriptionSeenPostFilterInput | null,
+};
+
+export type OnUpdateSeenPostSubscription = {
+  onUpdateSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type OnDeleteSeenPostSubscriptionVariables = {
+  filter?: ModelSubscriptionSeenPostFilterInput | null,
+};
+
+export type OnDeleteSeenPostSubscription = {
+  onDeleteSeenPost?:  {
+    __typename: "SeenPost",
+    id: string,
+    itemId: string,
+    userIds: Array< string >,
+    itemType: string,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
   } | null,
 };

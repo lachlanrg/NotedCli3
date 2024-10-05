@@ -81,15 +81,21 @@ const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const ExploreStack = createNativeStackNavigator<ExploreStackParamList>();
 
+import { HomeScreenData } from './src/utils/homeScreenInitializer';
+
 const HomeStackNavigator = () => {
   return (
     <HomeStack.Navigator>
-      <HomeStack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <HomeStack.Screen 
+        name="Home" 
+        component={HomeScreen as React.ComponentType<any>}
+        options={{ headerShown: false }}
+        initialParams={{ initialData: undefined as HomeScreenData | undefined }}
+      />
       <HomeStack.Screen name="HomeUserProfile" component={HomeUserProfileScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="PostRepost" component={PostRepostScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="RepostOriginalPost" component={RepostOriginalPostScreen} options={{ headerShown: false }} />
       <HomeStack.Screen name="ExplorePost" component={ExplorePostScreen} options={{ headerShown: false }} />
-
     </HomeStack.Navigator>
   );
 };

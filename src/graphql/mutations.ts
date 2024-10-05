@@ -1784,3 +1784,66 @@ export const deleteUserDeviceToken = /* GraphQL */ `mutation DeleteUserDeviceTok
   APITypes.DeleteUserDeviceTokenMutationVariables,
   APITypes.DeleteUserDeviceTokenMutation
 >;
+export const createSeenPost = /* GraphQL */ `mutation CreateSeenPost(
+  $input: CreateSeenPostInput!
+  $condition: ModelSeenPostConditionInput
+) {
+  createSeenPost(input: $input, condition: $condition) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateSeenPostMutationVariables,
+  APITypes.CreateSeenPostMutation
+>;
+export const updateSeenPost = /* GraphQL */ `mutation UpdateSeenPost(
+  $input: UpdateSeenPostInput!
+  $condition: ModelSeenPostConditionInput
+) {
+  updateSeenPost(input: $input, condition: $condition) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateSeenPostMutationVariables,
+  APITypes.UpdateSeenPostMutation
+>;
+export const deleteSeenPost = /* GraphQL */ `mutation DeleteSeenPost(
+  $input: DeleteSeenPostInput!
+  $condition: ModelSeenPostConditionInput
+) {
+  deleteSeenPost(input: $input, condition: $condition) {
+    id
+    itemId
+    userIds
+    itemType
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteSeenPostMutationVariables,
+  APITypes.DeleteSeenPostMutation
+>;

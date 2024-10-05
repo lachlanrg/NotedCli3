@@ -457,3 +457,35 @@ export declare type UserDeviceToken = LazyLoading extends LazyLoadingDisabled ? 
 export declare const UserDeviceToken: (new (init: ModelInit<UserDeviceToken>) => UserDeviceToken) & {
   copyOf(source: UserDeviceToken, mutator: (draft: MutableModel<UserDeviceToken>) => MutableModel<UserDeviceToken> | void): UserDeviceToken;
 }
+
+type EagerSeenPost = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SeenPost, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly itemId: string;
+  readonly userIds: string[];
+  readonly itemType: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazySeenPost = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SeenPost, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly itemId: string;
+  readonly userIds: string[];
+  readonly itemType: string;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type SeenPost = LazyLoading extends LazyLoadingDisabled ? EagerSeenPost : LazySeenPost
+
+export declare const SeenPost: (new (init: ModelInit<SeenPost>) => SeenPost) & {
+  copyOf(source: SeenPost, mutator: (draft: MutableModel<SeenPost>) => MutableModel<SeenPost> | void): SeenPost;
+}
