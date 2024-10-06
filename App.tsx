@@ -66,9 +66,7 @@ import { ExploreStackParamList } from './src/components/types';
 
 import { initializePushNotifications } from 'aws-amplify/push-notifications';
 import { NotificationProvider } from './src/context/NotificationContext';
-
-
-initializePushNotifications();
+import { AuthProvider } from './src/context/AuthContext';
 
 (Amplify as any).configure(awsconfig);
 
@@ -193,48 +191,50 @@ const App = () => {
   const navigationRef = useRef(null);
 
   return (
-    <NotificationProvider>
-    <SpotifyProvider>
-      <SafeAreaProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <BottomSheetModalProvider>
-            <ThemeProvider>
-              <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} ref={navigationRef}>
-                <Stack.Navigator initialRouteName="AppLoading">
-                  <Stack.Screen 
-                    name="AppLoading" 
-                    component={AppLoadingScreen} 
-                    options={{ 
-                      headerShown: false,
-                      gestureEnabled: false,
-                    }} 
-                  />
-                  <Stack.Screen 
-                    name="Login" 
-                    component={LoginScreen} 
-                    options={{ 
-                      headerShown: false,
-                      gestureEnabled: false,
-                    }} 
-                  />
-                  <Stack.Screen 
-                    name="Main" 
-                    component={MainTabNavigator} 
-                    options={{ 
-                      headerShown: false,
-                      gestureEnabled: false,
-                    }} 
-                  />
-                  <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
-                  <Stack.Screen name="SignUpSpotifyLogin" component={SignUpSpotifyLoginScreen} options={{ headerShown: false }} />
-                </Stack.Navigator>
-              </NavigationContainer>
-            </ThemeProvider>
-          </BottomSheetModalProvider>
-        </GestureHandlerRootView>
-      </SafeAreaProvider>
-    </SpotifyProvider>
-    </NotificationProvider>
+    <AuthProvider>
+      <NotificationProvider>
+        <SpotifyProvider>
+          <SafeAreaProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <BottomSheetModalProvider>
+                <ThemeProvider>
+                  <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme} ref={navigationRef}>
+                    <Stack.Navigator initialRouteName="AppLoading">
+                      <Stack.Screen 
+                        name="AppLoading" 
+                        component={AppLoadingScreen} 
+                        options={{ 
+                          headerShown: false,
+                          gestureEnabled: false,
+                        }} 
+                      />
+                      <Stack.Screen 
+                        name="Login" 
+                        component={LoginScreen} 
+                        options={{ 
+                          headerShown: false,
+                          gestureEnabled: false,
+                        }} 
+                      />
+                      <Stack.Screen 
+                        name="Main" 
+                        component={MainTabNavigator} 
+                        options={{ 
+                          headerShown: false,
+                          gestureEnabled: false,
+                        }} 
+                      />
+                      <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: false }} />
+                      <Stack.Screen name="SignUpSpotifyLogin" component={SignUpSpotifyLoginScreen} options={{ headerShown: false }} />
+                    </Stack.Navigator>
+                  </NavigationContainer>
+                </ThemeProvider>
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </SafeAreaProvider>
+        </SpotifyProvider>
+      </NotificationProvider>
+    </AuthProvider>
   );
 };
 
