@@ -47,7 +47,6 @@
     "react-native-skeleton-content": "^1.0.28",
     "react-native-sound": "^0.11.2",
     "react-native-svg": "^15.5.0",
-    "react-native-track-player": "^4.1.1",
     "react-native-webview": "^13.12.1",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22"
   },
