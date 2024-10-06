@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { View } from 'react-native';
 import {
   getPermissionStatus,
@@ -22,6 +22,7 @@ import { generateClient } from 'aws-amplify/api';
 import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import PopdownNotification from '../components/PopdownNotification';
+import { useAuth } from './AuthContext';
 
 interface NotificationContextType {
   deviceToken: string | null;
@@ -44,6 +45,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [deviceToken, setDeviceToken] = useState<string | null>(null);
   const [launchNotification, setLaunchNotification] = useState<GetLaunchNotificationOutput | null>(null);
   const [activeNotification, setActiveNotification] = useState<{ title: string; message: string; isComment: boolean } | null>(null);
+  const setupDoneRef = useRef(false);
+  const foregroundListenerRef = useRef<OnNotificationReceivedInForegroundOutput | null>(null);
+  const lastNotificationTimeRef = useRef(0);
+  const notificationListenerRef = useRef<{ remove: () => void } | null>(null);
+  const processedNotifications = useRef(new Set<string>());
 
   const client = generateClient();
 
@@ -96,6 +102,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setupTokenListenerAndIdentifyUser = () => {
     const myTokenReceivedHandler: OnTokenReceivedInput = async (token) => {
+      if (deviceToken === token) return; // Skip if token hasn't changed
       console.log('Received device token:', token);
       setDeviceToken(token);
       
@@ -108,7 +115,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             userId: userId,
             userProfile: {
               name: username || '',
-              // Add more user profile details as needed
             },
             options: {
               address: token,
@@ -119,7 +125,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           await identifyUser(identifyUserInput);
           console.log('User identified to Amazon Pinpoint', { userId, username, token });
 
-          // Update UserDeviceToken
           await updateUserDeviceToken(userId, token);
         } else {
           console.log('User not authenticated or missing required information');
@@ -132,45 +137,29 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return onTokenReceived(myTokenReceivedHandler);
   };
 
-  useEffect(() => {
-    handlePermissions();
-    setupTokenListenerAndIdentifyUser();
-    setupNotificationListener();
-    setupForegroundNotificationListener();
-    checkLaunchNotification();
+  const setupNotificationListeners = useCallback(() => {
+    if (notificationListenerRef.current) {
+      return; // Listeners already set up
+    }
 
-    return () => {
-      if (tokenListener) {
-        tokenListener.remove();
-      }
-      if (notificationListener) {
-        notificationListener.remove();
-      }
-      if (foregroundNotificationListener) {
-        foregroundNotificationListener.remove();
-      }
-    };
-  }, []);
-
-  let tokenListener: OnTokenReceivedOutput | null = null;
-  let notificationListener: { remove: () => void } | null = null;
-  let foregroundNotificationListener: OnNotificationReceivedInForegroundOutput | null = null;
-
-  const setupNotificationListener = () => {
-    const handleNotificationOpened: OnNotificationOpenedInput = (notification) => {
-      console.log('Notification opened:', notification);
-      // Handle the opened notification here
-      // You can add logic to navigate to a specific screen or update the app state
-      // based on the notification content
-    };
-
-    notificationListener = onNotificationOpened(handleNotificationOpened);
-  };
-
-  const setupForegroundNotificationListener = () => {
-    const handleForegroundNotification: OnNotificationReceivedInForegroundInput = (notification) => {
-      console.log('Received notification in foreground:', notification);
+    const handleNotification = (notification: any) => {
+      console.log('Received notification:', notification);
       
+      // Generate a unique key for the notification
+      const notificationKey = `${notification.title}-${notification.body}-${Date.now()}`;
+      
+      if (processedNotifications.current.has(notificationKey)) {
+        console.log('Ignoring duplicate notification');
+        return;
+      }
+      
+      processedNotifications.current.add(notificationKey);
+      
+      // Remove the key after 5 seconds to prevent the set from growing indefinitely
+      setTimeout(() => {
+        processedNotifications.current.delete(notificationKey);
+      }, 5000);
+
       const notificationType = notification.data && notification.data.type;
       let title = notification.title || '';
       let message = notification.body || '';
@@ -207,8 +196,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       });
     };
 
-    foregroundNotificationListener = onNotificationReceivedInForeground(handleForegroundNotification);
-  };
+    notificationListenerRef.current = onNotificationReceivedInForeground(handleNotification);
+    onNotificationOpened(handleNotification);
+  }, []);
 
   const checkLaunchNotification = async () => {
     try {
@@ -224,17 +214,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  const handlePermissions = async () => {
+  const { isAuthenticated } = useAuth();
+
+  const setupNotifications = useCallback(async () => {
+    if (setupDoneRef.current) return;
+    
     const status = await getPermissionStatus();
     if (status === 'granted') {
       setupTokenListenerAndIdentifyUser();
-      return;
-    }
-    if (status === 'denied') {
-      console.log('Push notifications permissions denied');
-      return;
-    }
-    if (status === 'shouldRequest' || status === 'shouldExplainThenRequest') {
+    } else if (status === 'shouldRequest' || status === 'shouldExplainThenRequest') {
       try {
         const result = await requestPermissions();
         if (result) {
@@ -245,13 +233,41 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch (error) {
         console.error('Error requesting push notification permissions:', error);
       }
+    } else {
+      console.log('Push notifications permissions denied');
     }
-  };
+
+    setupNotificationListeners();
+    checkLaunchNotification();
+    
+    setupDoneRef.current = true;
+  }, [setupNotificationListeners]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setupNotifications();
+    }
+
+    return () => {
+      if (tokenListener) {
+        tokenListener.remove();
+      }
+      if (notificationListener) {
+        notificationListener.remove();
+      }
+      if (foregroundListenerRef.current) {
+        foregroundListenerRef.current.remove();
+      }
+    };
+  }, [isAuthenticated, setupNotifications]);
+
+  let tokenListener: OnTokenReceivedOutput | null = null;
+  let notificationListener: { remove: () => void } | null = null;
 
   return (
     <NotificationContext.Provider value={{ 
       deviceToken, 
-      handlePermissions, 
+      handlePermissions: setupNotifications, 
       launchNotification,
       activeNotification
     }}>
