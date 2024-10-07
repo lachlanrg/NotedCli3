@@ -191,7 +191,7 @@ const CustomBottomSheet = forwardRef<Ref, Props>(({ selectedPost, postId }, ref)
             ? selectedPost.originalPost.userPostsId 
             : selectedPost.userPostsId;
           
-          sendCommentNotification(recipientUserId, username, newComment)
+          sendCommentNotification(postId, recipientUserId, username, newComment)
             .catch(error => console.error("Error sending comment notification:", error));
         }
       }

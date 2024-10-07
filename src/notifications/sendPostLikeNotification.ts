@@ -1,11 +1,28 @@
 import { generateClient } from 'aws-amplify/api';
 import { userDeviceTokensByUserId } from '../graphql/queries';
 import { sendNotification } from './sendNotification';
+import { createNotification } from '../graphql/mutations';
 
-export const sendPostLikeNotification = async (postId: string, postUserId: string, likerUsername: string) => {
+export const sendPostLikeNotification = async (postId: string, postUserId: string, likerUsername: string) => { 
   const client = generateClient();
 
   try {
+    // Create a notification record
+    await client.graphql({
+      query: createNotification,
+      variables: {
+        input: {
+          type: "LIKE",
+          userId: postUserId,
+          actorId: likerUsername, // Use username instead of userId
+          targetId: postId,
+          read: false,
+          message: `${likerUsername} liked your post!`,
+          createdAt: new Date().toISOString()
+        }
+      }
+    });
+
     // Fetch the UserDeviceToken for the post creator
     const userDeviceTokenResponse = await client.graphql({
       query: userDeviceTokensByUserId,
@@ -17,15 +34,16 @@ export const sendPostLikeNotification = async (postId: string, postUserId: strin
     if (userDeviceTokens.length > 0) {
       const deviceTokens = userDeviceTokens[0].deviceTokens;
 
-      // Send a notification to each valid device token
+      // Send a push notification to each valid device token
       for (const deviceToken of deviceTokens) {
-        if (deviceToken) {  // Check if deviceToken is not null or undefined
+        if (deviceToken) {
           const payload = {
             deviceToken: deviceToken,
-            title: "New Like", // This won't be displayed for likes
+            title: "New Like",
             message: `${likerUsername} liked your post!`,
             data: {
-              type: 'like'
+              type: 'like',
+              postId: postId
             }
           };
 

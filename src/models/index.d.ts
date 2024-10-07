@@ -489,3 +489,41 @@ export declare type SeenPost = LazyLoading extends LazyLoadingDisabled ? EagerSe
 export declare const SeenPost: (new (init: ModelInit<SeenPost>) => SeenPost) & {
   copyOf(source: SeenPost, mutator: (draft: MutableModel<SeenPost>) => MutableModel<SeenPost> | void): SeenPost;
 }
+
+type EagerNotification = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Notification, 'id'>;
+    readOnlyFields: 'updatedAt';
+  };
+  readonly id: string;
+  readonly type: string;
+  readonly userId: string;
+  readonly actorId: string;
+  readonly targetId?: string | null;
+  readonly read: boolean;
+  readonly message?: string | null;
+  readonly createdAt: string;
+  readonly updatedAt?: string | null;
+}
+
+type LazyNotification = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Notification, 'id'>;
+    readOnlyFields: 'updatedAt';
+  };
+  readonly id: string;
+  readonly type: string;
+  readonly userId: string;
+  readonly actorId: string;
+  readonly targetId?: string | null;
+  readonly read: boolean;
+  readonly message?: string | null;
+  readonly createdAt: string;
+  readonly updatedAt?: string | null;
+}
+
+export declare type Notification = LazyLoading extends LazyLoadingDisabled ? EagerNotification : LazyNotification
+
+export declare const Notification: (new (init: ModelInit<Notification>) => Notification) & {
+  copyOf(source: Notification, mutator: (draft: MutableModel<Notification>) => MutableModel<Notification> | void): Notification;
+}

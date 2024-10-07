@@ -1,33 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { ProfileStackParamList } from '../../components/types';
-import * as queries from '../../graphql/queries';
-import * as mutations from '../../graphql/mutations';
+import { listNotifications, getPost, getRepost } from '../../graphql/queries';
 import { Amplify } from 'aws-amplify';
 import { generateClient } from 'aws-amplify/api';
 import awsconfig from '../../aws-exports';
 import { getCurrentUser } from 'aws-amplify/auth';
-import { FriendRequest } from '../../API';
+import { Notification, Post, Repost } from '../../API';
 import { formatRelativeTime } from '../../components/formatComponents';
 import { dark, light, gray, lgray, dgray } from '../../components/colorModes';
-import { fetchUsernameById } from '../../components/getUserUsername'; 
 import { useNotification } from '../../context/NotificationContext';
-import { sendNotification } from '../../notifications/sendNotification';
-import { sendApprovalNotification } from '../../notifications/sendApprovalNotification';
 
 Amplify.configure(awsconfig);
 
 type NotificationsScreenProps = {
-  navigation: NativeStackNavigationProp<ProfileStackParamList, 'Profile'>;
+  navigation: NativeStackNavigationProp<ProfileStackParamList, 'Notifications'>;
+};
+
+type GroupedNotification = {
+  id: string;
+  type: string;
+  targetId: string | null;
+  actors: string[];
+  message: string;
+  createdAt: string;
+  imageUrl?: string;
 };
 
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [currentAuthUserInfo, setCurrentAuthUserInfo] = useState<any>(null);
-  const [friendRequests, setFriendRequests] = useState<Array<FriendRequest>>([]);
-  const [requestUsernames, setRequestUsernames] = useState<{ [userId: string]: string | null }>({});
+  const [groupedNotifications, setGroupedNotifications] = useState<GroupedNotification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { deviceToken } = useNotification();
 
   const client = generateClient();
@@ -40,141 +46,102 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     try {
       const { userId } = await getCurrentUser();
       setCurrentAuthUserInfo({ userId });
-      fetchFriendRequests(userId);
+      fetchNotifications(userId);
     } catch (err) {
       console.log(err);
+      setIsLoading(false);
     }
   }
 
-  const fetchFriendRequests = async (userId: string) => {
+  const fetchNotifications = async (userId: string) => {
     try {
-      const response = await client.graphql({
-        query: queries.listFriendRequests,
-        variables: {
-          filter: {
-            userReceivedFriendRequestsId: { eq: userId },
-          }
-        }
+      setIsLoading(true);
+      const notificationsResponse = await client.graphql({
+        query: listNotifications,
+        variables: { filter: { userId: { eq: userId } } }
       });
 
-      setFriendRequests(response.data.listFriendRequests.items as Array<FriendRequest>);
+      const notifications = notificationsResponse.data.listNotifications.items as Notification[];
+      const groupedNotifications = await groupNotifications(notifications);
+      setGroupedNotifications(groupedNotifications);
     } catch (error) {
-      console.error('Error fetching friend requests:', error);
-    }
-  };
-  
-
-  const handleApproveRequest = async (friendRequest: FriendRequest) => {
-    try {
-      const response = await client.graphql({
-        query: mutations.updateFriendRequest,
-        variables: {
-          input: {
-            id: friendRequest.id,
-            status: 'Following',
-            _version: friendRequest._version,
-          }
-        }
-      });
-
-      if (response.data.updateFriendRequest) {
-        // Immediately update the UI and refetch friend requests
-        fetchFriendRequests(currentAuthUserInfo.userId);
-
-        // Send approval notification asynchronously
-        sendApprovalNotificationAsync(friendRequest);
-      } else {
-        console.error('Failed to approve friend request:', response.errors);
-      }
-    } catch (error) {
-      console.error('Error approving friend request:', error);
+      console.error('Error fetching notifications:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const sendApprovalNotificationAsync = async (friendRequest: FriendRequest) => {
-    try {
-      // Fetch the current user's username
-      const currentUserResponse = await client.graphql({
-        query: queries.getUser,
-        variables: { id: currentAuthUserInfo.userId }
-      });
+  const groupNotifications = async (notifications: Notification[]): Promise<GroupedNotification[]> => {
+    const grouped: { [key: string]: GroupedNotification } = {};
 
-      const currentUser = currentUserResponse.data.getUser;
-      if (currentUser && currentUser.username) {
-        const currentUsername = currentUser.username;
+    for (const notification of notifications) {
+      const key = `${notification.type}-${notification.targetId || 'null'}`;
+      if (!grouped[key]) {
+        grouped[key] = {
+          id: notification.id,
+          type: notification.type,
+          targetId: notification.targetId || null,
+          actors: [notification.actorId],
+          message: notification.message || '',
+          createdAt: notification.createdAt,
+        };
 
-        // Send approval notification
-        if (friendRequest.userSentFriendRequestsId) {
-          await sendApprovalNotification(friendRequest.userSentFriendRequestsId, currentUsername);
+        // Fetch image URL for post or repost
+        if (notification.targetId) {
+          grouped[key].imageUrl = await fetchImageUrl(notification.type, notification.targetId);
         }
       } else {
-        console.error('Current user or username not found');
-      }
-    } catch (error) {
-      console.error('Error sending approval notification:', error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchUsernames = async () => {
-      const newRequestUsernames: { [userId: string]: string | null } = {};
-
-      for (const request of friendRequests) {
-        if (request.userSentFriendRequestsId) {
-          const username = await fetchUsernameById(request.userSentFriendRequestsId);
-          newRequestUsernames[request.userSentFriendRequestsId] = username;
+        grouped[key].actors.push(notification.actorId);
+        if (new Date(notification.createdAt) > new Date(grouped[key].createdAt)) {
+          grouped[key].createdAt = notification.createdAt;
         }
       }
+    }
 
-      setRequestUsernames(newRequestUsernames); 
-    };
+    const groupedArray = Object.values(grouped).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
-    fetchUsernames();
-  }, [friendRequests]); 
-
-  const handleSendTestNotification = async () => {
-    const payload = {
-      deviceToken: "84844bde225c32584f881d97cdb03ad47efe373639f5540f3a82180e96f04f73",
-      message: "This is a test notification",
-      title: "Test Notification"
-    };
-
-    await sendNotification(payload);
+    return groupedArray;
   };
 
-  const renderItem = ({ item }: { item: FriendRequest }) => {
-    const username = item.userSentFriendRequestsId 
-      ? requestUsernames[item.userSentFriendRequestsId] || 'Loading...' 
-      : 'Loading...';
-
-    if (item.status !== 'Cancelled') {
-      return (
-        <View style={styles.friendRequestItem}>
-          <View style={styles.requestInfo}>
-            <Text style={styles.friendRequestUsername}>{username}</Text> 
-            <Text style={styles.friendRequestStatus}>
-              {item.status === 'Pending' ? 'Sent a friend request' : 'Is now following you'}
-            </Text>
-            <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
-          </View>
-          {item.status === 'Pending' && (
-            <TouchableOpacity onPress={() => handleApproveRequest(item)} style={styles.approveButton}>
-              <FontAwesomeIcon icon={faCheck} size={16} color={light} />
-            </TouchableOpacity>
-          )}
-        </View>
-      );
-    } else {
-      return null;
+  const fetchImageUrl = async (type: string, targetId: string): Promise<string | undefined> => {
+    try {
+      if (type === 'LIKE' || type === 'COMMENT' || type === 'REPOST') {
+        const postResponse = await client.graphql({
+          query: getPost,
+          variables: { id: targetId }
+        });
+        const post = postResponse.data.getPost as Post;
+        return post.scTrackArtworkUrl || post.spotifyTrackImageUrl || post.spotifyAlbumImageUrl || undefined;
+      }
+    } catch (error) {
+      console.error('Error fetching image URL:', error);
     }
+    return undefined;
   };
 
-  const renderFooter = () => {
-    if (friendRequests.length === 0) {
-      return null; // Don't render anything if there are no notifications
+  const renderNotificationItem = (item: GroupedNotification) => {
+    let message = item.message;
+
+    if (item.type === 'COMMENT' && item.actors.length > 1) {
+      message = `${item.actors[0]} and ${item.actors.length - 1} others commented on your post`;
+    } else if (item.type === 'LIKE' && item.actors.length > 1) {
+      message = `${item.actors[0]} and ${item.actors.length - 1} others liked your post`;
+    } else if (item.type === 'LIKE' && item.actors.length === 1) {
+      message = `${item.actors[0]} liked your post`;
     }
+
     return (
-      <Text style={styles.noMoreNotifications}>No more notifications</Text>
+      <View key={item.id} style={styles.notificationItem}>
+        {item.imageUrl && (
+          <Image source={{ uri: item.imageUrl }} style={styles.notificationImage} />
+        )}
+        <View style={styles.notificationContent}>
+          <Text style={styles.notificationMessage}>{message}</Text>
+          <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
+        </View>
+      </View>
     );
   };
 
@@ -188,19 +155,27 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
           <Text style={styles.headerTitle}>Notifications</Text>
           <View style={styles.placeholderView} />
         </View>
-        <FlatList
-          data={friendRequests}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={() => (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <TouchableOpacity 
+            style={styles.friendRequestsButton}
+            onPress={() => navigation.navigate('FriendRequests')}
+          >
+            <Text style={styles.friendRequestsText}>Friend Requests</Text>
+            <FontAwesomeIcon icon={faChevronRight} size={18} color={light} />
+          </TouchableOpacity>
+          
+          <Text style={styles.activityTitle}>Activity</Text>
+          
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size='large' color={light} />
+            </View>
+          ) : groupedNotifications.length > 0 ? (
+            groupedNotifications.map(renderNotificationItem)
+          ) : (
             <Text style={styles.noNotifications}>No notifications</Text>
           )}
-          ListFooterComponent={renderFooter}
-        />
-        <TouchableOpacity onPress={handleSendTestNotification} style={styles.sendNotificationButton}>
-          <Text style={styles.sendNotificationButtonText}>Send Test Notification</Text>
-        </TouchableOpacity>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
@@ -225,7 +200,7 @@ const styles = StyleSheet.create({
     borderBottomColor: gray,
   },
   backButton: {
-    width: 40, // Set a fixed width
+    width: 40,
   },
   headerTitle: {
     flex: 1,
@@ -235,45 +210,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   placeholderView: {
-    width: 40, // Match the width of the backButton
+    width: 40,
   },
-  listContent: {
+  scrollContent: {
     paddingHorizontal: 20,
   },
-  friendRequestItem: {
+  notificationItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: gray,
   },
-  requestInfo: {
+  notificationImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 4,
+    marginRight: 15,
+  },
+  notificationContent: {
     flex: 1,
   },
-  friendRequestUsername: {
-    fontWeight: 'bold',
+  notificationMessage: {
     fontSize: 16,
     color: light,
     marginBottom: 4,
   },
-  friendRequestStatus: {
-    fontSize: 14,
-    color: lgray,
-    marginBottom: 2,
-  },
   timestamp: {
     fontSize: 12,
     color: dgray,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-  },
-  approveButton: {
-    backgroundColor: '#4CAF50',
-    padding: 8,
-    borderRadius: 20,
-    marginLeft: 10,
   },
   noNotifications: {
     textAlign: 'center',
@@ -281,24 +246,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: lgray,
   },
-  noMoreNotifications: {
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    fontSize: 14,
-    color: dgray,
-  },
-  sendNotificationButton: {
-    backgroundColor: light,
-    padding: 15,
-    borderRadius: 10,
-    margin: 20,
+  friendRequestsButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: gray,
   },
-  sendNotificationButtonText: {
-    color: dark,
+  friendRequestsText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: light,
+  },
+  activityTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: light,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+    marginTop: 40,
   },
 });
 

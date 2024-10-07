@@ -1,11 +1,39 @@
 import { generateClient } from 'aws-amplify/api';
-import { userDeviceTokensByUserId } from '../graphql/queries';
+import { userDeviceTokensByUserId, getPost } from '../graphql/queries';
 import { sendNotification } from './sendNotification';
+import { createNotification } from '../graphql/mutations';
 
 export const sendRepostNotification = async (postId: string, postUserId: string, reposterUsername: string) => {
   const client = generateClient();
 
   try {
+    // Fetch the original post first
+    const postResponse = await client.graphql({
+      query: getPost,
+      variables: { id: postId }
+    });
+    const originalPost = postResponse.data.getPost;
+
+    if (!originalPost) {
+      throw new Error('Original post not found');
+    }
+
+    // Create a notification record
+    await client.graphql({
+      query: createNotification,
+      variables: {
+        input: {
+          type: "REPOST",
+          userId: postUserId,
+          actorId: reposterUsername,
+          targetId: postId,
+          read: false,
+          message: `${reposterUsername} reposted your post!`,
+          createdAt: new Date().toISOString()
+        }
+      }
+    });
+
     // Fetch the UserDeviceToken for the original post creator
     const userDeviceTokenResponse = await client.graphql({
       query: userDeviceTokensByUserId,
@@ -21,13 +49,14 @@ export const sendRepostNotification = async (postId: string, postUserId: string,
 
       // Send a notification to each valid device token
       for (const deviceToken of deviceTokens) {
-        if (deviceToken) {  // Check if deviceToken is not null or undefined
+        if (deviceToken) {
           const payload = {
             deviceToken: deviceToken,
             title: notificationMessage,
-            message: '', // We'll leave this empty as we want to display the title as the main message
+            message: '',
             data: {
-              type: 'repost'
+              type: 'repost',
+              postId: postId
             }
           };
 

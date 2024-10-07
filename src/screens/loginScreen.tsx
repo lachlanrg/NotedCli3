@@ -10,6 +10,7 @@ import { createUser } from '../graphql/mutations';
 import { generateClient } from 'aws-amplify/api';
 import ConfirmationCodeInput from '../components/ConfirmationCodeInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { HomeScreenData, initializeHomeScreenData } from '../utils/homeScreenInitializer';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -34,8 +35,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
       if (isSignedIn) {
         console.log("Successful Sign In with:", username);
-        navigation.navigate('Main'); 
-        // navigation.navigate("SignUpSpotifyLogin");
+        
+        const homeScreenData: HomeScreenData = await initializeHomeScreenData();
+        // Navigate to Main stack with initialized data
+        navigation.navigate('Main', { 
+          screen: 'HomeTab', 
+          params: { 
+            screen: 'Home', 
+            params: { initialData: homeScreenData } 
+          } 
+        });
 
         setIsAuthenticated(true);
 

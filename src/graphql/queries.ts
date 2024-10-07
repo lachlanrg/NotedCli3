@@ -1397,3 +1397,130 @@ export const seenPostsByItemId = /* GraphQL */ `query SeenPostsByItemId(
   APITypes.SeenPostsByItemIdQueryVariables,
   APITypes.SeenPostsByItemIdQuery
 >;
+export const getNotification = /* GraphQL */ `query GetNotification($id: ID!) {
+  getNotification(id: $id) {
+    id
+    type
+    userId
+    actorId
+    targetId
+    read
+    message
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetNotificationQueryVariables,
+  APITypes.GetNotificationQuery
+>;
+export const listNotifications = /* GraphQL */ `query ListNotifications(
+  $filter: ModelNotificationFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listNotifications(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      type
+      userId
+      actorId
+      targetId
+      read
+      message
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListNotificationsQueryVariables,
+  APITypes.ListNotificationsQuery
+>;
+export const syncNotifications = /* GraphQL */ `query SyncNotifications(
+  $filter: ModelNotificationFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncNotifications(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      type
+      userId
+      actorId
+      targetId
+      read
+      message
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncNotificationsQueryVariables,
+  APITypes.SyncNotificationsQuery
+>;
+export const notificationsByUserIdAndCreatedAt = /* GraphQL */ `query NotificationsByUserIdAndCreatedAt(
+  $userId: ID!
+  $createdAt: ModelStringKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelNotificationFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  notificationsByUserIdAndCreatedAt(
+    userId: $userId
+    createdAt: $createdAt
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      type
+      userId
+      actorId
+      targetId
+      read
+      message
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.NotificationsByUserIdAndCreatedAtQueryVariables,
+  APITypes.NotificationsByUserIdAndCreatedAtQuery
+>;
