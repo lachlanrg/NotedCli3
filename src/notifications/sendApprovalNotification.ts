@@ -1,6 +1,7 @@
 import { generateClient } from 'aws-amplify/api';
 import { userDeviceTokensByUserId } from '../graphql/queries';
 import { sendNotification } from './sendNotification';
+import { createNotification } from '../graphql/mutations';
 
 export const sendApprovalNotification = async (
   recipientUserId: string,
@@ -9,6 +10,22 @@ export const sendApprovalNotification = async (
   const client = generateClient();
 
   try {
+    // Create a notification record
+    await client.graphql({
+      query: createNotification,
+      variables: {
+        input: {
+          type: "APPROVAL",
+          userId: recipientUserId,
+          actorId: approverUsername,
+          targetId: null, // Approval doesn't have a specific target
+          read: false,
+          message: `${approverUsername} approved your follow request`,
+          createdAt: new Date().toISOString()
+        }
+      }
+    });
+
     // Fetch the UserDeviceToken for the recipient
     const userDeviceTokenResponse = await client.graphql({
       query: userDeviceTokensByUserId,
@@ -24,11 +41,11 @@ export const sendApprovalNotification = async (
 
       // Send a notification to each valid device token
       for (const deviceToken of deviceTokens) {
-        if (deviceToken) {  // Check if deviceToken is not null or undefined
+        if (deviceToken) {
           const payload = {
             deviceToken: deviceToken,
             title: notificationMessage,
-            message: '', // We'll leave this empty as we want to display the title as the main message
+            message: '',
             data: {
               type: 'approval'
             }

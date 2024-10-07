@@ -1,11 +1,28 @@
 import { generateClient } from 'aws-amplify/api';
 import { userDeviceTokensByUserId } from '../graphql/queries';
 import { sendNotification } from './sendNotification';
+import { createNotification } from '../graphql/mutations';
 
 export const sendCommentLikeNotification = async (commentId: string, commentUserId: string, likerUsername: string) => {
   const client = generateClient();
 
   try {
+    // Create a notification record
+    await client.graphql({
+      query: createNotification,
+      variables: {
+        input: {
+          type: "COMMENT_LIKE",
+          userId: commentUserId,
+          actorId: likerUsername,
+          targetId: commentId,
+          read: false,
+          message: `${likerUsername} liked your comment!`,
+          createdAt: new Date().toISOString()
+        }
+      }
+    });
+
     // Fetch the UserDeviceToken for the comment creator
     const userDeviceTokenResponse = await client.graphql({
       query: userDeviceTokensByUserId,
@@ -21,13 +38,14 @@ export const sendCommentLikeNotification = async (commentId: string, commentUser
 
       // Send a notification to each valid device token
       for (const deviceToken of deviceTokens) {
-        if (deviceToken) {  // Check if deviceToken is not null or undefined
+        if (deviceToken) {
           const payload = {
             deviceToken: deviceToken,
             title: notificationMessage,
-            message: '', // We'll leave this empty as we want to display the title as the main message
+            message: '',
             data: {
-              type: 'comment_like'
+              type: 'comment_like',
+              commentId: commentId
             }
           };
 

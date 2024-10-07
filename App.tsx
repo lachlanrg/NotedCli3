@@ -47,6 +47,7 @@ import SearchSpotifyTrackScreen from './src/screens/SearchStack/searchSpotifyTra
 import SearchSpotifyArtistScreen from './src/screens/SearchStack/searchSpotifyArtistScreen';
 import SearchSCTrackScreen from './src/screens/SearchStack/searchSCTrackScreen';
 import ProfilePostScreen from './src/screens/ProfileStack/profilePostScreen';
+import FriendRequestsScreen from './src/screens/ProfileStack/friendRequestsScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -121,6 +122,7 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="UserSearch" component={UserSearchScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="UserSearchProfile" component={UserSearchProfileScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="FriendRequests" component={FriendRequestsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="GeneralSettings" component={GeneralSettingsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="AccountSettings" component={AccountSettingsScreen} options={{ headerShown: false }} />

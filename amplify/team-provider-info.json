@@ -42,7 +42,7 @@
       "function": {
         "SpotifyRecentlyPlayedLambda": {
           "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
-          "s3Key": "amplify-builds/SpotifyRecentlyPlayedLambda-564648366f4c6f565276-build.zip"
+          "s3Key": "amplify-builds/SpotifyRecentlyPlayedLambda-62685730486976466470-build.zip"
         },
         "sendNotificationsoundcred": {
           "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",

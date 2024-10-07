@@ -35,6 +35,7 @@ export type ProfileStackParamList = {
   UserSearch: undefined;
   UserSearchProfile: { userId: string };
   Notifications: undefined;
+  FriendRequests: undefined; // Add this line
   ResetPassword: undefined;
   GeneralSettings: undefined;
   AccountSettings: undefined;
