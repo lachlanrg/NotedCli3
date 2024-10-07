@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Image, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, FlatList, Image, ActivityIndicator } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -30,11 +30,36 @@ type GroupedNotification = {
   imageUrl?: string;
 };
 
+const NotificationItem = React.memo(({ item }: { item: GroupedNotification }) => {
+  let message = item.message;
+
+  if (item.type === 'COMMENT' && item.actors.length > 1) {
+    message = `${item.actors[0]} and ${item.actors.length - 1} others commented on your post`;
+  } else if (item.type === 'LIKE' && item.actors.length > 1) {
+    message = `${item.actors[0]} and ${item.actors.length - 1} others liked your post`;
+  } else if (item.type === 'LIKE' && item.actors.length === 1) {
+    message = `${item.actors[0]} liked your post`;
+  }
+
+  return (
+    <View style={styles.notificationItem}>
+      {item.imageUrl && (
+        <Image source={{ uri: item.imageUrl }} style={styles.notificationImage} />
+      )}
+      <View style={styles.notificationContent}>
+        <Text style={styles.notificationMessage}>{message}</Text>
+        <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
+      </View>
+    </View>
+  );
+});
+
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [currentAuthUserInfo, setCurrentAuthUserInfo] = useState<any>(null);
   const [groupedNotifications, setGroupedNotifications] = useState<GroupedNotification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { deviceToken } = useNotification();
+  const [nextToken, setNextToken] = useState<string | null>(null);
 
   const client = generateClient();
 
@@ -53,17 +78,34 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     }
   }
 
-  const fetchNotifications = async (userId: string) => {
+  const fetchNotifications = async (userId: string, nextTokenParam?: string | null) => {
     try {
       setIsLoading(true);
       const notificationsResponse = await client.graphql({
         query: listNotifications,
-        variables: { filter: { userId: { eq: userId } } }
+        variables: { 
+          filter: { userId: { eq: userId } },
+          limit: 20,
+          nextToken: nextTokenParam
+        }
       });
 
-      const notifications = notificationsResponse.data.listNotifications.items as Notification[];
-      const groupedNotifications = await groupNotifications(notifications);
-      setGroupedNotifications(groupedNotifications);
+      const newNotifications = notificationsResponse.data.listNotifications.items as Notification[];
+      const newGroupedNotifications = await groupNotifications(newNotifications);
+      
+      if (nextTokenParam) {
+        setGroupedNotifications(prev => [...prev, ...newGroupedNotifications]);
+      } else {
+        setGroupedNotifications(newGroupedNotifications);
+      }
+      
+      // Only set the nextToken if it's not undefined
+      const responseNextToken = notificationsResponse.data.listNotifications.nextToken;
+      if (responseNextToken !== undefined) {
+        setNextToken(responseNextToken);
+      } else {
+        setNextToken(null);
+      }
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -121,29 +163,17 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     return undefined;
   };
 
-  const renderNotificationItem = (item: GroupedNotification) => {
-    let message = item.message;
-
-    if (item.type === 'COMMENT' && item.actors.length > 1) {
-      message = `${item.actors[0]} and ${item.actors.length - 1} others commented on your post`;
-    } else if (item.type === 'LIKE' && item.actors.length > 1) {
-      message = `${item.actors[0]} and ${item.actors.length - 1} others liked your post`;
-    } else if (item.type === 'LIKE' && item.actors.length === 1) {
-      message = `${item.actors[0]} liked your post`;
+  const loadMoreNotifications = () => {
+    if (nextToken && !isLoading && currentAuthUserInfo) {
+      fetchNotifications(currentAuthUserInfo.userId, nextToken);
     }
-
-    return (
-      <View key={item.id} style={styles.notificationItem}>
-        {item.imageUrl && (
-          <Image source={{ uri: item.imageUrl }} style={styles.notificationImage} />
-        )}
-        <View style={styles.notificationContent}>
-          <Text style={styles.notificationMessage}>{message}</Text>
-          <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
-        </View>
-      </View>
-    );
   };
+
+  const renderNotificationItem = useCallback(({ item }: { item: GroupedNotification }) => (
+    <NotificationItem item={item} />
+  ), []);
+
+  const keyExtractor = useCallback((item: GroupedNotification) => item.id, []);
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
@@ -155,27 +185,38 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
           <Text style={styles.headerTitle}>Notifications</Text>
           <View style={styles.placeholderView} />
         </View>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <TouchableOpacity 
-            style={styles.friendRequestsButton}
-            onPress={() => navigation.navigate('FriendRequests')}
-          >
-            <Text style={styles.friendRequestsText}>Friend Requests</Text>
-            <FontAwesomeIcon icon={faChevronRight} size={18} color={light} />
-          </TouchableOpacity>
-          
-          <Text style={styles.activityTitle}>Activity</Text>
-          
-          {isLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size='large' color={light} />
-            </View>
-          ) : groupedNotifications.length > 0 ? (
-            groupedNotifications.map(renderNotificationItem)
-          ) : (
-            <Text style={styles.noNotifications}>No notifications</Text>
-          )}
-        </ScrollView>
+        <FlatList
+          contentContainerStyle={styles.flatListContent}
+          data={groupedNotifications}
+          renderItem={renderNotificationItem}
+          keyExtractor={keyExtractor}
+          onEndReached={loadMoreNotifications}
+          onEndReachedThreshold={0.5}
+          ListHeaderComponent={
+            <>
+              <TouchableOpacity 
+                style={styles.friendRequestsButton}
+                onPress={() => navigation.navigate('FriendRequests')}
+              >
+                <Text style={styles.friendRequestsText}>Friend Requests</Text>
+                <FontAwesomeIcon icon={faChevronRight} size={18} color={light} />
+              </TouchableOpacity>
+              <Text style={styles.activityTitle}>Activity</Text>
+            </>
+          }
+          ListEmptyComponent={
+            !isLoading ? (
+              <Text style={styles.noNotifications}>No notifications</Text>
+            ) : null
+          }
+          ListFooterComponent={
+            isLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size='large' color={light} />
+              </View>
+            ) : null
+          }
+        />
       </View>
     </SafeAreaView>
   );
@@ -212,15 +253,10 @@ const styles = StyleSheet.create({
   placeholderView: {
     width: 40,
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-  },
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: gray,
   },
   notificationImage: {
     width: 50,
@@ -273,6 +309,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     marginTop: 40,
+  },
+  flatListContent: {
+    paddingHorizontal: 20, // Add horizontal padding here
   },
 });
 
