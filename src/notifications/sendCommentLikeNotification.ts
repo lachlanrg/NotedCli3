@@ -46,7 +46,8 @@ export const sendCommentLikeNotification = async (commentId: string, commentUser
             data: {
               type: 'comment_like',
               commentId: commentId
-            }
+            },
+            userId: commentUserId
           };
 
           await sendNotification(payload);

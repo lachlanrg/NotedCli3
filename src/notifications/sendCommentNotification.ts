@@ -49,7 +49,8 @@ export const sendCommentNotification = async (postId: string, postUserId: string
             data: {
               type: 'comment',
               postId: postId
-            }
+            },
+            userId: postUserId // Add this line
           };
 
           await sendNotification(payload);

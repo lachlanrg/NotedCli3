@@ -57,7 +57,8 @@ export const sendRepostNotification = async (postId: string, postUserId: string,
             data: {
               type: 'repost',
               postId: postId
-            }
+            },
+            userId: postUserId
           };
 
           await sendNotification(payload);

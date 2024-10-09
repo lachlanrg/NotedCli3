@@ -48,7 +48,8 @@ export const sendApprovalNotification = async (
             message: '',
             data: {
               type: 'approval'
-            }
+            },
+            userId: recipientUserId
           };
 
           await sendNotification(payload);

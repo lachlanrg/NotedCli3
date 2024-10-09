@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Text, Animated, StyleSheet, TouchableOpacity, PanResponder, Dimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNotification } from '../context/NotificationContext';
 
 interface PopdownNotificationProps {
   title: string;
@@ -10,6 +11,7 @@ interface PopdownNotificationProps {
 }
 
 const PopdownNotification: React.FC<PopdownNotificationProps> = ({ title, message, isComment, onDismiss }) => {
+  const { inAppEnabled } = useNotification();
   const translateY = useRef(new Animated.Value(-100)).current;
   const { height } = Dimensions.get('window');
 
@@ -37,6 +39,11 @@ const PopdownNotification: React.FC<PopdownNotificationProps> = ({ title, messag
   });
 
   useEffect(() => {
+    if (!inAppEnabled) {
+      onDismiss();
+      return;
+    }
+
     Animated.spring(translateY, {
       toValue: 0,
       useNativeDriver: true,
@@ -51,7 +58,11 @@ const PopdownNotification: React.FC<PopdownNotificationProps> = ({ title, messag
     }, 8000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [inAppEnabled]);
+
+  if (!inAppEnabled) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={[styles.safeArea, { top: height * 0.08 }]} edges={['top']}>

@@ -16,6 +16,7 @@ type User @model @auth(rules: [{allow: public}]) {
   spotifyImage: String
   soundCloudUri: String
   userDeviceTokens: [UserDeviceToken] @hasMany
+  notificationSettings: NotificationSettings @hasOne
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {
@@ -154,4 +155,17 @@ type Notification @model @auth(rules: [{allow: public}]) {
   read: Boolean!
   message: String
   createdAt: AWSDateTime!
+}
+
+type NotificationSettings @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  userId: ID! @index(name: "byUserId", sortKeyFields: ["id"])
+  user: User @belongsTo(fields: ["userId"])
+  likeEnabled: Boolean!
+  commentEnabled: Boolean!
+  followRequestEnabled: Boolean!
+  repostEnabled: Boolean!
+  commentLikeEnabled: Boolean!
+  approvalEnabled: Boolean!
+  inAppEnabled: Boolean!
 }

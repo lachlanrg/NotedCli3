@@ -67,7 +67,8 @@ import { ExploreStackParamList } from './src/components/types';
 
 import { initializePushNotifications } from 'aws-amplify/push-notifications';
 import { NotificationProvider } from './src/context/NotificationContext';
-import { AuthProvider } from './src/context/AuthContext';
+
+initializePushNotifications();
 
 (Amplify as any).configure(awsconfig);
 
@@ -193,7 +194,6 @@ const App = () => {
   const navigationRef = useRef(null);
 
   return (
-    <AuthProvider>
       <NotificationProvider>
         <SpotifyProvider>
           <SafeAreaProvider>
@@ -236,7 +236,6 @@ const App = () => {
           </SafeAreaProvider>
         </SpotifyProvider>
       </NotificationProvider>
-    </AuthProvider>
   );
 };
 
