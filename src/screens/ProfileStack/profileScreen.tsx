@@ -87,8 +87,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         query: listSpotifyRecentlyPlayedTracks,
         variables: { 
           filter: { 
-            userSpotifyRecentlyPlayedTrackId: { eq: userResponse.userId } 
-          } 
+            and: [
+              { userSpotifyRecentlyPlayedTrackId: { eq: userResponse.userId } },
+              { _deleted: { ne: true } } // Filter out deleted tracks
+            ]
+          },
         },
       });
 

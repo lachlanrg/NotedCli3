@@ -11,6 +11,8 @@ import { generateClient } from 'aws-amplify/api';
 import * as queries from '../../graphql/queries';
 import * as mutations from '../../graphql/mutations';
 import { updateUser } from '../../graphql/mutations';
+import { deleteSpotifyRecentlyPlayedTrack } from '../../graphql/mutations';
+import { deleteSpotifyTokens } from '../../graphql/mutations';
 
 const SpotifyAccountSettingsScreen: React.FC = () => {
     const navigation = useNavigation<any>();
@@ -41,14 +43,96 @@ const SpotifyAccountSettingsScreen: React.FC = () => {
 
     const handleSpotifySignOut = async () => {
         try {
+            // Remove Spotify-related data from AsyncStorage
             await AsyncStorage.removeItem('spotifyAccessToken');
             await AsyncStorage.removeItem('spotifyRefreshToken');
             await AsyncStorage.removeItem('spotifyTokenExpiration');
             await AsyncStorage.removeItem('spotifyUser');
-            console.log('Spotify user signed out');
+
+            // Delete all recently played tracks associated with the user
+            await deleteAllRecentlyPlayedTracks();
+
+            // Delete the SpotifyTokens entry for the user
+            await deleteSpotifyTokensEntry();
+
+            console.log('Spotify user signed out, recently played tracks and tokens deleted');
             navigation.goBack();
         } catch (error) {
             console.log('Error signing out Spotify user: ', error);
+        }
+    };
+
+    const deleteAllRecentlyPlayedTracks = async () => {
+        const client = generateClient();
+        try {
+            const { userId } = await getCurrentUser();
+
+            // Fetch all recently played tracks for the user
+            const response = await client.graphql({
+                query: queries.listSpotifyRecentlyPlayedTracks,
+                variables: {
+                    filter: {
+                        userSpotifyRecentlyPlayedTrackId: { eq: userId }
+                    }
+                }
+            });
+
+            const tracks = response.data.listSpotifyRecentlyPlayedTracks.items;
+
+            // Delete each track
+            for (const track of tracks) {
+                await client.graphql({
+                    query: deleteSpotifyRecentlyPlayedTrack,
+                    variables: {
+                        input: {
+                            id: track.id,
+                            _version: track._version
+                        }
+                    }
+                });
+            }
+
+            console.log(`Deleted ${tracks.length} recently played tracks`);
+        } catch (error) {
+            console.error('Error deleting recently played tracks:', error);
+        }
+    };
+
+    const deleteSpotifyTokensEntry = async () => {
+        const client = generateClient();
+        try {
+            const { userId } = await getCurrentUser();
+
+            // Fetch the SpotifyTokens entry for the user
+            const response = await client.graphql({
+                query: queries.listSpotifyTokens,
+                variables: {
+                    filter: {
+                        userId: { eq: userId }
+                    }
+                }
+            });
+
+            const tokens = response.data.listSpotifyTokens.items;
+
+            if (tokens.length > 0) {
+                // Delete the SpotifyTokens entry
+                await client.graphql({
+                    query: deleteSpotifyTokens,
+                    variables: {
+                        input: {
+                            id: tokens[0].id,
+                            _version: tokens[0]._version
+                        }
+                    }
+                });
+
+                console.log('Deleted SpotifyTokens entry for the user');
+            } else {
+                console.log('No SpotifyTokens entry found for the user');
+            }
+        } catch (error) {
+            console.error('Error deleting SpotifyTokens entry:', error);
         }
     };
 

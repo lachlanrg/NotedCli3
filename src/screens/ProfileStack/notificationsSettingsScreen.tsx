@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Switch, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -163,7 +163,7 @@ const NotificationsSettingsScreen: React.FC = () => {
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Notifications Settings</Text>
                 </View>
-                <View style={styles.content}>
+                <ScrollView style={styles.scrollView} contentContainerStyle={styles.contentContainer}>
                     <View style={styles.globalToggleContainer}>
                         <Text style={styles.globalToggleLabel}>All Notifications</Text>
                         <Switch
@@ -184,7 +184,7 @@ const NotificationsSettingsScreen: React.FC = () => {
                     {renderSettingItem('Reposts', 'repostEnabled')}
                     {renderSettingItem('Comment Likes', 'commentLikeEnabled')}
                     {renderSettingItem('Approvals', 'approvalEnabled')}
-                </View>
+                </ScrollView>
             </View>
         </SafeAreaView>
     );
@@ -217,10 +217,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: light,
         textAlign: 'center',
-        marginRight: 34, // To center the title with the back button
+        marginRight: 34,
     },
-    content: {
+    scrollView: {
         flex: 1,
+    },
+    contentContainer: {
         padding: 20,
     },
     settingItem: {
