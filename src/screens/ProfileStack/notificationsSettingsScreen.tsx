@@ -5,19 +5,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { dark, gray, light } from '../../components/colorModes';
 import { generateClient } from 'aws-amplify/api';
-import { getNotificationSettings } from '../../graphql/queries';
+import { listNotificationSettings } from '../../graphql/queries'; // Import the generated query
 import { updateNotificationSettings } from '../../graphql/mutations';
 import { getCurrentUser } from '@aws-amplify/auth';
+import { GraphQLResult } from '@aws-amplify/api-graphql';
+import { useNotification } from '../../context/NotificationContext';
+
+// Update the NotificationSettings interface
+interface NotificationSettings {
+  id: string;
+  userId: string;
+  likeEnabled: boolean;
+  commentEnabled: boolean;
+  followRequestEnabled: boolean;
+  repostEnabled: boolean;
+  commentLikeEnabled: boolean;
+  approvalEnabled: boolean;
+  inAppEnabled: boolean;
+  _version: number;
+}
+
+type UpdatableSettingKey = Exclude<keyof NotificationSettings, 'id' | 'userId'>;
 
 const NotificationsSettingsScreen: React.FC = () => {
     const navigation = useNavigation();
-    const [settings, setSettings] = useState({
+    const { updateInAppEnabled } = useNotification();
+    const [settings, setSettings] = useState<NotificationSettings>({
+        id: '',
+        userId: '',
         likeEnabled: true,
         commentEnabled: true,
         followRequestEnabled: true,
         repostEnabled: true,
         commentLikeEnabled: true,
         approvalEnabled: true,
+        inAppEnabled: true,
+        _version: 1,
     });
 
     const client = generateClient();
@@ -30,12 +53,18 @@ const NotificationsSettingsScreen: React.FC = () => {
         try {
             const { userId } = await getCurrentUser();
             const settingsData = await client.graphql({
-                query: getNotificationSettings,
-                variables: { id: userId }
-            });
+                query: listNotificationSettings,
+                variables: { 
+                    filter: { userId: { eq: userId } }
+                }
+            }) as GraphQLResult<{
+                listNotificationSettings: {
+                    items: NotificationSettings[];
+                }
+            }>;
             
-            if (settingsData.data.getNotificationSettings) {
-                setSettings(settingsData.data.getNotificationSettings);
+            if (settingsData.data?.listNotificationSettings.items.length > 0) {
+                setSettings(settingsData.data.listNotificationSettings.items[0]);
             } else {
                 console.error('No notification settings found for user');
             }
@@ -44,34 +73,83 @@ const NotificationsSettingsScreen: React.FC = () => {
         }
     };
 
-    const updateSetting = async (key: string, value: boolean) => {
+    const updateSetting = async (key: UpdatableSettingKey, value: boolean) => {
         try {
-            const { userId } = await getCurrentUser();
             const updatedSettings = { ...settings, [key]: value };
             setSettings(updatedSettings);
 
-            await client.graphql({
+            const result = await client.graphql({
                 query: updateNotificationSettings,
                 variables: {
                     input: {
-                        id: userId,
+                        id: settings.id,
                         [key]: value,
+                        _version: settings._version
                     }
                 }
-            });
+            }) as GraphQLResult<{
+                updateNotificationSettings: NotificationSettings;
+            }>;
+
+            if (result.data?.updateNotificationSettings) {
+                setSettings(result.data.updateNotificationSettings);
+                if (key === 'inAppEnabled') {
+                    updateInAppEnabled(value);
+                }
+            }
         } catch (error) {
             console.error('Error updating notification setting:', error);
+            setSettings(settings);
         }
     };
 
-    const renderSettingItem = (label: string, key: string) => (
+    const toggleAllNotifications = async (enabled: boolean) => {
+        try {
+            const updatedSettings = {
+                likeEnabled: enabled,
+                commentEnabled: enabled,
+                followRequestEnabled: enabled,
+                repostEnabled: enabled,
+                commentLikeEnabled: enabled,
+                approvalEnabled: enabled,
+                inAppEnabled: enabled,
+            };
+
+            const result = await client.graphql({
+                query: updateNotificationSettings,
+                variables: {
+                    input: {
+                        id: settings.id,
+                        ...updatedSettings,
+                        _version: settings._version
+                    }
+                }
+            }) as GraphQLResult<{
+                updateNotificationSettings: NotificationSettings;
+            }>;
+
+            if (result.data?.updateNotificationSettings) {
+                setSettings(result.data.updateNotificationSettings);
+                updateInAppEnabled(enabled);
+            }
+        } catch (error) {
+            console.error('Error updating all notification settings:', error);
+            setSettings(settings);
+        }
+    };
+
+    const allNotificationsEnabled = Object.values(settings).every(
+        (value) => value === true || typeof value !== 'boolean'
+    );
+
+    const renderSettingItem = (label: string, key: UpdatableSettingKey) => (
         <View style={styles.settingItem}>
             <Text style={styles.settingLabel}>{label}</Text>
             <Switch
-                value={settings[key as keyof typeof settings]}
+                value={Boolean(settings[key])}
                 onValueChange={(value) => updateSetting(key, value)}
                 trackColor={{ false: gray, true: '#4CAF50' }}
-                thumbColor={settings[key as keyof typeof settings] ? '#fff' : '#f4f3f4'}
+                thumbColor={Boolean(settings[key]) ? '#fff' : '#f4f3f4'}
             />
         </View>
     );
@@ -86,6 +164,20 @@ const NotificationsSettingsScreen: React.FC = () => {
                     <Text style={styles.headerTitle}>Notifications Settings</Text>
                 </View>
                 <View style={styles.content}>
+                    <View style={styles.globalToggleContainer}>
+                        <Text style={styles.globalToggleLabel}>All Notifications</Text>
+                        <Switch
+                            value={allNotificationsEnabled}
+                            onValueChange={toggleAllNotifications}
+                            trackColor={{ false: gray, true: '#4CAF50' }}
+                            thumbColor={allNotificationsEnabled ? '#fff' : '#f4f3f4'}
+                        />
+                    </View>
+                    
+                    <Text style={styles.sectionTitle}>General</Text>
+                    {renderSettingItem('In App Notifications', 'inAppEnabled')}
+                    
+                    <Text style={styles.sectionTitleActivity}>Activity</Text>
                     {renderSettingItem('Likes', 'likeEnabled')}
                     {renderSettingItem('Comments', 'commentEnabled')}
                     {renderSettingItem('Follow Requests', 'followRequestEnabled')}
@@ -141,6 +233,33 @@ const styles = StyleSheet.create({
     },
     settingLabel: {
         fontSize: 16,
+        color: light,
+    },
+    sectionTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: light,
+        marginBottom: 10,
+    },
+    sectionTitleActivity: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: light,
+        marginBottom: 10,
+        marginTop: 20,
+    },
+    globalToggleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: gray,
+        marginBottom: 20,
+    },
+    globalToggleLabel: {
+        fontSize: 18,
+        fontWeight: 'bold',
         color: light,
     },
 });

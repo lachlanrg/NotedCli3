@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, SafeAreaView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../context/AuthContext';
 
 import { signIn, type SignInInput, signOut, getCurrentUser, confirmSignUp, resendSignUpCode, autoSignIn } from 'aws-amplify/auth';
 import { dark, light, error, gray, placeholder } from '../components/colorModes';
@@ -16,6 +15,7 @@ type LoginScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
 
+
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -24,8 +24,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [confirmationCode, setConfirmationCode] = useState('');
   const [confirmationEmail, setConfirmationEmail] = useState(''); // New state for email in modal
   const client = generateClient(); 
-
-  const { setIsAuthenticated } = useAuth();
 
   async function handleSignIn() {
     try {
@@ -45,8 +43,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             params: { initialData: homeScreenData } 
           } 
         });
-
-        setIsAuthenticated(true);
 
       } else if (nextStep && nextStep.signInStep === 'CONFIRM_SIGN_UP') {
         console.log('User not confirmed. Showing confirmation modal...');

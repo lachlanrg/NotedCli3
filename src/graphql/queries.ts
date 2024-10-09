@@ -72,6 +72,7 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -1580,6 +1581,7 @@ export const getNotificationSettings = /* GraphQL */ `query GetNotificationSetti
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version
@@ -1611,6 +1613,7 @@ export const listNotificationSettings = /* GraphQL */ `query ListNotificationSet
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -1648,6 +1651,7 @@ export const syncNotificationSettings = /* GraphQL */ `query SyncNotificationSet
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -1689,6 +1693,7 @@ export const notificationSettingsByUserIdAndId = /* GraphQL */ `query Notificati
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version

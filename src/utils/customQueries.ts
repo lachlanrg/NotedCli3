@@ -111,3 +111,39 @@ export const getSCTrackPostAndRepostCount = /* GraphQL */ `
     }
   }
 `;
+
+export const getNotificationSettingsByUserId = /* GraphQL */ `
+  query GetNotificationSettingsByUserId(
+    $userId: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelNotificationSettingsFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    notificationSettingsByUserId(
+      userId: $userId
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        userId
+        likeEnabled
+        commentEnabled
+        followRequestEnabled
+        repostEnabled
+        commentLikeEnabled
+        approvalEnabled
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;

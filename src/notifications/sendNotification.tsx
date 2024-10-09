@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 import { generateClient } from 'aws-amplify/api';
-import { getNotificationSettings } from '../graphql/queries';
+import { getNotificationSettings, listNotificationSettings } from '../graphql/queries';
 
 interface NotificationPayload {
   deviceToken: string;
@@ -21,11 +21,13 @@ export const sendNotification = async (payload: NotificationPayload): Promise<vo
 
     // Fetch user's notification settings
     const settingsResponse = await client.graphql({
-      query: getNotificationSettings,
-      variables: { id: payload.userId }
+      query: listNotificationSettings,
+      variables: { 
+          filter: { userId: { eq: payload.userId } }
+      }
     });
 
-    const userSettings = settingsResponse.data.getNotificationSettings;
+    const userSettings = settingsResponse.data.listNotificationSettings.items[0];
     if (!userSettings) {
       console.log(`No notification settings found for user ${payload.userId}`);
       return;

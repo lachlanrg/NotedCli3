@@ -167,4 +167,5 @@ type NotificationSettings @model @auth(rules: [{allow: public}]) {
   repostEnabled: Boolean!
   commentLikeEnabled: Boolean!
   approvalEnabled: Boolean!
+  inAppEnabled: Boolean!
 }

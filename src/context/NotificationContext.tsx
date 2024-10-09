@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import {
   getPermissionStatus,
@@ -22,14 +22,15 @@ import { generateClient } from 'aws-amplify/api';
 import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import PopdownNotification from '../components/PopdownNotification';
-import { useAuth } from './AuthContext';
-import { getNotificationSettings } from '../graphql/queries';
+import { getNotificationSettings, listNotificationSettings } from '../graphql/queries';
 
 interface NotificationContextType {
   deviceToken: string | null;
   handlePermissions: () => Promise<void>;
   launchNotification: GetLaunchNotificationOutput | null;
   activeNotification: { title: string; message: string; isComment: boolean } | null;
+  inAppEnabled: boolean;
+  updateInAppEnabled: (enabled: boolean) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -46,11 +47,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [deviceToken, setDeviceToken] = useState<string | null>(null);
   const [launchNotification, setLaunchNotification] = useState<GetLaunchNotificationOutput | null>(null);
   const [activeNotification, setActiveNotification] = useState<{ title: string; message: string; isComment: boolean } | null>(null);
-  const setupDoneRef = useRef(false);
-  const foregroundListenerRef = useRef<OnNotificationReceivedInForegroundOutput | null>(null);
-  const lastNotificationTimeRef = useRef(0);
-  const notificationListenerRef = useRef<{ remove: () => void } | null>(null);
-  const processedNotifications = useRef(new Set<string>());
+  const [inAppEnabled, setInAppEnabled] = useState<boolean>(true);
 
   const client = generateClient();
 
@@ -58,13 +55,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       // Check if NotificationSettings exist for the user
       const existingSettings = await client.graphql({
-        query: getNotificationSettings,
-        variables: { id: userId }
+        query: listNotificationSettings,
+        variables: { 
+            filter: { userId: { eq: userId } }
+        }
       });
 
-      if (existingSettings.data.getNotificationSettings) {
+      if (existingSettings.data.listNotificationSettings.items.length > 0) {
         console.log('Existing NotificationSettings found');
-        return existingSettings.data.getNotificationSettings;
+        return existingSettings.data.listNotificationSettings.items[0];
       }
 
       // If no settings exist, create new settings
@@ -79,6 +78,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             repostEnabled: true,
             commentLikeEnabled: true,
             approvalEnabled: true,
+            inAppEnabled: true,
           }
         }
       });
@@ -143,7 +143,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const setupTokenListenerAndIdentifyUser = () => {
     const myTokenReceivedHandler: OnTokenReceivedInput = async (token) => {
-      if (deviceToken === token) return; // Skip if token hasn't changed
       console.log('Received device token:', token);
       setDeviceToken(token);
       
@@ -156,6 +155,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             userId: userId,
             userProfile: {
               name: username || '',
+              // Add more user profile details as needed
             },
             options: {
               address: token,
@@ -166,6 +166,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           await identifyUser(identifyUserInput);
           console.log('User identified to Amazon Pinpoint', { userId, username, token });
 
+          // Update UserDeviceToken
           await updateUserDeviceToken(userId, token);
         } else {
           console.log('User not authenticated or missing required information');
@@ -178,29 +179,51 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return onTokenReceived(myTokenReceivedHandler);
   };
 
-  const setupNotificationListeners = useCallback(() => {
-    if (notificationListenerRef.current) {
-      return; // Listeners already set up
-    }
+  useEffect(() => {
+    handlePermissions();
+    setupTokenListenerAndIdentifyUser();
+    setupNotificationListener();
+    setupForegroundNotificationListener();
+    checkLaunchNotification();
+    fetchNotificationSettings();
 
-    const handleNotification = (notification: any) => {
-      console.log('Received notification:', notification);
+    return () => {
+      if (tokenListener) {
+        tokenListener.remove();
+      }
+      if (notificationListener) {
+        notificationListener.remove();
+      }
+      if (foregroundNotificationListener) {
+        foregroundNotificationListener.remove();
+      }
+    };
+  }, []);
+
+  let tokenListener: OnTokenReceivedOutput | null = null;
+  let notificationListener: { remove: () => void } | null = null;
+  let foregroundNotificationListener: OnNotificationReceivedInForegroundOutput | null = null;
+
+  const setupNotificationListener = () => {
+    const handleNotificationOpened: OnNotificationOpenedInput = (notification) => {
+      console.log('Notification opened:', notification);
+      // Handle the opened notification here
+      // You can add logic to navigate to a specific screen or update the app state
+      // based on the notification content
+    };
+
+    notificationListener = onNotificationOpened(handleNotificationOpened);
+  };
+
+  const setupForegroundNotificationListener = () => {
+    const handleForegroundNotification: OnNotificationReceivedInForegroundInput = (notification) => {
+      console.log('Received notification in foreground:', notification);
       
-      // Generate a unique key for the notification
-      const notificationKey = `${notification.title}-${notification.body}-${Date.now()}`;
-      
-      if (processedNotifications.current.has(notificationKey)) {
-        console.log('Ignoring duplicate notification');
+      if (!inAppEnabled) {
+        console.log('In-app notifications are disabled. Skipping popdown notification.');
         return;
       }
       
-      processedNotifications.current.add(notificationKey);
-      
-      // Remove the key after 5 seconds to prevent the set from growing indefinitely
-      setTimeout(() => {
-        processedNotifications.current.delete(notificationKey);
-      }, 5000);
-
       const notificationType = notification.data && notification.data.type;
       let title = notification.title || '';
       let message = notification.body || '';
@@ -237,9 +260,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       });
     };
 
-    notificationListenerRef.current = onNotificationReceivedInForeground(handleNotification);
-    onNotificationOpened(handleNotification);
-  }, []);
+    foregroundNotificationListener = onNotificationReceivedInForeground(handleForegroundNotification);
+  };
 
   const checkLaunchNotification = async () => {
     try {
@@ -255,15 +277,17 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  const { isAuthenticated } = useAuth();
-
-  const setupNotifications = useCallback(async () => {
-    if (setupDoneRef.current) return;
-    
+  const handlePermissions = async () => {
     const status = await getPermissionStatus();
     if (status === 'granted') {
       setupTokenListenerAndIdentifyUser();
-    } else if (status === 'shouldRequest' || status === 'shouldExplainThenRequest') {
+      return;
+    }
+    if (status === 'denied') {
+      console.log('Push notifications permissions denied');
+      return;
+    }
+    if (status === 'shouldRequest' || status === 'shouldExplainThenRequest') {
       try {
         const result = await requestPermissions();
         if (result) {
@@ -274,47 +298,44 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch (error) {
         console.error('Error requesting push notification permissions:', error);
       }
-    } else {
-      console.log('Push notifications permissions denied');
     }
+  };
 
-    setupNotificationListeners();
-    checkLaunchNotification();
-    
-    setupDoneRef.current = true;
-  }, [setupNotificationListeners]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      setupNotifications();
+  const fetchNotificationSettings = async () => {
+    try {
+      const { userId } = await getCurrentUser();
+      const settingsData = await client.graphql({
+        query: listNotificationSettings,
+        variables: { 
+          filter: { userId: { eq: userId } }
+        }
+      });
+      
+      if (settingsData.data?.listNotificationSettings.items.length > 0) {
+        const settings = settingsData.data.listNotificationSettings.items[0];
+        setInAppEnabled(settings.inAppEnabled);
+      }
+    } catch (error) {
+      console.error('Error fetching notification settings:', error);
     }
+  };
 
-    return () => {
-      if (tokenListener) {
-        tokenListener.remove();
-      }
-      if (notificationListener) {
-        notificationListener.remove();
-      }
-      if (foregroundListenerRef.current) {
-        foregroundListenerRef.current.remove();
-      }
-    };
-  }, [isAuthenticated, setupNotifications]);
-
-  let tokenListener: OnTokenReceivedOutput | null = null;
-  let notificationListener: { remove: () => void } | null = null;
+  const updateInAppEnabled = (enabled: boolean) => {
+    setInAppEnabled(enabled);
+  };
 
   return (
     <NotificationContext.Provider value={{ 
       deviceToken, 
-      handlePermissions: setupNotifications, 
+      handlePermissions, 
       launchNotification,
-      activeNotification
+      activeNotification,
+      inAppEnabled,
+      updateInAppEnabled
     }}>
       <View style={{ flex: 1 }}>
         {children}
-        {activeNotification && (
+        {inAppEnabled && activeNotification && (
           <PopdownNotification
             title={activeNotification.title}
             message={activeNotification.message}

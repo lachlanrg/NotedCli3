@@ -1768,6 +1768,13 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
+                "inAppEnabled": {
+                    "name": "inAppEnabled",
+                    "isArray": false,
+                    "type": "Boolean",
+                    "isRequired": true,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -1824,5 +1831,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "0b6d1721e2ebfdb7ee42f1639a360452"
+    "version": "af96b358d2ebe9d1060aeecabf1158cf"
 };

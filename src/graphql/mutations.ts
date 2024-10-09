@@ -75,6 +75,7 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -162,6 +163,7 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -249,6 +251,7 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -2030,6 +2033,7 @@ export const createNotificationSettings = /* GraphQL */ `mutation CreateNotifica
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version
@@ -2072,6 +2076,7 @@ export const updateNotificationSettings = /* GraphQL */ `mutation UpdateNotifica
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version
@@ -2114,6 +2119,7 @@ export const deleteNotificationSettings = /* GraphQL */ `mutation DeleteNotifica
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version

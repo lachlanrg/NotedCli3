@@ -546,6 +546,7 @@ type EagerNotificationSettings = {
   readonly repostEnabled: boolean;
   readonly commentLikeEnabled: boolean;
   readonly approvalEnabled: boolean;
+  readonly inAppEnabled: boolean;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -564,6 +565,7 @@ type LazyNotificationSettings = {
   readonly repostEnabled: boolean;
   readonly commentLikeEnabled: boolean;
   readonly approvalEnabled: boolean;
+  readonly inAppEnabled: boolean;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

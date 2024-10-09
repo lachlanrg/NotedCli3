@@ -72,6 +72,7 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -156,6 +157,7 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -240,6 +242,7 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       repostEnabled
       commentLikeEnabled
       approvalEnabled
+      inAppEnabled
       createdAt
       updatedAt
       _version
@@ -1966,6 +1969,7 @@ export const onCreateNotificationSettings = /* GraphQL */ `subscription OnCreate
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version
@@ -2007,6 +2011,7 @@ export const onUpdateNotificationSettings = /* GraphQL */ `subscription OnUpdate
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version
@@ -2048,6 +2053,7 @@ export const onDeleteNotificationSettings = /* GraphQL */ `subscription OnDelete
     repostEnabled
     commentLikeEnabled
     approvalEnabled
+    inAppEnabled
     createdAt
     updatedAt
     _version
