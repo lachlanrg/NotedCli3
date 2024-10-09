@@ -44,7 +44,8 @@ export const sendPostLikeNotification = async (postId: string, postUserId: strin
             data: {
               type: 'like',
               postId: postId
-            }
+            },
+            userId: postUserId
           };
 
           await sendNotification(payload);

@@ -63,11 +63,28 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -92,6 +109,7 @@ export const listUsers = /* GraphQL */ `query ListUsers(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     nextToken
@@ -126,6 +144,7 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     nextToken
@@ -151,6 +170,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -167,6 +187,7 @@ export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -255,6 +276,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -271,6 +293,7 @@ export const getFriendRequest = /* GraphQL */ `query GetFriendRequest($id: ID!) 
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -371,6 +394,7 @@ export const getPost = /* GraphQL */ `query GetPost($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -617,6 +641,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -803,6 +828,7 @@ export const getRepost = /* GraphQL */ `query GetRepost($id: ID!) {
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -910,6 +936,7 @@ export const getSpotifyRecentlyPlayedTrack = /* GraphQL */ `query GetSpotifyRece
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1069,6 +1096,7 @@ export const getSpotifyTokens = /* GraphQL */ `query GetSpotifyTokens($id: ID!) 
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1172,6 +1200,7 @@ export const getUserDeviceToken = /* GraphQL */ `query GetUserDeviceToken($id: I
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1523,4 +1552,156 @@ export const notificationsByUserIdAndCreatedAt = /* GraphQL */ `query Notificati
 ` as GeneratedQuery<
   APITypes.NotificationsByUserIdAndCreatedAtQueryVariables,
   APITypes.NotificationsByUserIdAndCreatedAtQuery
+>;
+export const getNotificationSettings = /* GraphQL */ `query GetNotificationSettings($id: ID!) {
+  getNotificationSettings(id: $id) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetNotificationSettingsQueryVariables,
+  APITypes.GetNotificationSettingsQuery
+>;
+export const listNotificationSettings = /* GraphQL */ `query ListNotificationSettings(
+  $filter: ModelNotificationSettingsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listNotificationSettings(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListNotificationSettingsQueryVariables,
+  APITypes.ListNotificationSettingsQuery
+>;
+export const syncNotificationSettings = /* GraphQL */ `query SyncNotificationSettings(
+  $filter: ModelNotificationSettingsFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncNotificationSettings(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncNotificationSettingsQueryVariables,
+  APITypes.SyncNotificationSettingsQuery
+>;
+export const notificationSettingsByUserIdAndId = /* GraphQL */ `query NotificationSettingsByUserIdAndId(
+  $userId: ID!
+  $id: ModelIDKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelNotificationSettingsFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  notificationSettingsByUserIdAndId(
+    userId: $userId
+    id: $id
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.NotificationSettingsByUserIdAndIdQueryVariables,
+  APITypes.NotificationSettingsByUserIdAndIdQuery
 >;

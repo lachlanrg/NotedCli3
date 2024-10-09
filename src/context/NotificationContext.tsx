@@ -23,6 +23,7 @@ import * as queries from '../graphql/queries';
 import * as mutations from '../graphql/mutations';
 import PopdownNotification from '../components/PopdownNotification';
 import { useAuth } from './AuthContext';
+import { getNotificationSettings } from '../graphql/queries';
 
 interface NotificationContextType {
   deviceToken: string | null;
@@ -52,6 +53,43 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const processedNotifications = useRef(new Set<string>());
 
   const client = generateClient();
+
+  const createOrGetNotificationSettings = async (userId: string) => {
+    try {
+      // Check if NotificationSettings exist for the user
+      const existingSettings = await client.graphql({
+        query: getNotificationSettings,
+        variables: { id: userId }
+      });
+
+      if (existingSettings.data.getNotificationSettings) {
+        console.log('Existing NotificationSettings found');
+        return existingSettings.data.getNotificationSettings;
+      }
+
+      // If no settings exist, create new settings
+      const newSettings = await client.graphql({
+        query: mutations.createNotificationSettings,
+        variables: {
+          input: {
+            userId: userId,
+            likeEnabled: true,
+            commentEnabled: true,
+            followRequestEnabled: true,
+            repostEnabled: true,
+            commentLikeEnabled: true,
+            approvalEnabled: true,
+          }
+        }
+      });
+
+      console.log('Created new NotificationSettings');
+      return newSettings.data.createNotificationSettings;
+    } catch (error) {
+      console.error('Error in createOrGetNotificationSettings:', error);
+      return null;
+    }
+  };
 
   const updateUserDeviceToken = async (userId: string, token: string) => {
     try {
@@ -95,6 +133,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         });
         console.log('Created new UserDeviceToken entry');
       }
+
+      // After updating the device token, create or get NotificationSettings
+      await createOrGetNotificationSettings(userId);
     } catch (error) {
       console.error('Error updating UserDeviceToken:', error);
     }

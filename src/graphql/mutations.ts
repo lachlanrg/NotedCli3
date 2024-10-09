@@ -66,11 +66,28 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -136,11 +153,28 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -206,11 +240,28 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -238,6 +289,7 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -254,6 +306,7 @@ export const createFriendship = /* GraphQL */ `mutation CreateFriendship(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -289,6 +342,7 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -305,6 +359,7 @@ export const updateFriendship = /* GraphQL */ `mutation UpdateFriendship(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -340,6 +395,7 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -356,6 +412,7 @@ export const deleteFriendship = /* GraphQL */ `mutation DeleteFriendship(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -391,6 +448,7 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -407,6 +465,7 @@ export const createFriendRequest = /* GraphQL */ `mutation CreateFriendRequest(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -444,6 +503,7 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -460,6 +520,7 @@ export const updateFriendRequest = /* GraphQL */ `mutation UpdateFriendRequest(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -497,6 +558,7 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -513,6 +575,7 @@ export const deleteFriendRequest = /* GraphQL */ `mutation DeleteFriendRequest(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -556,6 +619,7 @@ export const createPost = /* GraphQL */ `mutation CreatePost(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -634,6 +698,7 @@ export const updatePost = /* GraphQL */ `mutation UpdatePost(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -712,6 +777,7 @@ export const deletePost = /* GraphQL */ `mutation DeletePost(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -848,6 +914,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -979,6 +1046,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -1110,6 +1178,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -1221,6 +1290,7 @@ export const createRepost = /* GraphQL */ `mutation CreateRepost(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -1310,6 +1380,7 @@ export const updateRepost = /* GraphQL */ `mutation UpdateRepost(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -1399,6 +1470,7 @@ export const deleteRepost = /* GraphQL */ `mutation DeleteRepost(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -1444,6 +1516,7 @@ export const createSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation CreateSp
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1487,6 +1560,7 @@ export const updateSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation UpdateSp
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1530,6 +1604,7 @@ export const deleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `mutation DeleteSp
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1573,6 +1648,7 @@ export const createSpotifyTokens = /* GraphQL */ `mutation CreateSpotifyTokens(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1613,6 +1689,7 @@ export const updateSpotifyTokens = /* GraphQL */ `mutation UpdateSpotifyTokens(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1653,6 +1730,7 @@ export const deleteSpotifyTokens = /* GraphQL */ `mutation DeleteSpotifyTokens(
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1693,6 +1771,7 @@ export const createUserDeviceToken = /* GraphQL */ `mutation CreateUserDeviceTok
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1730,6 +1809,7 @@ export const updateUserDeviceToken = /* GraphQL */ `mutation UpdateUserDeviceTok
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1767,6 +1847,7 @@ export const deleteUserDeviceToken = /* GraphQL */ `mutation DeleteUserDeviceTok
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1918,4 +1999,130 @@ export const deleteNotification = /* GraphQL */ `mutation DeleteNotification(
 ` as GeneratedMutation<
   APITypes.DeleteNotificationMutationVariables,
   APITypes.DeleteNotificationMutation
+>;
+export const createNotificationSettings = /* GraphQL */ `mutation CreateNotificationSettings(
+  $input: CreateNotificationSettingsInput!
+  $condition: ModelNotificationSettingsConditionInput
+) {
+  createNotificationSettings(input: $input, condition: $condition) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateNotificationSettingsMutationVariables,
+  APITypes.CreateNotificationSettingsMutation
+>;
+export const updateNotificationSettings = /* GraphQL */ `mutation UpdateNotificationSettings(
+  $input: UpdateNotificationSettingsInput!
+  $condition: ModelNotificationSettingsConditionInput
+) {
+  updateNotificationSettings(input: $input, condition: $condition) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateNotificationSettingsMutationVariables,
+  APITypes.UpdateNotificationSettingsMutation
+>;
+export const deleteNotificationSettings = /* GraphQL */ `mutation DeleteNotificationSettings(
+  $input: DeleteNotificationSettingsInput!
+  $condition: ModelNotificationSettingsConditionInput
+) {
+  deleteNotificationSettings(input: $input, condition: $condition) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteNotificationSettingsMutationVariables,
+  APITypes.DeleteNotificationSettingsMutation
 >;

@@ -1,15 +1,44 @@
 import { Alert } from 'react-native';
+import { generateClient } from 'aws-amplify/api';
+import { getNotificationSettings } from '../graphql/queries';
 
 interface NotificationPayload {
-  deviceToken: string;  // Note: This should be a string, not string | null
+  deviceToken: string;
   message: string;
   title: string;
+  data: {
+    type: string;
+    [key: string]: any;
+  };
+  userId: string;
 }
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const sendNotification = async (payload: NotificationPayload): Promise<void> => {
   try {
+    const client = generateClient();
+
+    // Fetch user's notification settings
+    const settingsResponse = await client.graphql({
+      query: getNotificationSettings,
+      variables: { id: payload.userId }
+    });
+
+    const userSettings = settingsResponse.data.getNotificationSettings;
+    if (!userSettings) {
+      console.log(`No notification settings found for user ${payload.userId}`);
+      return;
+    }
+
+    // Check if the notification type is enabled
+    const isEnabled = checkNotificationEnabled(userSettings, payload.data.type);
+
+    if (!isEnabled) {
+      console.log(`Notification type ${payload.data.type} is disabled for user ${payload.userId}`);
+      return;
+    }
+
     console.log('Preparing to send payload:', JSON.stringify(payload));
 
     // Add a 1-second delay
@@ -44,5 +73,24 @@ export const sendNotification = async (payload: NotificationPayload): Promise<vo
     }
   } catch (error) {
     console.error('Error sending notification:', error);
+  }
+};
+
+const checkNotificationEnabled = (settings: any, notificationType: string): boolean => {
+  switch (notificationType) {
+    case 'like':
+      return settings.likeEnabled;
+    case 'comment':
+      return settings.commentEnabled;
+    case 'follow_request':
+      return settings.followRequestEnabled;
+    case 'repost':
+      return settings.repostEnabled;
+    case 'comment_like':
+      return settings.commentLikeEnabled;
+    case 'approval':
+      return settings.approvalEnabled;
+    default:
+      return true; // Enable by default for unknown types
   }
 };

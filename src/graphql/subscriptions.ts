@@ -63,11 +63,28 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -130,11 +147,28 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -197,11 +231,28 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       startedAt
       __typename
     }
+    notificationSettings {
+      id
+      userId
+      likeEnabled
+      commentEnabled
+      followRequestEnabled
+      repostEnabled
+      commentLikeEnabled
+      approvalEnabled
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
     _deleted
     _lastChangedAt
+    userNotificationSettingsId
     __typename
   }
 }
@@ -228,6 +279,7 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -244,6 +296,7 @@ export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -278,6 +331,7 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -294,6 +348,7 @@ export const onUpdateFriendship = /* GraphQL */ `subscription OnUpdateFriendship
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -328,6 +383,7 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     friend {
@@ -344,6 +400,7 @@ export const onDeleteFriendship = /* GraphQL */ `subscription OnDeleteFriendship
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     createdAt
@@ -378,6 +435,7 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -394,6 +452,7 @@ export const onCreateFriendRequest = /* GraphQL */ `subscription OnCreateFriendR
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -430,6 +489,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -446,6 +506,7 @@ export const onUpdateFriendRequest = /* GraphQL */ `subscription OnUpdateFriendR
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -482,6 +543,7 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     recipient {
@@ -498,6 +560,7 @@ export const onDeleteFriendRequest = /* GraphQL */ `subscription OnDeleteFriendR
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     status
@@ -538,6 +601,7 @@ export const onCreatePost = /* GraphQL */ `subscription OnCreatePost($filter: Mo
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -613,6 +677,7 @@ export const onUpdatePost = /* GraphQL */ `subscription OnUpdatePost($filter: Mo
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -688,6 +753,7 @@ export const onDeletePost = /* GraphQL */ `subscription OnDeletePost($filter: Mo
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -821,6 +887,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -949,6 +1016,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -1077,6 +1145,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userPostsId
@@ -1185,6 +1254,7 @@ export const onCreateRepost = /* GraphQL */ `subscription OnCreateRepost($filter
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -1271,6 +1341,7 @@ export const onUpdateRepost = /* GraphQL */ `subscription OnUpdateRepost($filter
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -1357,6 +1428,7 @@ export const onDeleteRepost = /* GraphQL */ `subscription OnDeleteRepost($filter
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userRepostsId
@@ -1401,6 +1473,7 @@ export const onCreateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1443,6 +1516,7 @@ export const onUpdateSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1485,6 +1559,7 @@ export const onDeleteSpotifyRecentlyPlayedTrack = /* GraphQL */ `subscription On
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userSpotifyRecentlyPlayedTrackId
@@ -1527,6 +1602,7 @@ export const onCreateSpotifyTokens = /* GraphQL */ `subscription OnCreateSpotify
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1566,6 +1642,7 @@ export const onUpdateSpotifyTokens = /* GraphQL */ `subscription OnUpdateSpotify
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1605,6 +1682,7 @@ export const onDeleteSpotifyTokens = /* GraphQL */ `subscription OnDeleteSpotify
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1644,6 +1722,7 @@ export const onCreateUserDeviceToken = /* GraphQL */ `subscription OnCreateUserD
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1680,6 +1759,7 @@ export const onUpdateUserDeviceToken = /* GraphQL */ `subscription OnUpdateUserD
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1716,6 +1796,7 @@ export const onDeleteUserDeviceToken = /* GraphQL */ `subscription OnDeleteUserD
       _version
       _deleted
       _lastChangedAt
+      userNotificationSettingsId
       __typename
     }
     userId
@@ -1855,4 +1936,127 @@ export const onDeleteNotification = /* GraphQL */ `subscription OnDeleteNotifica
 ` as GeneratedSubscription<
   APITypes.OnDeleteNotificationSubscriptionVariables,
   APITypes.OnDeleteNotificationSubscription
+>;
+export const onCreateNotificationSettings = /* GraphQL */ `subscription OnCreateNotificationSettings(
+  $filter: ModelSubscriptionNotificationSettingsFilterInput
+) {
+  onCreateNotificationSettings(filter: $filter) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateNotificationSettingsSubscriptionVariables,
+  APITypes.OnCreateNotificationSettingsSubscription
+>;
+export const onUpdateNotificationSettings = /* GraphQL */ `subscription OnUpdateNotificationSettings(
+  $filter: ModelSubscriptionNotificationSettingsFilterInput
+) {
+  onUpdateNotificationSettings(filter: $filter) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateNotificationSettingsSubscriptionVariables,
+  APITypes.OnUpdateNotificationSettingsSubscription
+>;
+export const onDeleteNotificationSettings = /* GraphQL */ `subscription OnDeleteNotificationSettings(
+  $filter: ModelSubscriptionNotificationSettingsFilterInput
+) {
+  onDeleteNotificationSettings(filter: $filter) {
+    id
+    userId
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    likeEnabled
+    commentEnabled
+    followRequestEnabled
+    repostEnabled
+    commentLikeEnabled
+    approvalEnabled
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteNotificationSettingsSubscriptionVariables,
+  APITypes.OnDeleteNotificationSettingsSubscription
 >;

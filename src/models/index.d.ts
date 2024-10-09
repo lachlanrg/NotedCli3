@@ -28,8 +28,10 @@ type EagerUser = {
   readonly spotifyImage?: string | null;
   readonly soundCloudUri?: string | null;
   readonly userDeviceTokens?: (UserDeviceToken | null)[] | null;
+  readonly notificationSettings?: NotificationSettings | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly userNotificationSettingsId?: string | null;
 }
 
 type LazyUser = {
@@ -54,8 +56,10 @@ type LazyUser = {
   readonly spotifyImage?: string | null;
   readonly soundCloudUri?: string | null;
   readonly userDeviceTokens: AsyncCollection<UserDeviceToken>;
+  readonly notificationSettings: AsyncItem<NotificationSettings | undefined>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
+  readonly userNotificationSettingsId?: string | null;
 }
 
 export declare type User = LazyLoading extends LazyLoadingDisabled ? EagerUser : LazyUser
@@ -526,4 +530,46 @@ export declare type Notification = LazyLoading extends LazyLoadingDisabled ? Eag
 
 export declare const Notification: (new (init: ModelInit<Notification>) => Notification) & {
   copyOf(source: Notification, mutator: (draft: MutableModel<Notification>) => MutableModel<Notification> | void): Notification;
+}
+
+type EagerNotificationSettings = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<NotificationSettings, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly userId: string;
+  readonly user?: User | null;
+  readonly likeEnabled: boolean;
+  readonly commentEnabled: boolean;
+  readonly followRequestEnabled: boolean;
+  readonly repostEnabled: boolean;
+  readonly commentLikeEnabled: boolean;
+  readonly approvalEnabled: boolean;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazyNotificationSettings = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<NotificationSettings, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly userId: string;
+  readonly user: AsyncItem<User | undefined>;
+  readonly likeEnabled: boolean;
+  readonly commentEnabled: boolean;
+  readonly followRequestEnabled: boolean;
+  readonly repostEnabled: boolean;
+  readonly commentLikeEnabled: boolean;
+  readonly approvalEnabled: boolean;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type NotificationSettings = LazyLoading extends LazyLoadingDisabled ? EagerNotificationSettings : LazyNotificationSettings
+
+export declare const NotificationSettings: (new (init: ModelInit<NotificationSettings>) => NotificationSettings) & {
+  copyOf(source: NotificationSettings, mutator: (draft: MutableModel<NotificationSettings>) => MutableModel<NotificationSettings> | void): NotificationSettings;
 }

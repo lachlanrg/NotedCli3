@@ -12,6 +12,7 @@ export type CreateUserInput = {
   spotifyImage?: string | null,
   soundCloudUri?: string | null,
   _version?: number | null,
+  userNotificationSettingsId?: string | null,
 };
 
 export type ModelUserConditionInput = {
@@ -28,6 +29,7 @@ export type ModelUserConditionInput = {
   _deleted?: ModelBooleanInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
+  userNotificationSettingsId?: ModelIDInput | null,
 };
 
 export type ModelStringInput = {
@@ -77,6 +79,22 @@ export type ModelBooleanInput = {
   attributeType?: ModelAttributeTypes | null,
 };
 
+export type ModelIDInput = {
+  ne?: string | null,
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  contains?: string | null,
+  notContains?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+  size?: ModelSizeInput | null,
+};
+
 export type User = {
   __typename: "User",
   id: string,
@@ -96,11 +114,13 @@ export type User = {
   spotifyImage?: string | null,
   soundCloudUri?: string | null,
   userDeviceTokens?: ModelUserDeviceTokenConnection | null,
+  notificationSettings?: NotificationSettings | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
+  userNotificationSettingsId?: string | null,
 };
 
 export type ModelPostConnection = {
@@ -332,6 +352,24 @@ export type UserDeviceToken = {
   userUserDeviceTokensId?: string | null,
 };
 
+export type NotificationSettings = {
+  __typename: "NotificationSettings",
+  id: string,
+  userId: string,
+  user?: User | null,
+  likeEnabled: boolean,
+  commentEnabled: boolean,
+  followRequestEnabled: boolean,
+  repostEnabled: boolean,
+  commentLikeEnabled: boolean,
+  approvalEnabled: boolean,
+  createdAt: string,
+  updatedAt: string,
+  _version: number,
+  _deleted?: boolean | null,
+  _lastChangedAt: number,
+};
+
 export type UpdateUserInput = {
   id: string,
   username?: string | null,
@@ -342,6 +380,7 @@ export type UpdateUserInput = {
   spotifyImage?: string | null,
   soundCloudUri?: string | null,
   _version?: number | null,
+  userNotificationSettingsId?: string | null,
 };
 
 export type DeleteUserInput = {
@@ -363,22 +402,6 @@ export type ModelFriendshipConditionInput = {
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   userFriendsId?: ModelIDInput | null,
-};
-
-export type ModelIDInput = {
-  ne?: string | null,
-  eq?: string | null,
-  le?: string | null,
-  lt?: string | null,
-  ge?: string | null,
-  gt?: string | null,
-  contains?: string | null,
-  notContains?: string | null,
-  between?: Array< string | null > | null,
-  beginsWith?: string | null,
-  attributeExists?: boolean | null,
-  attributeType?: ModelAttributeTypes | null,
-  size?: ModelSizeInput | null,
 };
 
 export type UpdateFriendshipInput = {
@@ -912,6 +935,51 @@ export type DeleteNotificationInput = {
   _version?: number | null,
 };
 
+export type CreateNotificationSettingsInput = {
+  id?: string | null,
+  userId: string,
+  likeEnabled: boolean,
+  commentEnabled: boolean,
+  followRequestEnabled: boolean,
+  repostEnabled: boolean,
+  commentLikeEnabled: boolean,
+  approvalEnabled: boolean,
+  _version?: number | null,
+};
+
+export type ModelNotificationSettingsConditionInput = {
+  userId?: ModelIDInput | null,
+  likeEnabled?: ModelBooleanInput | null,
+  commentEnabled?: ModelBooleanInput | null,
+  followRequestEnabled?: ModelBooleanInput | null,
+  repostEnabled?: ModelBooleanInput | null,
+  commentLikeEnabled?: ModelBooleanInput | null,
+  approvalEnabled?: ModelBooleanInput | null,
+  and?: Array< ModelNotificationSettingsConditionInput | null > | null,
+  or?: Array< ModelNotificationSettingsConditionInput | null > | null,
+  not?: ModelNotificationSettingsConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+};
+
+export type UpdateNotificationSettingsInput = {
+  id: string,
+  userId?: string | null,
+  likeEnabled?: boolean | null,
+  commentEnabled?: boolean | null,
+  followRequestEnabled?: boolean | null,
+  repostEnabled?: boolean | null,
+  commentLikeEnabled?: boolean | null,
+  approvalEnabled?: boolean | null,
+  _version?: number | null,
+};
+
+export type DeleteNotificationSettingsInput = {
+  id: string,
+  _version?: number | null,
+};
+
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -927,6 +995,7 @@ export type ModelUserFilterInput = {
   or?: Array< ModelUserFilterInput | null > | null,
   not?: ModelUserFilterInput | null,
   _deleted?: ModelBooleanInput | null,
+  userNotificationSettingsId?: ModelIDInput | null,
 };
 
 export type ModelUserConnection = {
@@ -1150,6 +1219,40 @@ export type ModelNotificationConnection = {
   startedAt?: number | null,
 };
 
+export type ModelNotificationSettingsFilterInput = {
+  id?: ModelIDInput | null,
+  userId?: ModelIDInput | null,
+  likeEnabled?: ModelBooleanInput | null,
+  commentEnabled?: ModelBooleanInput | null,
+  followRequestEnabled?: ModelBooleanInput | null,
+  repostEnabled?: ModelBooleanInput | null,
+  commentLikeEnabled?: ModelBooleanInput | null,
+  approvalEnabled?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  and?: Array< ModelNotificationSettingsFilterInput | null > | null,
+  or?: Array< ModelNotificationSettingsFilterInput | null > | null,
+  not?: ModelNotificationSettingsFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
+export type ModelNotificationSettingsConnection = {
+  __typename: "ModelNotificationSettingsConnection",
+  items:  Array<NotificationSettings | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
+};
+
+export type ModelIDKeyConditionInput = {
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+};
+
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
@@ -1173,6 +1276,7 @@ export type ModelSubscriptionUserFilterInput = {
   userSpotifyRecentlyPlayedTrackId?: ModelSubscriptionIDInput | null,
   userSpotifyTokensId?: ModelSubscriptionIDInput | null,
   userUserDeviceTokensId?: ModelSubscriptionIDInput | null,
+  userNotificationSettingsId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionIDInput = {
@@ -1402,6 +1506,22 @@ export type ModelSubscriptionNotificationFilterInput = {
   _deleted?: ModelBooleanInput | null,
 };
 
+export type ModelSubscriptionNotificationSettingsFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  userId?: ModelSubscriptionIDInput | null,
+  likeEnabled?: ModelSubscriptionBooleanInput | null,
+  commentEnabled?: ModelSubscriptionBooleanInput | null,
+  followRequestEnabled?: ModelSubscriptionBooleanInput | null,
+  repostEnabled?: ModelSubscriptionBooleanInput | null,
+  commentLikeEnabled?: ModelSubscriptionBooleanInput | null,
+  approvalEnabled?: ModelSubscriptionBooleanInput | null,
+  createdAt?: ModelSubscriptionStringInput | null,
+  updatedAt?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionNotificationSettingsFilterInput | null > | null,
+  or?: Array< ModelSubscriptionNotificationSettingsFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
 export type CreateUserMutationVariables = {
   input: CreateUserInput,
   condition?: ModelUserConditionInput | null,
@@ -1463,11 +1583,28 @@ export type CreateUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -1532,11 +1669,28 @@ export type UpdateUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -1601,11 +1755,28 @@ export type DeleteUserMutation = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -1633,6 +1804,7 @@ export type CreateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -1649,6 +1821,7 @@ export type CreateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -1683,6 +1856,7 @@ export type UpdateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -1699,6 +1873,7 @@ export type UpdateFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -1733,6 +1908,7 @@ export type DeleteFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -1749,6 +1925,7 @@ export type DeleteFriendshipMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -1783,6 +1960,7 @@ export type CreateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -1799,6 +1977,7 @@ export type CreateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -1835,6 +2014,7 @@ export type UpdateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -1851,6 +2031,7 @@ export type UpdateFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -1887,6 +2068,7 @@ export type DeleteFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -1903,6 +2085,7 @@ export type DeleteFriendRequestMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -1945,6 +2128,7 @@ export type CreatePostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2022,6 +2206,7 @@ export type UpdatePostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2099,6 +2284,7 @@ export type DeletePostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2234,6 +2420,7 @@ export type CreateCommentMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2364,6 +2551,7 @@ export type UpdateCommentMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2494,6 +2682,7 @@ export type DeleteCommentMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -2604,6 +2793,7 @@ export type CreateRepostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -2692,6 +2882,7 @@ export type UpdateRepostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -2780,6 +2971,7 @@ export type DeleteRepostMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -2824,6 +3016,7 @@ export type CreateSpotifyRecentlyPlayedTrackMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -2866,6 +3059,7 @@ export type UpdateSpotifyRecentlyPlayedTrackMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -2908,6 +3102,7 @@ export type DeleteSpotifyRecentlyPlayedTrackMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -2950,6 +3145,7 @@ export type CreateSpotifyTokensMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -2989,6 +3185,7 @@ export type UpdateSpotifyTokensMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -3028,6 +3225,7 @@ export type DeleteSpotifyTokensMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -3067,6 +3265,7 @@ export type CreateUserDeviceTokenMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -3103,6 +3302,7 @@ export type UpdateUserDeviceTokenMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -3139,6 +3339,7 @@ export type DeleteUserDeviceTokenMutation = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -3280,6 +3481,129 @@ export type DeleteNotificationMutation = {
   } | null,
 };
 
+export type CreateNotificationSettingsMutationVariables = {
+  input: CreateNotificationSettingsInput,
+  condition?: ModelNotificationSettingsConditionInput | null,
+};
+
+export type CreateNotificationSettingsMutation = {
+  createNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type UpdateNotificationSettingsMutationVariables = {
+  input: UpdateNotificationSettingsInput,
+  condition?: ModelNotificationSettingsConditionInput | null,
+};
+
+export type UpdateNotificationSettingsMutation = {
+  updateNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type DeleteNotificationSettingsMutationVariables = {
+  input: DeleteNotificationSettingsInput,
+  condition?: ModelNotificationSettingsConditionInput | null,
+};
+
+export type DeleteNotificationSettingsMutation = {
+  deleteNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
 export type GetUserQueryVariables = {
   id: string,
 };
@@ -3340,11 +3664,28 @@ export type GetUserQuery = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -3372,6 +3713,7 @@ export type ListUsersQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -3403,6 +3745,7 @@ export type SyncUsersQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null >,
     nextToken?: string | null,
     startedAt?: number | null,
@@ -3432,6 +3775,7 @@ export type GetFriendshipQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -3448,6 +3792,7 @@ export type GetFriendshipQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -3530,6 +3875,7 @@ export type GetFriendRequestQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -3546,6 +3892,7 @@ export type GetFriendRequestQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -3640,6 +3987,7 @@ export type GetPostQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -3889,6 +4237,7 @@ export type GetCommentQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -4069,6 +4418,7 @@ export type GetRepostQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -4173,6 +4523,7 @@ export type GetSpotifyRecentlyPlayedTrackQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -4314,6 +4665,7 @@ export type GetSpotifyTokensQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -4411,6 +4763,7 @@ export type GetUserDeviceTokenQuery = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -4717,6 +5070,140 @@ export type NotificationsByUserIdAndCreatedAtQuery = {
   } | null,
 };
 
+export type GetNotificationSettingsQueryVariables = {
+  id: string,
+};
+
+export type GetNotificationSettingsQuery = {
+  getNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type ListNotificationSettingsQueryVariables = {
+  filter?: ModelNotificationSettingsFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListNotificationSettingsQuery = {
+  listNotificationSettings?:  {
+    __typename: "ModelNotificationSettingsConnection",
+    items:  Array< {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SyncNotificationSettingsQueryVariables = {
+  filter?: ModelNotificationSettingsFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+  lastSync?: number | null,
+};
+
+export type SyncNotificationSettingsQuery = {
+  syncNotificationSettings?:  {
+    __typename: "ModelNotificationSettingsConnection",
+    items:  Array< {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type NotificationSettingsByUserIdAndIdQueryVariables = {
+  userId: string,
+  id?: ModelIDKeyConditionInput | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelNotificationSettingsFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type NotificationSettingsByUserIdAndIdQuery = {
+  notificationSettingsByUserIdAndId?:  {
+    __typename: "ModelNotificationSettingsConnection",
+    items:  Array< {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscriptionVariables = {
   filter?: ModelSubscriptionUserFilterInput | null,
 };
@@ -4777,11 +5264,28 @@ export type OnCreateUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -4845,11 +5349,28 @@ export type OnUpdateUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -4913,11 +5434,28 @@ export type OnDeleteUserSubscription = {
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
+    notificationSettings?:  {
+      __typename: "NotificationSettings",
+      id: string,
+      userId: string,
+      likeEnabled: boolean,
+      commentEnabled: boolean,
+      followRequestEnabled: boolean,
+      repostEnabled: boolean,
+      commentLikeEnabled: boolean,
+      approvalEnabled: boolean,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null,
     createdAt: string,
     updatedAt: string,
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+    userNotificationSettingsId?: string | null,
   } | null,
 };
 
@@ -4944,6 +5482,7 @@ export type OnCreateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -4960,6 +5499,7 @@ export type OnCreateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -4993,6 +5533,7 @@ export type OnUpdateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -5009,6 +5550,7 @@ export type OnUpdateFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -5042,6 +5584,7 @@ export type OnDeleteFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     friend?:  {
       __typename: "User",
@@ -5058,6 +5601,7 @@ export type OnDeleteFriendshipSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     createdAt: string,
     updatedAt: string,
@@ -5091,6 +5635,7 @@ export type OnCreateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -5107,6 +5652,7 @@ export type OnCreateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -5142,6 +5688,7 @@ export type OnUpdateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -5158,6 +5705,7 @@ export type OnUpdateFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -5193,6 +5741,7 @@ export type OnDeleteFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     recipient:  {
       __typename: "User",
@@ -5209,6 +5758,7 @@ export type OnDeleteFriendRequestSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     },
     status: string,
     createdAt: string,
@@ -5250,6 +5800,7 @@ export type OnCreatePostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -5326,6 +5877,7 @@ export type OnUpdatePostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -5402,6 +5954,7 @@ export type OnDeletePostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -5536,6 +6089,7 @@ export type OnCreateCommentSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -5665,6 +6219,7 @@ export type OnUpdateCommentSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -5794,6 +6349,7 @@ export type OnDeleteCommentSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userPostsId: string,
     username: string,
@@ -5903,6 +6459,7 @@ export type OnCreateRepostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -5990,6 +6547,7 @@ export type OnUpdateRepostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -6077,6 +6635,7 @@ export type OnDeleteRepostSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userRepostsId: string,
     userOriginalPostId: string,
@@ -6120,6 +6679,7 @@ export type OnCreateSpotifyRecentlyPlayedTrackSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -6161,6 +6721,7 @@ export type OnUpdateSpotifyRecentlyPlayedTrackSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -6202,6 +6763,7 @@ export type OnDeleteSpotifyRecentlyPlayedTrackSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userSpotifyRecentlyPlayedTrackId?: string | null,
     spotifyId?: string | null,
@@ -6243,6 +6805,7 @@ export type OnCreateSpotifyTokensSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -6281,6 +6844,7 @@ export type OnUpdateSpotifyTokensSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -6319,6 +6883,7 @@ export type OnDeleteSpotifyTokensSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     spotifyUserId: string,
@@ -6357,6 +6922,7 @@ export type OnCreateUserDeviceTokenSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -6392,6 +6958,7 @@ export type OnUpdateUserDeviceTokenSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -6427,6 +6994,7 @@ export type OnDeleteUserDeviceTokenSubscription = {
       _version: number,
       _deleted?: boolean | null,
       _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
     } | null,
     userId: string,
     deviceTokens: Array< string | null >,
@@ -6554,6 +7122,126 @@ export type OnDeleteNotificationSubscription = {
     targetId?: string | null,
     read: boolean,
     message?: string | null,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type OnCreateNotificationSettingsSubscriptionVariables = {
+  filter?: ModelSubscriptionNotificationSettingsFilterInput | null,
+};
+
+export type OnCreateNotificationSettingsSubscription = {
+  onCreateNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type OnUpdateNotificationSettingsSubscriptionVariables = {
+  filter?: ModelSubscriptionNotificationSettingsFilterInput | null,
+};
+
+export type OnUpdateNotificationSettingsSubscription = {
+  onUpdateNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+  } | null,
+};
+
+export type OnDeleteNotificationSettingsSubscriptionVariables = {
+  filter?: ModelSubscriptionNotificationSettingsFilterInput | null,
+};
+
+export type OnDeleteNotificationSettingsSubscription = {
+  onDeleteNotificationSettings?:  {
+    __typename: "NotificationSettings",
+    id: string,
+    userId: string,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      email: string,
+      publicProfile?: boolean | null,
+      recentlyPlayedDisabled?: boolean | null,
+      spotifyUri?: string | null,
+      spotifyImage?: string | null,
+      soundCloudUri?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userNotificationSettingsId?: string | null,
+    } | null,
+    likeEnabled: boolean,
+    commentEnabled: boolean,
+    followRequestEnabled: boolean,
+    repostEnabled: boolean,
+    commentLikeEnabled: boolean,
+    approvalEnabled: boolean,
     createdAt: string,
     updatedAt: string,
     _version: number,
