@@ -21,6 +21,9 @@ const SCOPES = [
   'user-read-currently-playing',
   'app-remote-control',
   'user-read-recently-played',
+  'playlist-modify-private',
+  'playlist-modify-public',
+  'playlist-read-collaborative',
 ].join(' ');
 const AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize';
 

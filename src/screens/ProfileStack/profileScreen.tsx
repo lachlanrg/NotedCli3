@@ -122,33 +122,36 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       // Increment the refreshKey to force UserPostList to re-render
       setRefreshKey(prevKey => prevKey + 1);
 
-      // const recentlyPlayedDisabledResponse = await client.graphql({
-      //   query: getUser,
-      //   variables: { id: userId },
-      // });
+      const recentlyPlayedDisabledResponse = await client.graphql({
+        query: getUser,
+        variables: { id: userId },
+      });
 
-      // const recentlyPlayedDisabled = recentlyPlayedDisabledResponse.data.getUser?.recentlyPlayedDisabled ?? false;
-      // setRecentlyPlayedDisabled(recentlyPlayedDisabled);
+      const recentlyPlayedDisabled = recentlyPlayedDisabledResponse.data.getUser?.recentlyPlayedDisabled ?? false;
+      setRecentlyPlayedDisabled(recentlyPlayedDisabled);
 
-      // const recentlyPlayedResponse = await client.graphql({
-      //   query: listSpotifyRecentlyPlayedTracks,
-      //   variables: { 
-      //     filter: { 
-      //       userSpotifyRecentlyPlayedTrackId: { eq: userId } 
-      //     } 
-      //   },
-      // });
+      const recentlyPlayedResponse = await client.graphql({
+        query: listSpotifyRecentlyPlayedTracks,
+        variables: { 
+          filter: { 
+            and: [
+              { userSpotifyRecentlyPlayedTrackId: { eq: userId } },
+              { _deleted: { ne: true } } // Filter out deleted tracks
+            ]
+          },
+        },
+      });
 
-      // const recentlyPlayedItems = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items;
-      // if (recentlyPlayedItems && recentlyPlayedItems.length > 0) {
-      //   const mostRecentTrack = recentlyPlayedItems.reduce((latest, current) => {
-      //     return new Date(current._lastChangedAt) > new Date(latest._lastChangedAt) ? current : latest;
-      //   });
-      //   setRecentlyPlayedTrack(mostRecentTrack as any);
-      // }
+      const recentlyPlayedItems = recentlyPlayedResponse.data.listSpotifyRecentlyPlayedTracks.items;
+      if (recentlyPlayedItems && recentlyPlayedItems.length > 0) {
+        const mostRecentTrack = recentlyPlayedItems.reduce((latest, current) => {
+          return new Date(current._lastChangedAt) > new Date(latest._lastChangedAt) ? current : latest;
+        });
+        setRecentlyPlayedTrack(mostRecentTrack as any);
+      }
       
     } catch (error) {
-      console.error('Error refreshing posts and follow counts:', error);
+      console.error('Error refreshing data:', error);
     }
   }, []);
 
@@ -459,7 +462,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     marginLeft: 10,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   recentlyPlayedContent: {
     flex: 1,

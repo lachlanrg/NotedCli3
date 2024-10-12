@@ -20,46 +20,12 @@ type NotificationsScreenProps = {
   navigation: NativeStackNavigationProp<ProfileStackParamList, 'Notifications'>;
 };
 
-type GroupedNotification = {
-  id: string;
-  type: string;
-  targetId: string | null;
-  actors: string[];
-  message: string;
-  createdAt: string;
-  imageUrl?: string;
-};
-
-const NotificationItem = React.memo(({ item }: { item: GroupedNotification }) => {
-  let message = item.message;
-
-  if (item.type === 'COMMENT' && item.actors.length > 1) {
-    message = `${item.actors[0]} and ${item.actors.length - 1} others commented on your post`;
-  } else if (item.type === 'LIKE' && item.actors.length > 1) {
-    message = `${item.actors[0]} and ${item.actors.length - 1} others liked your post`;
-  } else if (item.type === 'LIKE' && item.actors.length === 1) {
-    message = `${item.actors[0]} liked your post`;
-  }
-
-  return (
-    <View style={styles.notificationItem}>
-      {item.imageUrl && (
-        <Image source={{ uri: item.imageUrl }} style={styles.notificationImage} />
-      )}
-      <View style={styles.notificationContent}>
-        <Text style={styles.notificationMessage}>{message}</Text>
-        <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
-      </View>
-    </View>
-  );
-});
-
 const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation }) => {
   const [currentAuthUserInfo, setCurrentAuthUserInfo] = useState<any>(null);
-  const [groupedNotifications, setGroupedNotifications] = useState<GroupedNotification[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { deviceToken } = useNotification();
-  const [nextToken, setNextToken] = useState<string | null>(null);
+  const [notificationImages, setNotificationImages] = useState<{[key: string]: string}>({});
 
   const client = generateClient();
 
@@ -71,90 +37,60 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     try {
       const { userId } = await getCurrentUser();
       setCurrentAuthUserInfo({ userId });
-      fetchNotifications(userId);
+      await fetchNotifications(userId);
     } catch (err) {
       console.log(err);
       setIsLoading(false);
     }
   }
 
-  const fetchNotifications = async (userId: string, nextTokenParam?: string | null) => {
+  const fetchNotifications = async (userId: string) => {
     try {
-      setIsLoading(true);
       const notificationsResponse = await client.graphql({
         query: listNotifications,
         variables: { 
           filter: { userId: { eq: userId } },
-          limit: 20,
-          nextToken: nextTokenParam
+          limit: 100
         }
       });
 
       const newNotifications = notificationsResponse.data.listNotifications.items as Notification[];
-      const newGroupedNotifications = await groupNotifications(newNotifications);
-      
-      if (nextTokenParam) {
-        setGroupedNotifications(prev => [...prev, ...newGroupedNotifications]);
-      } else {
-        setGroupedNotifications(newGroupedNotifications);
-      }
-      
-      // Only set the nextToken if it's not undefined
-      const responseNextToken = notificationsResponse.data.listNotifications.nextToken;
-      if (responseNextToken !== undefined) {
-        setNextToken(responseNextToken);
-      } else {
-        setNextToken(null);
-      }
+      setNotifications(newNotifications);
+      await fetchImages(newNotifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
-    } finally {
       setIsLoading(false);
     }
-  };
-
-  const groupNotifications = async (notifications: Notification[]): Promise<GroupedNotification[]> => {
-    const grouped: { [key: string]: GroupedNotification } = {};
-
-    for (const notification of notifications) {
-      const key = `${notification.type}-${notification.targetId || 'null'}`;
-      if (!grouped[key]) {
-        grouped[key] = {
-          id: notification.id,
-          type: notification.type,
-          targetId: notification.targetId || null,
-          actors: [notification.actorId],
-          message: notification.message || '',
-          createdAt: notification.createdAt,
-        };
-
-        // Fetch image URL for post or repost
-        if (notification.targetId) {
-          grouped[key].imageUrl = await fetchImageUrl(notification.type, notification.targetId);
-        }
-      } else {
-        grouped[key].actors.push(notification.actorId);
-        if (new Date(notification.createdAt) > new Date(grouped[key].createdAt)) {
-          grouped[key].createdAt = notification.createdAt;
-        }
-      }
-    }
-
-    const groupedArray = Object.values(grouped).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    return groupedArray;
   };
 
   const fetchImageUrl = async (type: string, targetId: string): Promise<string | undefined> => {
     try {
       if (type === 'LIKE' || type === 'COMMENT' || type === 'REPOST') {
-        const postResponse = await client.graphql({
+        let postResponse = await client.graphql({
           query: getPost,
           variables: { id: targetId }
         });
-        const post = postResponse.data.getPost as Post;
+        
+        let post = postResponse.data.getPost as Post | null;
+        
+        if (!post) {
+          const repostResponse = await client.graphql({
+            query: getRepost,
+            variables: { id: targetId }
+          });
+          
+          const repost = repostResponse.data.getRepost as Repost | null;
+          
+          if (repost && repost.originalPost) {
+            post = repost.originalPost;
+          }
+        }
+        
+        if (!post) {
+          console.log(`Post or Repost not found for targetId: ${targetId}`);
+          return undefined;
+        }
+        
         return post.scTrackArtworkUrl || post.spotifyTrackImageUrl || post.spotifyAlbumImageUrl || undefined;
       }
     } catch (error) {
@@ -163,17 +99,65 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
     return undefined;
   };
 
-  const loadMoreNotifications = () => {
-    if (nextToken && !isLoading && currentAuthUserInfo) {
-      fetchNotifications(currentAuthUserInfo.userId, nextToken);
-    }
+  const fetchImages = async (notificationsToFetch: Notification[]) => {
+    const imagePromises = notificationsToFetch.map(async (notification) => {
+      if (notification.targetId) {
+        const imageUrl = await fetchImageUrl(notification.type, notification.targetId);
+        return imageUrl ? { [notification.id]: imageUrl } : null;
+      }
+      return null;
+    });
+
+    const imageResults = await Promise.all(imagePromises);
+    const newImages = imageResults.reduce((acc, result) => {
+      if (result) {
+        return { ...acc, ...result };
+      }
+      return acc;
+    }, {} as { [key: string]: string });
+
+    setNotificationImages(prevImages => ({ ...prevImages, ...newImages }));
+    setIsLoading(false);
   };
 
-  const renderNotificationItem = useCallback(({ item }: { item: GroupedNotification }) => (
-    <NotificationItem item={item} />
-  ), []);
+  const renderNotificationItem = useCallback(({ item }: { item: Notification }) => (
+    <View style={styles.notificationItem}>
+      {item.targetId && notificationImages[item.id] && (
+        <Image 
+          source={{ uri: notificationImages[item.id] }} 
+          style={styles.notificationImage} 
+        />
+      )}
+      <View style={styles.notificationContent}>
+        <Text style={styles.notificationMessage}>{item.message}</Text>
+        <Text style={styles.timestamp}>{formatRelativeTime(item.createdAt)}</Text>
+      </View>
+    </View>
+  ), [notificationImages]);
 
-  const keyExtractor = useCallback((item: GroupedNotification) => item.id, []);
+  const keyExtractor = useCallback((item: Notification) => item.id, []);
+
+  const renderNotificationList = () => {
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size='large' color={light} />
+        </View>
+      );
+    }
+
+    return (
+      <FlatList
+        contentContainerStyle={styles.flatListContent}
+        data={notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())}
+        renderItem={renderNotificationItem}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={
+          <Text style={styles.noNotifications}>No notifications</Text>
+        }
+      />
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
@@ -185,38 +169,15 @@ const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ navigation })
           <Text style={styles.headerTitle}>Notifications</Text>
           <View style={styles.placeholderView} />
         </View>
-        <FlatList
-          contentContainerStyle={styles.flatListContent}
-          data={groupedNotifications}
-          renderItem={renderNotificationItem}
-          keyExtractor={keyExtractor}
-          onEndReached={loadMoreNotifications}
-          onEndReachedThreshold={0.5}
-          ListHeaderComponent={
-            <>
-              <TouchableOpacity 
-                style={styles.friendRequestsButton}
-                onPress={() => navigation.navigate('FriendRequests')}
-              >
-                <Text style={styles.friendRequestsText}>Friend Requests</Text>
-                <FontAwesomeIcon icon={faChevronRight} size={18} color={light} />
-              </TouchableOpacity>
-              <Text style={styles.activityTitle}>Activity</Text>
-            </>
-          }
-          ListEmptyComponent={
-            !isLoading ? (
-              <Text style={styles.noNotifications}>No notifications</Text>
-            ) : null
-          }
-          ListFooterComponent={
-            isLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size='large' color={light} />
-              </View>
-            ) : null
-          }
-        />
+        <TouchableOpacity 
+          style={styles.friendRequestsButton}
+          onPress={() => navigation.navigate('FriendRequests')}
+        >
+          <Text style={styles.friendRequestsText}>Friend Requests</Text>
+          <FontAwesomeIcon icon={faChevronRight} size={18} color={light} />
+        </TouchableOpacity>
+        <Text style={styles.activityTitle}>Activity</Text>
+        {renderNotificationList()}
       </View>
     </SafeAreaView>
   );
@@ -281,6 +242,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: lgray,
+    paddingHorizontal: 20,
   },
   friendRequestsButton: {
     flexDirection: 'row',
@@ -289,6 +251,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: gray,
+    paddingHorizontal: 20,
   },
   friendRequestsText: {
     fontSize: 18,
@@ -302,13 +265,13 @@ const styles = StyleSheet.create({
     color: light,
     marginTop: 20,
     marginBottom: 10,
+    paddingHorizontal: 20,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
-    marginTop: 40,
+    // paddingVertical: 20,
   },
   flatListContent: {
     paddingHorizontal: 20, // Add horizontal padding here

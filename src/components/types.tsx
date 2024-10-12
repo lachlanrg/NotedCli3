@@ -51,3 +51,10 @@ export type ExploreStackParamList = {
   Explore: undefined;
   ItemDetailsExplore: undefined;
 };
+
+// Add this new type definition
+export type CollaborationStackParamList = {
+  Collaboration: undefined;
+  CreateCollabPlaylist: undefined;
+  // Add more screens for the CollaborationStack as needed
+};
