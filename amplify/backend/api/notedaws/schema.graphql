@@ -17,6 +17,26 @@ type User @model @auth(rules: [{allow: public}]) {
   soundCloudUri: String
   userDeviceTokens: [UserDeviceToken] @hasMany
   notificationSettings: NotificationSettings @hasOne
+  spotifyPlaylists: [SpotifyPlaylist] @hasMany
+}
+
+type SpotifyPlaylist @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  description: String
+  user: User @belongsTo
+  userSpotifyPlaylistsId: ID!
+  username: String!
+  type: String!
+  spotifyPlaylistId: String
+  spotifyUserId: String
+  spotifyExternalUrl: String
+  imageUrl: String
+  tracks: Int
+  followers: Int
+  likedBy: [ID!]
+  likesCount: Int!
+  comments: [Comment] @hasMany
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {
@@ -84,6 +104,8 @@ type Comment @model @auth(rules: [{allow: public}]) {
   postId: String
   repost: Repost @belongsTo
   repostId: String
+  spotifyPlaylist: SpotifyPlaylist @belongsTo
+  spotifyPlaylistId: String
   content: String!
   likedBy: [ID!]
   likesCount: Int!

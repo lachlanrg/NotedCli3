@@ -16,6 +16,9 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CollaborationStackParamList } from '../../components/types';
 import { createSpotifyPlaylist } from '../../utils/spotifyPlaylistAPI';
+import { generateClient } from 'aws-amplify/api';
+import { getCurrentUser } from 'aws-amplify/auth';
+import { createSpotifyPlaylist as createSpotifyPlaylistMutation } from '../../graphql/mutations';
 
 type CreateCollabPlaylistScreenNavigationProp = NativeStackNavigationProp<
   CollaborationStackParamList,
@@ -29,12 +32,46 @@ const CreateCollabPlaylistScreen: React.FC = () => {
 
   const handleCreatePlaylist = async () => {
     try {
-      await createSpotifyPlaylist(playlistName, playlistDescription);
+      const newPlaylist = await createSpotifyPlaylist(playlistName, playlistDescription);
+      await createSpotifyPlaylistInGraphQL(newPlaylist);
       Alert.alert('Success', 'Collaborative playlist created successfully!');
       navigation.goBack();
     } catch (error) {
       console.error('Error creating playlist:', error);
       Alert.alert('Error', 'Failed to create collaborative playlist. Please try again.');
+    }
+  };
+
+  const createSpotifyPlaylistInGraphQL = async (playlist: any) => {
+    try {
+      const client = generateClient();
+      const { userId, username } = await getCurrentUser();
+
+      const playlistDetails = {
+        name: playlist.name,
+        description: playlist.description,
+        userSpotifyPlaylistsId: userId,
+        type: playlist.public ? 'PUBLIC' : (playlist.collaborative ? 'COLLABORATIVE' : 'PRIVATE'),
+        spotifyPlaylistId: playlist.id,
+        username: username,
+        spotifyUserId: playlist.owner.id,
+        spotifyExternalUrl: playlist.external_urls.spotify,
+        imageUrl: playlist.images[0]?.url,
+        tracks: playlist.tracks.total,
+        followers: playlist.followers.total,
+        likedBy: [],
+        likesCount: 0,
+      };
+
+      const result = await client.graphql({
+        query: createSpotifyPlaylistMutation,
+        variables: { input: playlistDetails }
+      });
+
+      console.log('Playlist created in GraphQL:', result.data.createSpotifyPlaylist);
+    } catch (error) {
+      console.error('Error creating playlist in GraphQL:', error);
+      throw error;
     }
   };
 
@@ -46,31 +83,31 @@ const CreateCollabPlaylistScreen: React.FC = () => {
     <SafeAreaView style={styles.safeAreaContainer}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-            <Text style={styles.title}>Create Collaborative Playlist</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Playlist Name"
-              placeholderTextColor={placeholder}
-              value={playlistName}
-              onChangeText={setPlaylistName}
-              returnKeyType="done"
-              onSubmitEditing={dismissKeyboard}
-            />
-            <TextInput
-              style={[styles.input, styles.descriptionInput]}
-              placeholder="Playlist Description"
-              placeholderTextColor={placeholder}
-              value={playlistDescription}
-              onChangeText={setPlaylistDescription}
-              multiline
-              returnKeyType="done"
-              onSubmitEditing={dismissKeyboard}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleCreatePlaylist}>
-              <Text style={styles.buttonText}>Create Playlist</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableWithoutFeedback>
+          <Text style={styles.title}>Create Collaborative Playlist</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Playlist Name"
+            placeholderTextColor={placeholder}
+            value={playlistName}
+            onChangeText={setPlaylistName}
+            returnKeyType="done"
+            onSubmitEditing={dismissKeyboard}
+          />
+          <TextInput
+            style={[styles.input, styles.descriptionInput]}
+            placeholder="Playlist Description"
+            placeholderTextColor={placeholder}
+            value={playlistDescription}
+            onChangeText={setPlaylistDescription}
+            multiline
+            returnKeyType="done"
+            onSubmitEditing={dismissKeyboard}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleCreatePlaylist}>
+            <Text style={styles.buttonText}>Create Playlist</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };

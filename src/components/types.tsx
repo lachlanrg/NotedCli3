@@ -56,5 +56,8 @@ export type ExploreStackParamList = {
 export type CollaborationStackParamList = {
   Collaboration: undefined;
   CreateCollabPlaylist: undefined;
-  // Add more screens for the CollaborationStack as needed
+  UsersSpotifyPlaylists: undefined;
+  PostPlaylist: { playlistId: string };
+  ViewPlaylist: { playlistId: string };
+  // ... any other screens in your CollaborationStack
 };

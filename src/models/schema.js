@@ -221,6 +221,22 @@ export const schema = {
                         ]
                     }
                 },
+                "spotifyPlaylists": {
+                    "name": "spotifyPlaylists",
+                    "isArray": true,
+                    "type": {
+                        "model": "SpotifyPlaylist"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "userSpotifyPlaylistsId"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -247,6 +263,181 @@ export const schema = {
             },
             "syncable": true,
             "pluralName": "Users",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "SpotifyPlaylist": {
+            "name": "SpotifyPlaylist",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "name": {
+                    "name": "name",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "description": {
+                    "name": "description",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "user": {
+                    "name": "user",
+                    "isArray": false,
+                    "type": {
+                        "model": "User"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "userSpotifyPlaylistsId"
+                        ]
+                    }
+                },
+                "userSpotifyPlaylistsId": {
+                    "name": "userSpotifyPlaylistsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "username": {
+                    "name": "username",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "type": {
+                    "name": "type",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "spotifyPlaylistId": {
+                    "name": "spotifyPlaylistId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyUserId": {
+                    "name": "spotifyUserId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyExternalUrl": {
+                    "name": "spotifyExternalUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "imageUrl": {
+                    "name": "imageUrl",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "tracks": {
+                    "name": "tracks",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "followers": {
+                    "name": "followers",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "likedBy": {
+                    "name": "likedBy",
+                    "isArray": true,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
+                "likesCount": {
+                    "name": "likesCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "comments": {
+                    "name": "comments",
+                    "isArray": true,
+                    "type": {
+                        "model": "Comment"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "spotifyPlaylistCommentsId"
+                        ]
+                    }
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                }
+            },
+            "syncable": true,
+            "pluralName": "SpotifyPlaylists",
             "attributes": [
                 {
                     "type": "model",
@@ -854,6 +1045,28 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "spotifyPlaylist": {
+                    "name": "spotifyPlaylist",
+                    "isArray": false,
+                    "type": {
+                        "model": "SpotifyPlaylist"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "spotifyPlaylistCommentsId"
+                        ]
+                    }
+                },
+                "spotifyPlaylistId": {
+                    "name": "spotifyPlaylistId",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "content": {
                     "name": "content",
                     "isArray": false,
@@ -961,6 +1174,13 @@ export const schema = {
                 },
                 "userCommentsId": {
                     "name": "userCommentsId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "spotifyPlaylistCommentsId": {
+                    "name": "spotifyPlaylistCommentsId",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": false,
@@ -1831,5 +2051,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "af96b358d2ebe9d1060aeecabf1158cf"
+    "version": "b7f5ed0593066c9ca878330287cfdc7d"
 };

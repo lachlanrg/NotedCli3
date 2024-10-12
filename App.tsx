@@ -50,6 +50,9 @@ import ProfilePostScreen from './src/screens/ProfileStack/profilePostScreen';
 import FriendRequestsScreen from './src/screens/ProfileStack/friendRequestsScreen';
 import CollaborationScreen from './src/screens/CollaborationStack/CollaborationScreen';
 import CreateCollabPlaylistScreen from './src/screens/CollaborationStack/CreateCollabPlaylistScreen';
+import UsersSpotifyPlaylistsScreen from './src/screens/CollaborationStack/UsersSpotifyPlaylistsScreen';
+import PostPlaylistScreen from './src/screens/CollaborationStack/PostPlaylistScreen';
+import ViewPlaylistScreen from './src/screens/CollaborationStack/ViewPlaylistScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -161,6 +164,21 @@ const CollaborationStackNavigator = () => {
       <CollaborationStack.Screen 
         name="CreateCollabPlaylist" 
         component={CreateCollabPlaylistScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="UsersSpotifyPlaylists" 
+        component={UsersSpotifyPlaylistsScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="PostPlaylist" 
+        component={PostPlaylistScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="ViewPlaylist" 
+        component={ViewPlaylistScreen} 
         options={{ headerShown: false }} 
       />
     </CollaborationStack.Navigator>
