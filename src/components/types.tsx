@@ -51,3 +51,13 @@ export type ExploreStackParamList = {
   Explore: undefined;
   ItemDetailsExplore: undefined;
 };
+
+// Add this new type definition
+export type CollaborationStackParamList = {
+  Collaboration: undefined;
+  CreateCollabPlaylist: undefined;
+  UsersSpotifyPlaylists: undefined;
+  PostPlaylist: { playlistId: string };
+  ViewPlaylist: { playlistId: string };
+  // ... any other screens in your CollaborationStack
+};

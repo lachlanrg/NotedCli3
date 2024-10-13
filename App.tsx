@@ -7,7 +7,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faHome, faPlus, faSearch, faUser, faCompass, faMagnifyingGlassChart } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faPlus, faSearch, faUser, faCompass, faMagnifyingGlassChart, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { dark, light, gray, error, placeholder, lgray } from './src/components/colorModes';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 // import { faCompass } from '@fortawesome/free-regular-svg-icons';
@@ -48,6 +48,11 @@ import SearchSpotifyArtistScreen from './src/screens/SearchStack/searchSpotifyAr
 import SearchSCTrackScreen from './src/screens/SearchStack/searchSCTrackScreen';
 import ProfilePostScreen from './src/screens/ProfileStack/profilePostScreen';
 import FriendRequestsScreen from './src/screens/ProfileStack/friendRequestsScreen';
+import CollaborationScreen from './src/screens/CollaborationStack/CollaborationScreen';
+import CreateCollabPlaylistScreen from './src/screens/CollaborationStack/CreateCollabPlaylistScreen';
+import UsersSpotifyPlaylistsScreen from './src/screens/CollaborationStack/UsersSpotifyPlaylistsScreen';
+import PostPlaylistScreen from './src/screens/CollaborationStack/PostPlaylistScreen';
+import ViewPlaylistScreen from './src/screens/CollaborationStack/ViewPlaylistScreen';
 
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
@@ -64,6 +69,7 @@ import { SearchScreenStackParamList } from './src/components/types';
 import { ProfileStackParamList } from './src/components/types';
 import { HomeStackParamList } from './src/components/types';
 import { ExploreStackParamList } from './src/components/types';
+import { CollaborationStackParamList } from './src/components/types';
 
 import { initializePushNotifications } from 'aws-amplify/push-notifications';
 import { NotificationProvider } from './src/context/NotificationContext';
@@ -80,6 +86,7 @@ const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 const SearchStack = createNativeStackNavigator<SearchScreenStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const ExploreStack = createNativeStackNavigator<ExploreStackParamList>();
+const CollaborationStack = createNativeStackNavigator<CollaborationStackParamList>();
 
 import { HomeScreenData } from './src/utils/homeScreenInitializer';
 
@@ -146,6 +153,38 @@ const ExploreStackNavigator = () => {
   )
 }
 
+const CollaborationStackNavigator = () => {
+  return (
+    <CollaborationStack.Navigator>
+      <CollaborationStack.Screen 
+        name="Collaboration" 
+        component={CollaborationScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="CreateCollabPlaylist" 
+        component={CreateCollabPlaylistScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="UsersSpotifyPlaylists" 
+        component={UsersSpotifyPlaylistsScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="PostPlaylist" 
+        component={PostPlaylistScreen} 
+        options={{ headerShown: false }} 
+      />
+      <CollaborationStack.Screen 
+        name="ViewPlaylist" 
+        component={ViewPlaylistScreen} 
+        options={{ headerShown: false }} 
+      />
+    </CollaborationStack.Navigator>
+  );
+};
+
 const MainTabNavigator = () => {
   const homeScreenRef = useRef(null);
 
@@ -160,9 +199,11 @@ const MainTabNavigator = () => {
           } else if (route.name === 'ProfileTab') {
             iconName = focused ? faUser : faUser;
           } else if (route.name === 'ExploreTab') { 
-          iconName = focused ? faCompass : faCompass;
+            iconName = focused ? faCompass : faCompass;
           } else if (route.name === 'SearchTab') {
             iconName = focused ? faMagnifyingGlassChart : faMagnifyingGlassChart;
+          } else if (route.name === 'CollaborationTab') {
+            iconName = focused ? faUsers : faUsers;
           }
 
           return <FontAwesomeIcon icon={iconName || faHome} size={size} color={color} />;
@@ -177,6 +218,7 @@ const MainTabNavigator = () => {
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="SearchTab" component={SearchStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="ExploreTab" component={ExploreStackNavigator} options={{ headerShown: false }} /> 
+      <Tab.Screen name="CollaborationTab" component={CollaborationStackNavigator} options={{ headerShown: false }} />
       <Tab.Screen name="ProfileTab" component={ProfileStackNavigator} options={{ headerShown: false }} />
     </Tab.Navigator>
   );

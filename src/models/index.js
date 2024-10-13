@@ -4,10 +4,11 @@ import { schema } from './schema';
 
 
 
-const { User, Friendship, FriendRequest, Post, Comment, Repost, SpotifyRecentlyPlayedTrack, SpotifyTokens, UserDeviceToken, SeenPost, Notification, NotificationSettings } = initSchema(schema);
+const { User, SpotifyPlaylist, Friendship, FriendRequest, Post, Comment, Repost, SpotifyRecentlyPlayedTrack, SpotifyTokens, UserDeviceToken, SeenPost, Notification, NotificationSettings } = initSchema(schema);
 
 export {
   User,
+  SpotifyPlaylist,
   Friendship,
   FriendRequest,
   Post,

@@ -80,6 +80,11 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser($filter: Mo
       _lastChangedAt
       __typename
     }
+    spotifyPlaylists {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -163,6 +168,11 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser($filter: Mo
       _version
       _deleted
       _lastChangedAt
+      __typename
+    }
+    spotifyPlaylists {
+      nextToken
+      startedAt
       __typename
     }
     createdAt
@@ -250,6 +260,11 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
       _lastChangedAt
       __typename
     }
+    spotifyPlaylists {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -262,6 +277,162 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser($filter: Mo
 ` as GeneratedSubscription<
   APITypes.OnDeleteUserSubscriptionVariables,
   APITypes.OnDeleteUserSubscription
+>;
+export const onCreateSpotifyPlaylist = /* GraphQL */ `subscription OnCreateSpotifyPlaylist(
+  $filter: ModelSubscriptionSpotifyPlaylistFilterInput
+) {
+  onCreateSpotifyPlaylist(filter: $filter) {
+    id
+    name
+    description
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    userSpotifyPlaylistsId
+    username
+    type
+    spotifyPlaylistId
+    spotifyUserId
+    spotifyExternalUrl
+    imageUrl
+    tracks
+    followers
+    likedBy
+    likesCount
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateSpotifyPlaylistSubscriptionVariables,
+  APITypes.OnCreateSpotifyPlaylistSubscription
+>;
+export const onUpdateSpotifyPlaylist = /* GraphQL */ `subscription OnUpdateSpotifyPlaylist(
+  $filter: ModelSubscriptionSpotifyPlaylistFilterInput
+) {
+  onUpdateSpotifyPlaylist(filter: $filter) {
+    id
+    name
+    description
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    userSpotifyPlaylistsId
+    username
+    type
+    spotifyPlaylistId
+    spotifyUserId
+    spotifyExternalUrl
+    imageUrl
+    tracks
+    followers
+    likedBy
+    likesCount
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateSpotifyPlaylistSubscriptionVariables,
+  APITypes.OnUpdateSpotifyPlaylistSubscription
+>;
+export const onDeleteSpotifyPlaylist = /* GraphQL */ `subscription OnDeleteSpotifyPlaylist(
+  $filter: ModelSubscriptionSpotifyPlaylistFilterInput
+) {
+  onDeleteSpotifyPlaylist(filter: $filter) {
+    id
+    name
+    description
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    userSpotifyPlaylistsId
+    username
+    type
+    spotifyPlaylistId
+    spotifyUserId
+    spotifyExternalUrl
+    imageUrl
+    tracks
+    followers
+    likedBy
+    likesCount
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteSpotifyPlaylistSubscriptionVariables,
+  APITypes.OnDeleteSpotifyPlaylistSubscription
 >;
 export const onCreateFriendship = /* GraphQL */ `subscription OnCreateFriendship(
   $filter: ModelSubscriptionFriendshipFilterInput
@@ -873,6 +1044,29 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       __typename
     }
     repostId
+    spotifyPlaylist {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    spotifyPlaylistId
     content
     likedBy
     likesCount
@@ -899,6 +1093,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       id
       postId
       repostId
+      spotifyPlaylistId
       content
       likedBy
       likesCount
@@ -911,6 +1106,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       _deleted
       _lastChangedAt
       userCommentsId
+      spotifyPlaylistCommentsId
       postCommentsId
       commentRepliesId
       repostCommentsId
@@ -928,6 +1124,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
     _deleted
     _lastChangedAt
     userCommentsId
+    spotifyPlaylistCommentsId
     postCommentsId
     commentRepliesId
     repostCommentsId
@@ -1002,6 +1199,29 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       __typename
     }
     repostId
+    spotifyPlaylist {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    spotifyPlaylistId
     content
     likedBy
     likesCount
@@ -1028,6 +1248,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       id
       postId
       repostId
+      spotifyPlaylistId
       content
       likedBy
       likesCount
@@ -1040,6 +1261,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       _deleted
       _lastChangedAt
       userCommentsId
+      spotifyPlaylistCommentsId
       postCommentsId
       commentRepliesId
       repostCommentsId
@@ -1057,6 +1279,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
     _deleted
     _lastChangedAt
     userCommentsId
+    spotifyPlaylistCommentsId
     postCommentsId
     commentRepliesId
     repostCommentsId
@@ -1131,6 +1354,29 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       __typename
     }
     repostId
+    spotifyPlaylist {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    spotifyPlaylistId
     content
     likedBy
     likesCount
@@ -1157,6 +1403,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       id
       postId
       repostId
+      spotifyPlaylistId
       content
       likedBy
       likesCount
@@ -1169,6 +1416,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       _deleted
       _lastChangedAt
       userCommentsId
+      spotifyPlaylistCommentsId
       postCommentsId
       commentRepliesId
       repostCommentsId
@@ -1186,6 +1434,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
     _deleted
     _lastChangedAt
     userCommentsId
+    spotifyPlaylistCommentsId
     postCommentsId
     commentRepliesId
     repostCommentsId

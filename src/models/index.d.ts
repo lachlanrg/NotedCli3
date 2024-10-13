@@ -29,6 +29,7 @@ type EagerUser = {
   readonly soundCloudUri?: string | null;
   readonly userDeviceTokens?: (UserDeviceToken | null)[] | null;
   readonly notificationSettings?: NotificationSettings | null;
+  readonly spotifyPlaylists?: (SpotifyPlaylist | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userNotificationSettingsId?: string | null;
@@ -57,6 +58,7 @@ type LazyUser = {
   readonly soundCloudUri?: string | null;
   readonly userDeviceTokens: AsyncCollection<UserDeviceToken>;
   readonly notificationSettings: AsyncItem<NotificationSettings | undefined>;
+  readonly spotifyPlaylists: AsyncCollection<SpotifyPlaylist>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userNotificationSettingsId?: string | null;
@@ -66,6 +68,62 @@ export declare type User = LazyLoading extends LazyLoadingDisabled ? EagerUser :
 
 export declare const User: (new (init: ModelInit<User>) => User) & {
   copyOf(source: User, mutator: (draft: MutableModel<User>) => MutableModel<User> | void): User;
+}
+
+type EagerSpotifyPlaylist = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SpotifyPlaylist, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name: string;
+  readonly description?: string | null;
+  readonly user?: User | null;
+  readonly userSpotifyPlaylistsId: string;
+  readonly username: string;
+  readonly type: string;
+  readonly spotifyPlaylistId?: string | null;
+  readonly spotifyUserId?: string | null;
+  readonly spotifyExternalUrl?: string | null;
+  readonly imageUrl?: string | null;
+  readonly tracks?: number | null;
+  readonly followers?: number | null;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
+  readonly comments?: (Comment | null)[] | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+type LazySpotifyPlaylist = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<SpotifyPlaylist, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly name: string;
+  readonly description?: string | null;
+  readonly user: AsyncItem<User | undefined>;
+  readonly userSpotifyPlaylistsId: string;
+  readonly username: string;
+  readonly type: string;
+  readonly spotifyPlaylistId?: string | null;
+  readonly spotifyUserId?: string | null;
+  readonly spotifyExternalUrl?: string | null;
+  readonly imageUrl?: string | null;
+  readonly tracks?: number | null;
+  readonly followers?: number | null;
+  readonly likedBy?: string[] | null;
+  readonly likesCount: number;
+  readonly comments: AsyncCollection<Comment>;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+}
+
+export declare type SpotifyPlaylist = LazyLoading extends LazyLoadingDisabled ? EagerSpotifyPlaylist : LazySpotifyPlaylist
+
+export declare const SpotifyPlaylist: (new (init: ModelInit<SpotifyPlaylist>) => SpotifyPlaylist) & {
+  copyOf(source: SpotifyPlaylist, mutator: (draft: MutableModel<SpotifyPlaylist>) => MutableModel<SpotifyPlaylist> | void): SpotifyPlaylist;
 }
 
 type EagerFriendship = {
@@ -246,6 +304,8 @@ type EagerComment = {
   readonly postId?: string | null;
   readonly repost?: Repost | null;
   readonly repostId?: string | null;
+  readonly spotifyPlaylist?: SpotifyPlaylist | null;
+  readonly spotifyPlaylistId?: string | null;
   readonly content: string;
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
@@ -258,6 +318,7 @@ type EagerComment = {
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
+  readonly spotifyPlaylistCommentsId?: string | null;
   readonly postCommentsId?: string | null;
   readonly repostCommentsId?: string | null;
   readonly commentRepliesId?: string | null;
@@ -273,6 +334,8 @@ type LazyComment = {
   readonly postId?: string | null;
   readonly repost: AsyncItem<Repost | undefined>;
   readonly repostId?: string | null;
+  readonly spotifyPlaylist: AsyncItem<SpotifyPlaylist | undefined>;
+  readonly spotifyPlaylistId?: string | null;
   readonly content: string;
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
@@ -285,6 +348,7 @@ type LazyComment = {
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly userCommentsId?: string | null;
+  readonly spotifyPlaylistCommentsId?: string | null;
   readonly postCommentsId?: string | null;
   readonly repostCommentsId?: string | null;
   readonly commentRepliesId?: string | null;

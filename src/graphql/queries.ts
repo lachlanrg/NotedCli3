@@ -80,6 +80,11 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
       _lastChangedAt
       __typename
     }
+    spotifyPlaylists {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -154,6 +159,136 @@ export const syncUsers = /* GraphQL */ `query SyncUsers(
   }
 }
 ` as GeneratedQuery<APITypes.SyncUsersQueryVariables, APITypes.SyncUsersQuery>;
+export const getSpotifyPlaylist = /* GraphQL */ `query GetSpotifyPlaylist($id: ID!) {
+  getSpotifyPlaylist(id: $id) {
+    id
+    name
+    description
+    user {
+      id
+      username
+      email
+      publicProfile
+      recentlyPlayedDisabled
+      spotifyUri
+      spotifyImage
+      soundCloudUri
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userNotificationSettingsId
+      __typename
+    }
+    userSpotifyPlaylistsId
+    username
+    type
+    spotifyPlaylistId
+    spotifyUserId
+    spotifyExternalUrl
+    imageUrl
+    tracks
+    followers
+    likedBy
+    likesCount
+    comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetSpotifyPlaylistQueryVariables,
+  APITypes.GetSpotifyPlaylistQuery
+>;
+export const listSpotifyPlaylists = /* GraphQL */ `query ListSpotifyPlaylists(
+  $filter: ModelSpotifyPlaylistFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listSpotifyPlaylists(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListSpotifyPlaylistsQueryVariables,
+  APITypes.ListSpotifyPlaylistsQuery
+>;
+export const syncSpotifyPlaylists = /* GraphQL */ `query SyncSpotifyPlaylists(
+  $filter: ModelSpotifyPlaylistFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncSpotifyPlaylists(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncSpotifyPlaylistsQueryVariables,
+  APITypes.SyncSpotifyPlaylistsQuery
+>;
 export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
   getFriendship(id: $id) {
     id
@@ -625,6 +760,29 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       __typename
     }
     repostId
+    spotifyPlaylist {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    spotifyPlaylistId
     content
     likedBy
     likesCount
@@ -651,6 +809,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       id
       postId
       repostId
+      spotifyPlaylistId
       content
       likedBy
       likesCount
@@ -663,6 +822,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       _deleted
       _lastChangedAt
       userCommentsId
+      spotifyPlaylistCommentsId
       postCommentsId
       commentRepliesId
       repostCommentsId
@@ -680,6 +840,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
     _deleted
     _lastChangedAt
     userCommentsId
+    spotifyPlaylistCommentsId
     postCommentsId
     commentRepliesId
     repostCommentsId
@@ -700,6 +861,7 @@ export const listComments = /* GraphQL */ `query ListComments(
       id
       postId
       repostId
+      spotifyPlaylistId
       content
       likedBy
       likesCount
@@ -712,6 +874,7 @@ export const listComments = /* GraphQL */ `query ListComments(
       _deleted
       _lastChangedAt
       userCommentsId
+      spotifyPlaylistCommentsId
       postCommentsId
       commentRepliesId
       repostCommentsId
@@ -742,6 +905,7 @@ export const syncComments = /* GraphQL */ `query SyncComments(
       id
       postId
       repostId
+      spotifyPlaylistId
       content
       likedBy
       likesCount
@@ -754,6 +918,7 @@ export const syncComments = /* GraphQL */ `query SyncComments(
       _deleted
       _lastChangedAt
       userCommentsId
+      spotifyPlaylistCommentsId
       postCommentsId
       commentRepliesId
       repostCommentsId
