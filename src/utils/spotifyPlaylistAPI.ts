@@ -202,3 +202,154 @@ export const updatePlaylistImage = async (playlistId: string, imageBase64: strin
     throw error;
   }
 };
+
+export const searchTracks = async (query: string) => {
+  try {
+    const { userId } = await getCurrentUser();
+    const response = await client.graphql({
+      query: listSpotifyTokens,
+      variables: { filter: { userId: { eq: userId } } }
+    });
+
+    const spotifyTokens = response.data.listSpotifyTokens.items[0] as SpotifyTokens;
+
+    if (!spotifyTokens) {
+      throw new Error('No Spotify tokens found for the user');
+    }
+
+    const accessToken = spotifyTokens.spotifyAccessToken;
+
+    const searchResponse = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=20`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!searchResponse.ok) {
+      const errorData = await searchResponse.json();
+      throw new Error(`Failed to search tracks: ${errorData.error.message}`);
+    }
+
+    const searchData = await searchResponse.json();
+    return searchData;
+  } catch (error) {
+    console.error('Error searching tracks:', error);
+    throw error;
+  }
+};
+
+export const addTrackToPlaylist = async (playlistId: string, trackUris: string[]) => {
+  try {
+    const { userId } = await getCurrentUser();
+    const response = await client.graphql({
+      query: listSpotifyTokens,
+      variables: { filter: { userId: { eq: userId } } }
+    });
+
+    const spotifyTokens = response.data.listSpotifyTokens.items[0] as SpotifyTokens;
+
+    if (!spotifyTokens) {
+      throw new Error('No Spotify tokens found for the user');
+    }
+
+    const accessToken = spotifyTokens.spotifyAccessToken;
+
+    const addTrackResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uris: trackUris,
+      }),
+    });
+
+    if (!addTrackResponse.ok) {
+      const errorData = await addTrackResponse.json();
+      throw new Error(`Failed to add tracks to playlist: ${errorData.error.message}`);
+    }
+
+    const addTrackData = await addTrackResponse.json();
+    return addTrackData;
+  } catch (error) {
+    console.error('Error adding tracks to playlist:', error);
+    throw error;
+  }
+};
+
+export const getPlaylistTracks = async (playlistId: string) => {
+  try {
+    const { userId } = await getCurrentUser();
+    const response = await client.graphql({
+      query: listSpotifyTokens,
+      variables: { filter: { userId: { eq: userId } } }
+    });
+
+    const spotifyTokens = response.data.listSpotifyTokens.items[0] as SpotifyTokens;
+
+    if (!spotifyTokens) {
+      throw new Error('No Spotify tokens found for the user');
+    }
+
+    const accessToken = spotifyTokens.spotifyAccessToken;
+
+    const tracksResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!tracksResponse.ok) {
+      const errorData = await tracksResponse.json();
+      throw new Error(`Failed to fetch playlist tracks: ${errorData.error.message}`);
+    }
+
+    const tracksData = await tracksResponse.json();
+    return tracksData.total;
+  } catch (error) {
+    console.error('Error fetching playlist tracks:', error);
+    throw error;
+  }
+};
+
+export const getPlaylistDetails = async (playlistId: string) => {
+  try {
+    const { userId } = await getCurrentUser();
+    const response = await client.graphql({
+      query: listSpotifyTokens,
+      variables: { filter: { userId: { eq: userId } } }
+    });
+
+    const spotifyTokens = response.data.listSpotifyTokens.items[0] as SpotifyTokens;
+
+    if (!spotifyTokens) {
+      throw new Error('No Spotify tokens found for the user');
+    }
+
+    const accessToken = spotifyTokens.spotifyAccessToken;
+
+    const playlistResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!playlistResponse.ok) {
+      const errorData = await playlistResponse.json();
+      throw new Error(`Failed to fetch playlist details: ${errorData.error.message}`);
+    }
+
+    const playlistData = await playlistResponse.json();
+    return {
+      tracks: playlistData.tracks.total,
+      followers: playlistData.followers.total
+    };
+  } catch (error) {
+    console.error('Error fetching playlist details:', error);
+    throw error;
+  }
+};
