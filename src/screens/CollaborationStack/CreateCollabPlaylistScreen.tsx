@@ -9,16 +9,17 @@ import {
   Alert, 
   TouchableWithoutFeedback,
   Keyboard,
-  Platform
 } from 'react-native';
 import { dark, light, placeholder } from '../../components/colorModes';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CollaborationStackParamList } from '../../components/types';
-import { createSpotifyPlaylist } from '../../utils/spotifyPlaylistAPI';
+import { createSpotifyPlaylist, updatePlaylistImage } from '../../utils/spotifyPlaylistAPI';
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { createSpotifyPlaylist as createSpotifyPlaylistMutation } from '../../graphql/mutations';
+import imageAssets from '../../assets/imageAssets.json';
+
 
 type CreateCollabPlaylistScreenNavigationProp = NativeStackNavigationProp<
   CollaborationStackParamList,
@@ -33,9 +34,15 @@ const CreateCollabPlaylistScreen: React.FC = () => {
   const handleCreatePlaylist = async () => {
     try {
       const newPlaylist = await createSpotifyPlaylist(playlistName, playlistDescription);
-      await createSpotifyPlaylistInGraphQL(newPlaylist);
-      Alert.alert('Success', 'Collaborative playlist created successfully!');
-      navigation.goBack();
+      const createdPlaylist = await createSpotifyPlaylistInGraphQL(newPlaylist);
+      
+      if (createdPlaylist && createdPlaylist.spotifyPlaylistId) {
+        await updatePlaylistCoverImage(createdPlaylist.spotifyPlaylistId);
+        Alert.alert('Success', 'Collaborative playlist created successfully!');
+        navigation.goBack();
+      } else {
+        throw new Error('Failed to get spotifyPlaylistId from created playlist');
+      }
     } catch (error) {
       console.error('Error creating playlist:', error);
       Alert.alert('Error', 'Failed to create collaborative playlist. Please try again.');
@@ -69,9 +76,26 @@ const CreateCollabPlaylistScreen: React.FC = () => {
       });
 
       console.log('Playlist created in GraphQL:', result.data.createSpotifyPlaylist);
+      return result.data.createSpotifyPlaylist;
     } catch (error) {
       console.error('Error creating playlist in GraphQL:', error);
       throw error;
+    }
+  };
+
+  const updatePlaylistCoverImage = async (spotifyPlaylistId: string) => {
+    try {
+      console.log('Updating playlist cover image for playlist ID:', spotifyPlaylistId);
+      console.log('Image data length:', imageAssets.collabImageBase64.length);
+      await updatePlaylistImage(spotifyPlaylistId, imageAssets.collabImageBase64);
+      console.log('Playlist cover image updated successfully');
+    } catch (error) {
+      console.error('Error updating playlist cover image:', error);
+      if (error instanceof Error) {
+        Alert.alert('Error', `Failed to update playlist image: ${error.message}`);
+      } else {
+        Alert.alert('Error', 'An unknown error occurred while updating the playlist image');
+      }
     }
   };
 

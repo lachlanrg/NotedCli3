@@ -24,6 +24,7 @@ const SCOPES = [
   'playlist-modify-private',
   'playlist-modify-public',
   'playlist-read-collaborative',
+  'ugc-image-upload',
 ].join(' ');
 const AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize';
 

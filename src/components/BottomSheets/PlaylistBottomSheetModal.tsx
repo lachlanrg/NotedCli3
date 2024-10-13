@@ -1,5 +1,5 @@
 import React, { useMemo, forwardRef, useCallback } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Linking } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from "react-native";
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { dark, light, mediumgray, lgray, spotifyGreen } from "../colorModes";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -48,6 +48,9 @@ const PlaylistBottomSheetModal = forwardRef<BottomSheetModal, PlaylistBottomShee
       if (playlist && playlist.spotifyPlaylistId) {
         navigation.navigate('ViewPlaylist', { playlistId: playlist.spotifyPlaylistId });
         (ref as React.RefObject<BottomSheetModal>).current?.dismiss();
+      } else {
+        console.error('Spotify Playlist ID is undefined:', playlist);
+        Alert.alert('Error', 'Unable to view this playlist. Please try again later.');
       }
     }, [playlist, navigation]);
 

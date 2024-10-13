@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, Image, ActivityIndicator, Alert } from 'react-native';
 import { dark, light, lgray, spotifyGreen } from '../../components/colorModes';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -79,19 +79,36 @@ const CollaborationScreen: React.FC = () => {
   }, []);
 
   const handlePlaylistPress = useCallback((playlist: SpotifyPlaylist) => {
+    if (playlist.spotifyPlaylistId) {
+      navigation.navigate('ViewPlaylist', { playlistId: playlist.spotifyPlaylistId });
+    } else {
+      console.error('Spotify Playlist ID is undefined:', playlist);
+      Alert.alert('Error', 'Unable to view this playlist. Please try again later.');
+    }
+  }, [navigation]);
+
+  const handlePlaylistLongPress = useCallback((playlist: SpotifyPlaylist) => {
     setSelectedPlaylist(playlist);
     playlistBottomSheetModalRef.current?.present();
   }, []);
 
   const renderPlaylistItem = ({ item }: { item: SpotifyPlaylist }) => (
-    <TouchableOpacity onPress={() => handlePlaylistPress(item)}>
+    <TouchableOpacity 
+      onPress={() => {
+        console.log('Pressed playlist:', item);
+        handlePlaylistPress(item);
+      }}
+      onLongPress={() => handlePlaylistLongPress(item)}
+      delayLongPress={500}
+    >
       <View style={styles.playlistItem}>
         {item.imageUrl ? (
           <Image source={{ uri: item.imageUrl }} style={styles.playlistImage} />
         ) : (
-          <View style={[styles.playlistImage, styles.placeholderImage]}>
-            <Text style={styles.placeholderText}>{item.name[0]}</Text>
-          </View>
+          <Image 
+            source={require('../../assets/collab.jpeg')} 
+            style={styles.playlistImage} 
+          />
         )}
         <View style={styles.playlistInfo}>
           <Text style={styles.playlistName}>{item.name}</Text>

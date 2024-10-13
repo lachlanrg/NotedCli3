@@ -149,3 +149,56 @@ export const getPlaylistById = async (playlistId: string) => {
     throw error;
   }
 };
+
+export const updatePlaylistImage = async (playlistId: string, imageBase64: string) => {
+  try {
+    const { userId } = await getCurrentUser();
+
+    const response = await client.graphql({
+      query: listSpotifyTokens,
+      variables: {
+        filter: {
+          userId: {
+            eq: userId
+          }
+        }
+      } 
+    });
+
+    const spotifyTokens = response.data.listSpotifyTokens.items[0] as SpotifyTokens;
+
+    if (!spotifyTokens) {
+      throw new Error('No Spotify tokens found for the user');
+    }
+
+    const accessToken = spotifyTokens.spotifyAccessToken;
+    // Remove the "data:image/jpeg;base64," prefix if it exists
+    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+    
+    console.log('Playlist ID:', playlistId);
+    console.log('Access Token:', accessToken.substring(0, 10) + '...');
+    console.log('Image data length:', base64Data.length);
+
+    const updateResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/images`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'image/jpeg'
+      },
+      body: base64Data
+    });
+
+    if (!updateResponse.ok) {
+      const errorText = await updateResponse.text();
+      console.log('Response status:', updateResponse.status);
+      console.log('Response headers:', JSON.stringify(updateResponse.headers));
+      console.log('Error text:', errorText);
+      throw new Error(`Failed to update playlist image: ${updateResponse.status} ${updateResponse.statusText} - ${errorText}`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error updating playlist image:', error);
+    throw error;
+  }
+};
