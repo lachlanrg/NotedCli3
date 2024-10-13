@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Image, FlatList, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CollaborationStackParamList } from '../../components/types';
 import { dark, light, gray, lgray, spotifyGreen } from '../../components/colorModes';
 import { getPlaylistById } from '../../utils/spotifyPlaylistAPI';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import AddTrackPlaylistBottomSheetModal from '../../components/BottomSheets/AddTrackPlaylistBottomSheetModal';
+
 
 type ViewPlaylistScreenRouteProp = RouteProp<CollaborationStackParamList, 'ViewPlaylist'>;
 
@@ -22,20 +25,30 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
   const { playlistId } = route.params;
   const [playlist, setPlaylist] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const addTrackBottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  useEffect(() => {
-    fetchPlaylistDetails();
-  }, []);
-
-  const fetchPlaylistDetails = async () => {
+  const refreshPlaylist = useCallback(async () => {
+    setIsLoading(true);
     try {
       const playlistData = await getPlaylistById(playlistId);
       setPlaylist(playlistData);
     } catch (error) {
-      console.error('Error fetching playlist details:', error);
+      console.error('Error refreshing playlist details:', error);
     } finally {
       setIsLoading(false);
     }
+  }, [playlistId]);
+
+  useEffect(() => {
+    refreshPlaylist();
+  }, [refreshPlaylist]);
+
+  const handleAddTrack = () => {
+    addTrackBottomSheetModalRef.current?.present();
+  };
+
+  const handleTracksAdded = () => {
+    refreshPlaylist();
   };
 
   const renderImage = (imageUrl: string | undefined | null, style: any, placeholderText: string) => {
@@ -91,11 +104,19 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
           </View>
         </View>
       </View>
+      <TouchableOpacity style={styles.addMusicButton} onPress={handleAddTrack}>
+        <Text style={styles.addMusicButtonText}>Add Your Music</Text>
+      </TouchableOpacity>
       <FlatList
         data={playlist.tracks.items}
         renderItem={renderTrackItem}
         keyExtractor={(item, index) => `${item.track.id || item.track.name}-${index}`}
         style={styles.trackList}
+      />
+      <AddTrackPlaylistBottomSheetModal 
+        ref={addTrackBottomSheetModalRef}
+        playlistId={playlistId}
+        onTracksAdded={handleTracksAdded}
       />
     </SafeAreaView>
   );
@@ -198,6 +219,19 @@ const styles = StyleSheet.create({
     color: light,
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  addMusicButton: {
+    backgroundColor: spotifyGreen,
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 20,
+    marginBottom: 10,
+  },
+  addMusicButtonText: {
+    color: dark,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

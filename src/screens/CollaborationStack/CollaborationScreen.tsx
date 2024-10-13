@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, FlatList, Image, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { dark, light, lgray, spotifyGreen } from '../../components/colorModes';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,6 +13,7 @@ import { SpotifyPlaylist } from '../../API';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import CreatePlaylistBottomSheetModal from '../../components/BottomSheets/CreatePlaylistBottomSheetModal';
 import PlaylistBottomSheetModal from '../../components/BottomSheets/PlaylistBottomSheetModal';
+import { getPlaylistDetails } from '../../utils/spotifyPlaylistAPI';
 
 type CollaborationScreenNavigationProp = NativeStackNavigationProp<
   CollaborationStackParamList,
@@ -23,15 +24,12 @@ const CollaborationScreen: React.FC = () => {
   const navigation = useNavigation<CollaborationScreenNavigationProp>();
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const createPlaylistBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const playlistBottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState<SpotifyPlaylist | null>(null);
 
-  useEffect(() => {
-    fetchPlaylists();
-  }, []);
-
-  const fetchPlaylists = async () => {
+  const fetchPlaylists = useCallback(async () => {
     try {
       const client = generateClient();
       const { userId } = await getCurrentUser();
@@ -65,14 +63,39 @@ const CollaborationScreen: React.FC = () => {
       const friendsPlaylistsResults = await Promise.all(friendsPlaylistsPromises);
       const friendsPlaylists = friendsPlaylistsResults.flatMap((result: any) => result.data.listSpotifyPlaylists.items);
 
-      // Combine and set playlists
-      setPlaylists([...userPlaylists, ...friendsPlaylists]);
+      // Combine playlists
+      const allPlaylists = [...userPlaylists, ...friendsPlaylists];
+
+      // Fetch track counts and follower counts for all playlists
+      const playlistsWithDetails = await Promise.all(
+        allPlaylists.map(async (playlist) => {
+          try {
+            const details = await getPlaylistDetails(playlist.spotifyPlaylistId);
+            return { ...playlist, tracks: details.tracks, followers: details.followers };
+          } catch (error) {
+            console.error(`Error fetching details for playlist ${playlist.id}:`, error);
+            return playlist; // Return the original playlist if there's an error
+          }
+        })
+      );
+
+      setPlaylists(playlistsWithDetails);
     } catch (error) {
       console.error('Error fetching playlists:', error);
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPlaylists();
+  }, [fetchPlaylists]);
+
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    fetchPlaylists();
+  }, [fetchPlaylists]);
 
   const handleCreatePlaylist = useCallback(() => {
     createPlaylistBottomSheetModalRef.current?.present();
@@ -94,10 +117,7 @@ const CollaborationScreen: React.FC = () => {
 
   const renderPlaylistItem = ({ item }: { item: SpotifyPlaylist }) => (
     <TouchableOpacity 
-      onPress={() => {
-        console.log('Pressed playlist:', item);
-        handlePlaylistPress(item);
-      }}
+      onPress={() => handlePlaylistPress(item)}
       onLongPress={() => handlePlaylistLongPress(item)}
       delayLongPress={500}
     >
@@ -145,6 +165,14 @@ const CollaborationScreen: React.FC = () => {
           style={styles.playlistList}
           ListEmptyComponent={
             <Text style={styles.emptyListText}>No playlists found. Create one or follow users to see their playlists.</Text>
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={light}
+              colors={[light]}
+            />
           }
         />
         <TouchableOpacity style={styles.plusButton} onPress={handleCreatePlaylist}>
