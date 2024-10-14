@@ -7,7 +7,7 @@ import { CLIENT_ID, CLIENT_SECRET } from '../../config';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { generateClient } from 'aws-amplify/api';
-import { getSpotifyPlaylist, listSpotifyPlaylists } from '../../graphql/queries';
+import { getSpotifyPlaylist, listSpotifyPlaylists, getUserPlaylistTrack } from '../../graphql/queries';
 import { getCurrentUser } from 'aws-amplify/auth';
 
 type AddTrackPlaylistBottomSheetModalProps = {
@@ -23,6 +23,9 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
     const [accessToken, setAccessToken] = useState('');
     const [selectedTracks, setSelectedTracks] = useState<Set<string>>(new Set());
     const [playlistType, setPlaylistType] = useState<string>('');
+    const [userTrackCount, setUserTrackCount] = useState(0);
+    const [userId, setUserId] = useState('');
+    const [trackLimitPerUser, setTrackLimitPerUser] = useState<number | 'unlimited'>(0);
 
     const snapPoints = useMemo(() => ['80%'], []);
 
@@ -41,8 +44,8 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
     }, []);
 
     useEffect(() => {
-      // Fetch playlist type from our database
-      const fetchPlaylistType = async () => {
+      // Fetch playlist type and track limit from our database
+      const fetchPlaylistDetails = async () => {
         try {
           const client = generateClient();
           const response = await client.graphql({
@@ -56,12 +59,46 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
           const dbPlaylist = response.data.listSpotifyPlaylists.items[0];
           if (dbPlaylist) {
             setPlaylistType(dbPlaylist.type);
+            const trackLimit = dbPlaylist.trackLimitPerUser;
+            setTrackLimitPerUser(trackLimit === 'unlimited' ? 'unlimited' : Number(trackLimit) || 0);
           }
         } catch (error) {
-          console.error('Error fetching playlist type:', error);
+          console.error('Error fetching playlist details:', error);
         }
       };
-      fetchPlaylistType();
+      fetchPlaylistDetails();
+    }, [playlistId]);
+
+    useEffect(() => {
+      const fetchUserIdAndTrackCount = async () => {
+        try {
+          const { userId } = await getCurrentUser();
+          setUserId(userId); // Set the userId state
+          
+          const client = generateClient();
+          const response = await client.graphql({
+            query: getUserPlaylistTrack,
+            variables: { 
+              id: `${playlistId}:${userId}`
+            }
+          });
+          
+          const userPlaylistTrack = response.data.getUserPlaylistTrack;
+          console.log('User playlist track:', userPlaylistTrack);
+          
+          if (userPlaylistTrack) {
+            const newTrackCount = userPlaylistTrack.trackCount;
+            setUserTrackCount(newTrackCount);
+            console.log('User track count:', newTrackCount);
+          } else {
+            setUserTrackCount(0);
+            console.log('User track count: 0 (no existing track data)');
+          }
+        } catch (error) {
+          console.error('Error fetching user track count:', error);
+        }
+      };
+      fetchUserIdAndTrackCount();
     }, [playlistId]);
 
     const renderBackdrop = useCallback(
@@ -101,26 +138,26 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
         const newSelected = new Set(prevSelected);
         if (newSelected.has(trackUri)) {
           newSelected.delete(trackUri);
-        } else {
+        } else if (trackLimitPerUser === 'unlimited' || newSelected.size < trackLimitPerUser - userTrackCount) {
           newSelected.add(trackUri);
         }
         return newSelected;
       });
-    }, []);
+    }, [trackLimitPerUser, userTrackCount]);
 
     const handleAddSelectedTracks = useCallback(async () => {
       try {
         const trackUris = Array.from(selectedTracks);
-        const { userId } = await getCurrentUser();
         await addTrackToPlaylist(playlistId, trackUris, playlistType, userId);
         setSelectedTracks(new Set());
+        setUserTrackCount(prevCount => prevCount + trackUris.length); // Update local state
         onTracksAdded();
         (ref as React.RefObject<BottomSheetModal>).current?.dismiss();
       } catch (error) {
         console.error('Error adding tracks to playlist:', error);
         Alert.alert('Error', 'Failed to add tracks to the playlist. Please try again.');
       }
-    }, [playlistId, selectedTracks, onTracksAdded, playlistType]);
+    }, [playlistId, selectedTracks, onTracksAdded, playlistType, userId]);
 
     const clearSelectedTracks = useCallback(() => {
       setSelectedTracks(new Set());
@@ -130,6 +167,7 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
       <TouchableOpacity 
         style={styles.trackItem} 
         onPress={() => toggleTrackSelection(item.uri)}
+        disabled={trackLimitPerUser !== 'unlimited' && selectedTracks.size >= trackLimitPerUser - userTrackCount && !selectedTracks.has(item.uri)} // Disable if limit reached
       >
         <Image source={{ uri: item.album.images[0]?.url }} style={styles.trackImage} />
         <View style={styles.trackInfo}>
@@ -153,21 +191,29 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
         keyboardBehavior="extend"
       >
         <View style={styles.contentContainer}>
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search for a track..."
-              placeholderTextColor={lgray}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={handleSearch}
-            />
-            {selectedTracks.size > 0 && (
-              <TouchableOpacity style={styles.deselectButton} onPress={clearSelectedTracks}>
-                <Text style={styles.deselectButtonText}>Deselect</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          {userTrackCount >= (trackLimitPerUser === 'unlimited' ? Infinity : trackLimitPerUser) ? (
+            <View style={styles.limitReachedContainer}>
+              <Text style={styles.limitReachedText}>Sorry!</Text>
+              <Text style={styles.limitReachedText}>You have reached your limit for this playlist</Text>
+            </View>
+          ) : (
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search for a track..."
+                placeholderTextColor={lgray}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                onSubmitEditing={handleSearch}
+                editable={trackLimitPerUser !== 'unlimited' && userTrackCount < trackLimitPerUser} // Disable if limit reached
+              />
+              {selectedTracks.size > 0 && (
+                <TouchableOpacity style={styles.deselectButton} onPress={clearSelectedTracks}>
+                  <Text style={styles.deselectButtonText}>Deselect</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
           {isLoading ? (
             <ActivityIndicator size="large" color={spotifyGreen} />
           ) : (
@@ -180,7 +226,10 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
           )}
           {selectedTracks.size > 0 && (
             <TouchableOpacity style={styles.addButton} onPress={handleAddSelectedTracks}>
-              <Text style={styles.addButtonText}>Add {selectedTracks.size} Track{selectedTracks.size > 1 ? 's' : ''}</Text>
+              <Text style={styles.addButtonText}>
+                Add {selectedTracks.size} Track{selectedTracks.size > 1 ? 's' : ''} 
+                (Total: {userTrackCount + selectedTracks.size})
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -259,6 +308,20 @@ const styles = StyleSheet.create({
   deselectButtonText: {
     color: error,
     fontWeight: 'bold',
+  },
+  limitReachedContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    marginTop: 10,
+  },
+  limitReachedText: {
+    color: lgray,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10,
   },
 });
 

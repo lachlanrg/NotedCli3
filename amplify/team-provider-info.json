@@ -50,7 +50,7 @@
         },
         "addTracksRestrictedCollabLambda": {
           "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
-          "s3Key": "amplify-builds/addTracksRestrictedCollabLambda-39495943707469755445-build.zip"
+          "s3Key": "amplify-builds/addTracksRestrictedCollabLambda-7a2f463271676b595168-build.zip"
         }
       },
       "analytics": {

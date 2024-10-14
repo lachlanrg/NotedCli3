@@ -173,34 +173,59 @@ async function addTracksToPlaylist(playlistId, trackUris, accessToken) {
 }
 
 async function updateUserTrackCount(playlistId, userId, newCount) {
+    const now = new Date().toISOString();
+    const item = {
+        id: `${playlistId}:${userId}`,
+        __typename: "UserPlaylistTrack",
+        userId: userId,
+        playlistId: playlistId,
+        trackCount: newCount,
+        createdAt: now,
+        updatedAt: now,
+        _version: 1,
+        _lastChangedAt: Date.now(),
+        spotifyPlaylistUserTracksId: playlistId // Assuming this is the correct value
+    };
+
     const command = new UpdateCommand({
         TableName: USER_PLAYLIST_TRACKS_TABLE,
-        Key: { id: `${playlistId}:${userId}` },
-        UpdateExpression: 'SET trackCount = :count, userId = :userId',
+        Key: { id: item.id },
+        UpdateExpression: `SET 
+            userId = :userId, 
+            playlistId = :playlistId, 
+            trackCount = :trackCount, 
+            createdAt = if_not_exists(createdAt, :createdAt), 
+            updatedAt = :updatedAt, 
+            #version = if_not_exists(#version, :initialVersion) + :increment,
+            #lastChangedAt = :lastChangedAt,
+            spotifyPlaylistUserTracksId = :spotifyPlaylistUserTracksId,
+            #typename = :typename`,
         ExpressionAttributeValues: {
-            ':count': newCount,
-            ':userId': userId
+            ':userId': item.userId,
+            ':playlistId': item.playlistId,
+            ':trackCount': item.trackCount,
+            ':createdAt': item.createdAt,
+            ':updatedAt': item.updatedAt,
+            ':initialVersion': 0,
+            ':increment': 1,
+            ':lastChangedAt': item._lastChangedAt,
+            ':spotifyPlaylistUserTracksId': item.spotifyPlaylistUserTracksId,
+            ':typename': item.__typename
         },
-        // If the item doesn't exist, create it
-        ConditionExpression: 'attribute_not_exists(id) OR attribute_exists(id)'
+        ExpressionAttributeNames: {
+            '#version': '_version',
+            '#lastChangedAt': '_lastChangedAt',
+            '#typename': '__typename'
+        },
+        ReturnValues: 'ALL_NEW'
     });
+
     try {
-        await dynamoDB.send(command);
+        const result = await dynamoDB.send(command);
+        console.log('Successfully updated/created UserPlaylistTrack:', result.Attributes);
+        return result.Attributes;
     } catch (error) {
-        if (error.name === 'ConditionalCheckFailedException') {
-            // If the item doesn't exist, create it
-            const putCommand = new PutCommand({
-                TableName: USER_PLAYLIST_TRACKS_TABLE,
-                Item: {
-                    id: `${playlistId}:${userId}`,
-                    playlistId: playlistId,
-                    userId: userId,
-                    trackCount: newCount
-                }
-            });
-            await dynamoDB.send(putCommand);
-        } else {
-            throw error;
-        }
+        console.error('Error updating/creating UserPlaylistTrack:', error);
+        throw error;
     }
 }
