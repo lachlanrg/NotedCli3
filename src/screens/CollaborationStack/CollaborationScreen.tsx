@@ -79,6 +79,9 @@ const CollaborationScreen: React.FC = () => {
         })
       );
 
+      // Sort playlists by creation date, assuming 'createdAt' is the date field
+      playlistsWithDetails.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
       setPlaylists(playlistsWithDetails);
     } catch (error) {
       console.error('Error fetching playlists:', error);
@@ -115,34 +118,48 @@ const CollaborationScreen: React.FC = () => {
     playlistBottomSheetModalRef.current?.present();
   }, []);
 
-  const renderPlaylistItem = ({ item }: { item: SpotifyPlaylist }) => (
-    <TouchableOpacity 
-      onPress={() => handlePlaylistPress(item)}
-      onLongPress={() => handlePlaylistLongPress(item)}
-      delayLongPress={500}
-    >
-      <View style={styles.playlistItem}>
-        {item.imageUrl ? (
-          <Image source={{ uri: item.imageUrl }} style={styles.playlistImage} />
-        ) : (
-          <Image 
-            source={require('../../assets/collab.jpeg')} 
-            style={styles.playlistImage} 
-          />
-        )}
-        <View style={styles.playlistInfo}>
-          <Text style={styles.playlistName}>{item.name}</Text>
-          <Text style={styles.playlistUsername}>By {item.username}</Text>
-          <Text style={styles.playlistDetails}>
-            {item.tracks} tracks • {item.followers} followers
-          </Text>
-          <View style={styles.playlistTypeContainer}>
-            <Text style={styles.playlistType}>{item.type}</Text>
+  const renderPlaylistItem = ({ item }: { item: SpotifyPlaylist }) => {
+    // Map the playlist type to the desired display text
+    const displayType = (type: string) => {
+      switch (type) {
+        case 'COLLABORATIVE':
+          return 'COLLAB';
+        case 'RESTRICTED_COLLABORATIVE':
+          return 'LIMITED COLLAB';
+        default:
+          return 'PUBLIC';
+      }
+    };
+
+    return (
+      <TouchableOpacity 
+        onPress={() => handlePlaylistPress(item)}
+        onLongPress={() => handlePlaylistLongPress(item)}
+        delayLongPress={500}
+      >
+        <View style={styles.playlistItem}>
+          {item.imageUrl ? (
+            <Image source={{ uri: item.imageUrl }} style={styles.playlistImage} />
+          ) : (
+            <Image 
+              source={require('../../assets/collab.jpeg')} 
+              style={styles.playlistImage} 
+            />
+          )}
+          <View style={styles.playlistInfo}>
+            <Text style={styles.playlistName}>{item.name}</Text>
+            <Text style={styles.playlistUsername}>By {item.username}</Text>
+            <Text style={styles.playlistDetails}>
+              {item.tracks} tracks • {item.followers} followers
+            </Text>
+            <View style={styles.playlistTypeContainer}>
+              <Text style={styles.playlistType}>{displayType(item.type)}</Text>
+            </View>
           </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -163,6 +180,7 @@ const CollaborationScreen: React.FC = () => {
           renderItem={renderPlaylistItem}
           keyExtractor={(item) => item.id}
           style={styles.playlistList}
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <Text style={styles.emptyListText}>No playlists found. Create one or follow users to see their playlists.</Text>
           }

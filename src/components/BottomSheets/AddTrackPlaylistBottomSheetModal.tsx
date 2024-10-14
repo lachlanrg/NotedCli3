@@ -1,14 +1,15 @@
 import React, { useMemo, forwardRef, useCallback, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, ActivityIndicator, Image, Alert } from 'react-native';
 import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import { dark, light, lgray, mediumgray, spotifyGreen, gray, error } from '../colorModes';
+import { dark, light, lgray, mediumgray, spotifyGreen, gray, error, dgray } from '../colorModes';
 import { addTrackToPlaylist } from '../../utils/spotifyPlaylistAPI';
 import { CLIENT_ID, CLIENT_SECRET } from '../../config';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { generateClient } from 'aws-amplify/api';
-import { getSpotifyPlaylist, listSpotifyPlaylists, getUserPlaylistTrack } from '../../graphql/queries';
+import { getSpotifyPlaylist, listSpotifyPlaylists, getUserPlaylistTrack, listSpotifyTokens } from '../../graphql/queries';
 import { getCurrentUser } from 'aws-amplify/auth';
+import { SpotifyTokens } from '../../models';
 
 type AddTrackPlaylistBottomSheetModalProps = {
   playlistId: string;
@@ -26,6 +27,7 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
     const [userTrackCount, setUserTrackCount] = useState(0);
     const [userId, setUserId] = useState('');
     const [trackLimitPerUser, setTrackLimitPerUser] = useState<number | 'unlimited'>(0);
+    const [existingTrackUris, setExistingTrackUris] = useState<Set<string>>(new Set());
 
     const snapPoints = useMemo(() => ['80%'], []);
 
@@ -84,12 +86,12 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
           });
           
           const userPlaylistTrack = response.data.getUserPlaylistTrack;
-          console.log('User playlist track:', userPlaylistTrack);
+          //console.log('User playlist track:', userPlaylistTrack);
           
           if (userPlaylistTrack) {
             const newTrackCount = userPlaylistTrack.trackCount;
             setUserTrackCount(newTrackCount);
-            console.log('User track count:', newTrackCount);
+            // console.log('User track count:', newTrackCount);
           } else {
             setUserTrackCount(0);
             console.log('User track count: 0 (no existing track data)');
@@ -99,6 +101,45 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
         }
       };
       fetchUserIdAndTrackCount();
+    }, [playlistId]);
+
+    useEffect(() => {
+      const fetchExistingTracks = async () => {
+        try {
+          const { userId } = await getCurrentUser();
+          const client = generateClient();
+          const response = await client.graphql({
+            query: listSpotifyTokens,
+            variables: { filter: { userId: { eq: userId } } }
+          });
+
+          const spotifyTokens = response.data.listSpotifyTokens.items[0] as unknown as SpotifyTokens;
+          if (!spotifyTokens) {
+            throw new Error('No Spotify tokens found for the user');
+          }
+
+          const accessToken = spotifyTokens.spotifyAccessToken;
+          const tracksResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          });
+
+          if (!tracksResponse.ok) {
+            const errorData = await tracksResponse.json();
+            throw new Error(`Failed to fetch playlist tracks: ${errorData.error.message}`);
+          }
+
+          const tracksData = await tracksResponse.json();
+          const uris = new Set(tracksData.items.map((item: any) => item.track.uri));
+          setExistingTrackUris(uris as Set<string>);
+        } catch (error) {
+          console.error('Error fetching existing playlist tracks:', error);
+        }
+      };
+
+      fetchExistingTracks();
     }, [playlistId]);
 
     const renderBackdrop = useCallback(
@@ -163,22 +204,39 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
       setSelectedTracks(new Set());
     }, []);
 
-    const renderTrackItem = ({ item }: { item: any }) => (
-      <TouchableOpacity 
-        style={styles.trackItem} 
-        onPress={() => toggleTrackSelection(item.uri)}
-        disabled={trackLimitPerUser !== 'unlimited' && selectedTracks.size >= trackLimitPerUser - userTrackCount && !selectedTracks.has(item.uri)} // Disable if limit reached
-      >
-        <Image source={{ uri: item.album.images[0]?.url }} style={styles.trackImage} />
-        <View style={styles.trackInfo}>
-          <Text style={styles.trackName}>{item.name}</Text>
-          <Text style={styles.artistName}>{item.artists.map((artist: any) => artist.name).join(', ')}</Text>
-        </View>
-        {selectedTracks.has(item.uri) && (
-          <FontAwesomeIcon icon={faCheck} size={20} color={spotifyGreen} />
-        )}
-      </TouchableOpacity>
-    );
+    const renderTrackItem = ({ item }: { item: any }) => {
+      const isAlreadyAdded = existingTrackUris.has(item.uri);
+      return (
+        <TouchableOpacity 
+          style={styles.trackItem} 
+          onPress={() => toggleTrackSelection(item.uri)}
+          disabled={trackLimitPerUser !== 'unlimited' && selectedTracks.size >= trackLimitPerUser - userTrackCount && !selectedTracks.has(item.uri)} // Disable if limit reached
+        >
+          <Image source={{ uri: item.album.images[0]?.url }} style={styles.trackImage} />
+          <View style={styles.trackInfo}>
+            <View style={styles.trackNameContainer}>
+                <Text style={styles.trackName} numberOfLines={1} ellipsizeMode="tail">
+                {item.name} 
+                </Text>
+                {item.explicit && (
+                    <View style={styles.explicitBox}>
+                    <Text style={styles.explicitText}>E</Text>
+                    </View>
+                )}
+            </View>
+            <Text style={styles.artistName} numberOfLines={1} ellipsizeMode="tail">
+              {item.artists.map((artist: any) => artist.name).join(', ')}
+            </Text>
+          </View>
+          {isAlreadyAdded && (
+            <Text style={styles.alreadyAddedText}>Added</Text>
+          )}
+          {selectedTracks.has(item.uri) && (
+            <FontAwesomeIcon icon={faCheck} size={20} color={spotifyGreen} />
+          )}
+        </TouchableOpacity>
+      );
+    };
 
     return (
       <BottomSheetModal
@@ -198,15 +256,22 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
             </View>
           ) : (
             <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search for a track..."
-                placeholderTextColor={lgray}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                onSubmitEditing={handleSearch}
-                editable={trackLimitPerUser !== 'unlimited' && userTrackCount < trackLimitPerUser} // Disable if limit reached
-              />
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search for a track..."
+                  placeholderTextColor={lgray}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  onSubmitEditing={handleSearch}
+                  editable={trackLimitPerUser !== 'unlimited' && userTrackCount < trackLimitPerUser} // Disable if limit reached
+                />
+                {searchQuery !== '' && (
+                  <TouchableOpacity style={styles.clearButton} onPress={() => setSearchQuery('')}>
+                    <FontAwesomeIcon icon={faTimes} size={14} style={styles.clearButtonIcon} />
+                  </TouchableOpacity>
+                )}
+              </View>
               {selectedTracks.size > 0 && (
                 <TouchableOpacity style={styles.deselectButton} onPress={clearSelectedTracks}>
                   <Text style={styles.deselectButtonText}>Deselect</Text>
@@ -215,13 +280,14 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
             </View>
           )}
           {isLoading ? (
-            <ActivityIndicator size="large" color={spotifyGreen} />
+            <ActivityIndicator style={styles.loadingIndicator} size="large" color={spotifyGreen} />
           ) : (
             <FlatList
               data={searchResults}
               renderItem={renderTrackItem}
               keyExtractor={(item) => item.id}
               style={styles.resultsList}
+              showsVerticalScrollIndicator={false}
             />
           )}
           {selectedTracks.size > 0 && (
@@ -245,6 +311,9 @@ const styles = StyleSheet.create({
   handleIndicator: {
     backgroundColor: lgray,
   },
+  loadingIndicator: {
+    marginTop: 40,
+  },
   contentContainer: {
     flex: 1,
     padding: 16,
@@ -254,12 +323,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  searchInput: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
     backgroundColor: dark,
-    color: light,
-    padding: 10,
     borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  searchInput: {
+    flex: 1,
+    color: light,
+    paddingVertical: 10,
   },
   resultsList: {
     flex: 1,
@@ -284,9 +359,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  trackNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 25,
+  },
   artistName: {
     color: lgray,
     fontSize: 14,
+    marginRight: 25,
   },
   addButton: {
     backgroundColor: spotifyGreen,
@@ -322,6 +403,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 10,
+  },
+  alreadyAddedText: {
+    color: error, // or any color you prefer
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  explicitBox: {
+    backgroundColor: dgray, // or any color you prefer
+    borderRadius: 3,
+    paddingHorizontal: 3,
+    marginLeft: 5,
+  },
+  explicitText: {
+    color: dark, // or any color you prefer
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  clearButton: {
+    padding: 10,
+  },
+  clearButtonIcon: {
+    color: light,
   },
 });
 
