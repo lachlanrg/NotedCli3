@@ -3,12 +3,19 @@ import { View, Text, StyleSheet, SafeAreaView, Image, FlatList, ActivityIndicato
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CollaborationStackParamList } from '../../components/types';
-import { dark, light, gray, lgray, spotifyGreen } from '../../components/colorModes';
+import { dark, light, gray, lgray, spotifyGreen, mediumgray } from '../../components/colorModes';
 import { getPlaylistById } from '../../utils/spotifyPlaylistAPI';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddTrackPlaylistBottomSheetModal from '../../components/BottomSheets/AddTrackPlaylistBottomSheetModal';
 import { generateClient } from 'aws-amplify/api';
 import { getSpotifyPlaylist, listSpotifyPlaylists } from '../../graphql/queries';
+import LinearGradient from 'react-native-linear-gradient';
+import { Linking } from 'react-native';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+
+const spotifyIcon: IconProp = faSpotify;
 
 type ViewPlaylistScreenRouteProp = RouteProp<CollaborationStackParamList, 'ViewPlaylist'>;
 
@@ -64,6 +71,10 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
     refreshPlaylist();
   };
 
+  const handleOpenInSpotify = () => {
+    Linking.openURL(playlist.external_urls.spotify);
+  };
+
   const renderImage = (imageUrl: string | undefined | null, style: any, placeholderText: string) => {
     if (imageUrl) {
       return <Image source={{ uri: imageUrl }} style={style} />;
@@ -83,6 +94,27 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
       <View style={styles.trackInfo}>
         <Text style={styles.trackName}>{item.track.name}</Text>
         <Text style={styles.artistName}>{item.track.artists.map((artist: any) => artist.name).join(', ')}</Text>
+      </View>
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      {renderImage(playlist.images?.[0]?.url, styles.playlistImage, playlist.name)}
+      <TouchableOpacity
+        style={styles.openInSpotifyButton}
+        onPress={handleOpenInSpotify}
+      >
+        <FontAwesomeIcon icon={spotifyIcon} size={21} color={spotifyGreen} />
+        <Text style={styles.openInSpotifyText}>Open in Spotify</Text>
+      </TouchableOpacity>
+      <View style={styles.playlistInfo}>
+        <Text style={styles.playlistName}>{playlist.name}</Text>
+        <Text style={styles.playlistOwner}>By {playlist.owner.display_name}</Text>
+        <Text style={styles.playlistDescription}>{playlist.description}</Text>
+        <View style={styles.playlistStats}>
+          <Text style={styles.statsText}>{playlist.tracks.total} tracks • {playlist.followers.total} followers</Text>
+        </View>
       </View>
     </View>
   );
@@ -107,29 +139,24 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        {renderImage(playlist.images?.[0]?.url, styles.playlistImage, playlist.name)}
-        <View style={styles.playlistInfo}>
-          <Text style={styles.playlistName}>{playlist.name}</Text>
-          <Text style={styles.playlistOwner}>By {playlist.owner.display_name}</Text>
-          <Text style={styles.playlistDescription}>{playlist.description}</Text>
-          <View style={styles.playlistStats}>
-            <Text style={styles.statsText}>{playlist.tracks.total} tracks</Text>
-            <Text style={styles.statsText}>{playlist.followers.total} followers</Text>
-          </View>
-        </View>
-      </View>
-      {isCollaborative && (
-        <TouchableOpacity style={styles.addMusicButton} onPress={handleAddTrack}>
-          <Text style={styles.addMusicButtonText}>Add Your Music</Text>
-        </TouchableOpacity>
-      )}
       <FlatList
         data={playlist.tracks.items}
         renderItem={renderTrackItem}
         keyExtractor={(item, index) => `${item.track.id || item.track.name}-${index}`}
+        ListHeaderComponent={renderHeader}
         style={styles.trackList}
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
+      {isCollaborative && (
+        <LinearGradient
+          colors={['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.8)']}
+          style={styles.overlayContainer}
+        >
+          <TouchableOpacity style={styles.addMusicButton} onPress={handleAddTrack}>
+            <Text style={styles.addMusicButtonText}>Add Your Music</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      )}
       {(playlistType === 'COLLABORATIVE' || playlistType === 'RESTRICTED_COLLABORATIVE') && (
         <AddTrackPlaylistBottomSheetModal 
           ref={addTrackBottomSheetModalRef}
@@ -152,17 +179,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    flexDirection: 'row',
-    padding: 20,
+    alignItems: 'center',
+    paddingTop: 20,
   },
   playlistImage: {
-    width: 120,
-    height: 120,
+    width: 180,
+    height: 180,
     borderRadius: 10,
   },
   playlistInfo: {
-    flex: 1,
-    marginLeft: 20,
+    alignItems: 'flex-start',
   },
   playlistName: {
     fontSize: 24,
@@ -172,16 +198,16 @@ const styles = StyleSheet.create({
   playlistOwner: {
     fontSize: 16,
     color: lgray,
-    marginTop: 5,
   },
   playlistDescription: {
     fontSize: 14,
     color: lgray,
-    marginTop: 10,
+    marginTop: 5,
   },
   playlistStats: {
     flexDirection: 'row',
-    marginTop: 10,
+    marginTop: 5,
+    marginBottom: 5,
   },
   statsText: {
     fontSize: 14,
@@ -239,18 +265,44 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  overlayContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 110, // Adjust height as needed
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   addMusicButton: {
     backgroundColor: spotifyGreen,
     padding: 10,
     borderRadius: 5,
-    marginHorizontal: 20,
-    marginBottom: 10,
+    width: '80%',
+    marginTop: 30,
   },
   addMusicButtonText: {
     color: dark,
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  openInSpotifyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // backgroundColor: spotifyGreen,
+    // borderWidth: 0.6,
+    borderColor: lgray,
+    padding: 10,
+    borderRadius: 18,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  openInSpotifyText: {
+    color: light,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 6,
   },
 });
 
