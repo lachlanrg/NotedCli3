@@ -82,7 +82,7 @@ type EagerSpotifyPlaylist = {
   readonly userSpotifyPlaylistsId: string;
   readonly username: string;
   readonly type: string;
-  readonly spotifyPlaylistId?: string | null;
+  readonly spotifyPlaylistId: string;
   readonly spotifyUserId?: string | null;
   readonly spotifyExternalUrl?: string | null;
   readonly imageUrl?: string | null;
@@ -91,6 +91,8 @@ type EagerSpotifyPlaylist = {
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
   readonly comments?: (Comment | null)[] | null;
+  readonly trackLimitPerUser?: string | null;
+  readonly userTracks?: (UserPlaylistTrack | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -107,7 +109,7 @@ type LazySpotifyPlaylist = {
   readonly userSpotifyPlaylistsId: string;
   readonly username: string;
   readonly type: string;
-  readonly spotifyPlaylistId?: string | null;
+  readonly spotifyPlaylistId: string;
   readonly spotifyUserId?: string | null;
   readonly spotifyExternalUrl?: string | null;
   readonly imageUrl?: string | null;
@@ -116,6 +118,8 @@ type LazySpotifyPlaylist = {
   readonly likedBy?: string[] | null;
   readonly likesCount: number;
   readonly comments: AsyncCollection<Comment>;
+  readonly trackLimitPerUser?: string | null;
+  readonly userTracks: AsyncCollection<UserPlaylistTrack>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -638,4 +642,38 @@ export declare type NotificationSettings = LazyLoading extends LazyLoadingDisabl
 
 export declare const NotificationSettings: (new (init: ModelInit<NotificationSettings>) => NotificationSettings) & {
   copyOf(source: NotificationSettings, mutator: (draft: MutableModel<NotificationSettings>) => MutableModel<NotificationSettings> | void): NotificationSettings;
+}
+
+type EagerUserPlaylistTrack = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<UserPlaylistTrack, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly userId: string;
+  readonly playlistId: string;
+  readonly trackCount: number;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly spotifyPlaylistUserTracksId?: string | null;
+}
+
+type LazyUserPlaylistTrack = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<UserPlaylistTrack, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly userId: string;
+  readonly playlistId: string;
+  readonly trackCount: number;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly spotifyPlaylistUserTracksId?: string | null;
+}
+
+export declare type UserPlaylistTrack = LazyLoading extends LazyLoadingDisabled ? EagerUserPlaylistTrack : LazyUserPlaylistTrack
+
+export declare const UserPlaylistTrack: (new (init: ModelInit<UserPlaylistTrack>) => UserPlaylistTrack) & {
+  copyOf(source: UserPlaylistTrack, mutator: (draft: MutableModel<UserPlaylistTrack>) => MutableModel<UserPlaylistTrack> | void): UserPlaylistTrack;
 }

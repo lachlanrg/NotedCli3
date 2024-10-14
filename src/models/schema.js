@@ -350,7 +350,7 @@ export const schema = {
                     "name": "spotifyPlaylistId",
                     "isArray": false,
                     "type": "String",
-                    "isRequired": false,
+                    "isRequired": true,
                     "attributes": []
                 },
                 "spotifyUserId": {
@@ -419,6 +419,29 @@ export const schema = {
                         ]
                     }
                 },
+                "trackLimitPerUser": {
+                    "name": "trackLimitPerUser",
+                    "isArray": false,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "userTracks": {
+                    "name": "userTracks",
+                    "isArray": true,
+                    "type": {
+                        "model": "UserPlaylistTrack"
+                    },
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true,
+                    "association": {
+                        "connectionType": "HAS_MANY",
+                        "associatedWith": [
+                            "spotifyPlaylistUserTracksId"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -442,6 +465,16 @@ export const schema = {
                 {
                     "type": "model",
                     "properties": {}
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "bySpotifyPlaylistId",
+                        "queryField": "spotifyPlaylistBySpotifyPlaylistId",
+                        "fields": [
+                            "spotifyPlaylistId"
+                        ]
+                    }
                 },
                 {
                     "type": "auth",
@@ -1613,6 +1646,16 @@ export const schema = {
                     "properties": {}
                 },
                 {
+                    "type": "key",
+                    "properties": {
+                        "name": "byUserId",
+                        "fields": [
+                            "userId",
+                            "id"
+                        ]
+                    }
+                },
+                {
                     "type": "auth",
                     "properties": {
                         "rules": [
@@ -2046,10 +2089,117 @@ export const schema = {
                     }
                 }
             ]
+        },
+        "UserPlaylistTrack": {
+            "name": "UserPlaylistTrack",
+            "fields": {
+                "id": {
+                    "name": "id",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "userId": {
+                    "name": "userId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "playlistId": {
+                    "name": "playlistId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "trackCount": {
+                    "name": "trackCount",
+                    "isArray": false,
+                    "type": "Int",
+                    "isRequired": true,
+                    "attributes": []
+                },
+                "createdAt": {
+                    "name": "createdAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "updatedAt": {
+                    "name": "updatedAt",
+                    "isArray": false,
+                    "type": "AWSDateTime",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isReadOnly": true
+                },
+                "spotifyPlaylistUserTracksId": {
+                    "name": "spotifyPlaylistUserTracksId",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                }
+            },
+            "syncable": true,
+            "pluralName": "UserPlaylistTracks",
+            "attributes": [
+                {
+                    "type": "model",
+                    "properties": {}
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byUserId",
+                        "fields": [
+                            "userId"
+                        ]
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "byPlaylistId",
+                        "fields": [
+                            "playlistId"
+                        ]
+                    }
+                },
+                {
+                    "type": "key",
+                    "properties": {
+                        "name": "gsi-SpotifyPlaylist.userTracks",
+                        "fields": [
+                            "spotifyPlaylistUserTracksId"
+                        ]
+                    }
+                },
+                {
+                    "type": "auth",
+                    "properties": {
+                        "rules": [
+                            {
+                                "allow": "public",
+                                "operations": [
+                                    "create",
+                                    "update",
+                                    "delete",
+                                    "read"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     },
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "b7f5ed0593066c9ca878330287cfdc7d"
+    "version": "e34e4038525ab01ab12d108cceadd887"
 };

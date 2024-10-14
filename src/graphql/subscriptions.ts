@@ -318,6 +318,12 @@ export const onCreateSpotifyPlaylist = /* GraphQL */ `subscription OnCreateSpoti
       startedAt
       __typename
     }
+    trackLimitPerUser
+    userTracks {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -370,6 +376,12 @@ export const onUpdateSpotifyPlaylist = /* GraphQL */ `subscription OnUpdateSpoti
       startedAt
       __typename
     }
+    trackLimitPerUser
+    userTracks {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -418,6 +430,12 @@ export const onDeleteSpotifyPlaylist = /* GraphQL */ `subscription OnDeleteSpoti
     likedBy
     likesCount
     comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    trackLimitPerUser
+    userTracks {
       nextToken
       startedAt
       __typename
@@ -1059,6 +1077,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -1214,6 +1233,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -1369,6 +1389,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -2314,4 +2335,67 @@ export const onDeleteNotificationSettings = /* GraphQL */ `subscription OnDelete
 ` as GeneratedSubscription<
   APITypes.OnDeleteNotificationSettingsSubscriptionVariables,
   APITypes.OnDeleteNotificationSettingsSubscription
+>;
+export const onCreateUserPlaylistTrack = /* GraphQL */ `subscription OnCreateUserPlaylistTrack(
+  $filter: ModelSubscriptionUserPlaylistTrackFilterInput
+) {
+  onCreateUserPlaylistTrack(filter: $filter) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateUserPlaylistTrackSubscriptionVariables,
+  APITypes.OnCreateUserPlaylistTrackSubscription
+>;
+export const onUpdateUserPlaylistTrack = /* GraphQL */ `subscription OnUpdateUserPlaylistTrack(
+  $filter: ModelSubscriptionUserPlaylistTrackFilterInput
+) {
+  onUpdateUserPlaylistTrack(filter: $filter) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateUserPlaylistTrackSubscriptionVariables,
+  APITypes.OnUpdateUserPlaylistTrackSubscription
+>;
+export const onDeleteUserPlaylistTrack = /* GraphQL */ `subscription OnDeleteUserPlaylistTrack(
+  $filter: ModelSubscriptionUserPlaylistTrackFilterInput
+) {
+  onDeleteUserPlaylistTrack(filter: $filter) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteUserPlaylistTrackSubscriptionVariables,
+  APITypes.OnDeleteUserPlaylistTrackSubscription
 >;

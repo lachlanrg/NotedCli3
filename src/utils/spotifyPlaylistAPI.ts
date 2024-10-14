@@ -5,7 +5,7 @@ import { SpotifyTokens } from '../API';
 
 const client = generateClient();
 
-export const createSpotifyPlaylist = async (name: string, description: string) => {
+export const createSpotifyPlaylist = async (name: string, description: string, type: 'COLLABORATIVE' | 'RESTRICTED_COLLABORATIVE') => {
   try {
     const { userId } = await getCurrentUser();
 
@@ -30,18 +30,29 @@ export const createSpotifyPlaylist = async (name: string, description: string) =
     const spotifyUserId = spotifyTokens.spotifyUserId;
     const accessToken = spotifyTokens.spotifyAccessToken;
 
+    let playlistBody;
+    if (type === 'COLLABORATIVE') {
+      playlistBody = {
+        name,
+        description,
+        public: false,
+        collaborative: true,
+      };
+    } else { // RESTRICTED_COLLABORATIVE
+      playlistBody = {
+        name,
+        description,
+        public: true,
+      };
+    }
+
     const playlistResponse = await fetch(`https://api.spotify.com/v1/users/${spotifyUserId}/playlists`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        name,
-        description,
-        public: false,
-        collaborative: true,
-      }),
+      body: JSON.stringify(playlistBody),
     });
 
     if (!playlistResponse.ok) {
@@ -239,9 +250,18 @@ export const searchTracks = async (query: string) => {
   }
 };
 
-export const addTrackToPlaylist = async (playlistId: string, trackUris: string[]) => {
+export const addTrackToPlaylist = async (playlistId: string, trackUris: string[], playlistType: string, userId: string) => {
   try {
-    const { userId } = await getCurrentUser();
+    console.log('Adding tracks to playlist:', playlistId);
+    console.log('Playlist type:', playlistType);
+    console.log('Track URIs:', trackUris);
+    console.log('User ID:', userId);
+
+    if (playlistType === 'RESTRICTED_COLLABORATIVE') {
+      return addTrackToRestrictedCollabPlaylist(playlistId, trackUris, userId);
+    }
+
+    // For COLLABORATIVE and other types, use the direct Spotify API
     const response = await client.graphql({
       query: listSpotifyTokens,
       variables: { filter: { userId: { eq: userId } } }
@@ -275,6 +295,49 @@ export const addTrackToPlaylist = async (playlistId: string, trackUris: string[]
     return addTrackData;
   } catch (error) {
     console.error('Error adding tracks to playlist:', error);
+    throw error;
+  }
+};
+
+const addTrackToRestrictedCollabPlaylist = async (playlistId: string, trackUris: string[], userId: string) => {
+  try {
+    const payload = {
+      playlistId,
+      trackUris,
+      userId
+    };
+
+    // console.log('Sending payload to Lambda:', JSON.stringify(payload));
+
+    const response = await fetch('https://ruh4rf4q75.execute-api.ap-southeast-2.amazonaws.com/dev/add-tracks-restricted', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    // console.log('Response status:', response.status);
+    // console.log('Response headers:', JSON.stringify(response.headers));
+
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
+
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Error parsing response:', parseError);
+      throw new Error('Invalid JSON response from Lambda');
+    }
+
+    if (!response.ok) {
+      throw new Error(`Failed to add tracks to restricted collaborative playlist: ${responseData.message || response.statusText}`);
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error('Error adding tracks to restricted collaborative playlist:', error);
     throw error;
   }
 };

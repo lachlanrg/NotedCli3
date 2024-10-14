@@ -197,6 +197,12 @@ export const getSpotifyPlaylist = /* GraphQL */ `query GetSpotifyPlaylist($id: I
       startedAt
       __typename
     }
+    trackLimitPerUser
+    userTracks {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -230,6 +236,7 @@ export const listSpotifyPlaylists = /* GraphQL */ `query ListSpotifyPlaylists(
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -273,6 +280,7 @@ export const syncSpotifyPlaylists = /* GraphQL */ `query SyncSpotifyPlaylists(
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -288,6 +296,52 @@ export const syncSpotifyPlaylists = /* GraphQL */ `query SyncSpotifyPlaylists(
 ` as GeneratedQuery<
   APITypes.SyncSpotifyPlaylistsQueryVariables,
   APITypes.SyncSpotifyPlaylistsQuery
+>;
+export const spotifyPlaylistBySpotifyPlaylistId = /* GraphQL */ `query SpotifyPlaylistBySpotifyPlaylistId(
+  $spotifyPlaylistId: String!
+  $sortDirection: ModelSortDirection
+  $filter: ModelSpotifyPlaylistFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  spotifyPlaylistBySpotifyPlaylistId(
+    spotifyPlaylistId: $spotifyPlaylistId
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      name
+      description
+      userSpotifyPlaylistsId
+      username
+      type
+      spotifyPlaylistId
+      spotifyUserId
+      spotifyExternalUrl
+      imageUrl
+      tracks
+      followers
+      likedBy
+      likesCount
+      trackLimitPerUser
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SpotifyPlaylistBySpotifyPlaylistIdQueryVariables,
+  APITypes.SpotifyPlaylistBySpotifyPlaylistIdQuery
 >;
 export const getFriendship = /* GraphQL */ `query GetFriendship($id: ID!) {
   getFriendship(id: $id) {
@@ -775,6 +829,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -1349,6 +1404,46 @@ export const syncSpotifyTokens = /* GraphQL */ `query SyncSpotifyTokens(
   APITypes.SyncSpotifyTokensQueryVariables,
   APITypes.SyncSpotifyTokensQuery
 >;
+export const spotifyTokensByUserIdAndId = /* GraphQL */ `query SpotifyTokensByUserIdAndId(
+  $userId: ID!
+  $id: ModelIDKeyConditionInput
+  $sortDirection: ModelSortDirection
+  $filter: ModelSpotifyTokensFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  spotifyTokensByUserIdAndId(
+    userId: $userId
+    id: $id
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      spotifyUserId
+      spotifyAccessToken
+      spotifyRefreshToken
+      tokenExpiration
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      userSpotifyTokensId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SpotifyTokensByUserIdAndIdQueryVariables,
+  APITypes.SpotifyTokensByUserIdAndIdQuery
+>;
 export const getUserDeviceToken = /* GraphQL */ `query GetUserDeviceToken($id: ID!) {
   getUserDeviceToken(id: $id) {
     id
@@ -1874,4 +1969,161 @@ export const notificationSettingsByUserIdAndId = /* GraphQL */ `query Notificati
 ` as GeneratedQuery<
   APITypes.NotificationSettingsByUserIdAndIdQueryVariables,
   APITypes.NotificationSettingsByUserIdAndIdQuery
+>;
+export const getUserPlaylistTrack = /* GraphQL */ `query GetUserPlaylistTrack($id: ID!) {
+  getUserPlaylistTrack(id: $id) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetUserPlaylistTrackQueryVariables,
+  APITypes.GetUserPlaylistTrackQuery
+>;
+export const listUserPlaylistTracks = /* GraphQL */ `query ListUserPlaylistTracks(
+  $filter: ModelUserPlaylistTrackFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listUserPlaylistTracks(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      playlistId
+      trackCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyPlaylistUserTracksId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListUserPlaylistTracksQueryVariables,
+  APITypes.ListUserPlaylistTracksQuery
+>;
+export const syncUserPlaylistTracks = /* GraphQL */ `query SyncUserPlaylistTracks(
+  $filter: ModelUserPlaylistTrackFilterInput
+  $limit: Int
+  $nextToken: String
+  $lastSync: AWSTimestamp
+) {
+  syncUserPlaylistTracks(
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+    lastSync: $lastSync
+  ) {
+    items {
+      id
+      userId
+      playlistId
+      trackCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyPlaylistUserTracksId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.SyncUserPlaylistTracksQueryVariables,
+  APITypes.SyncUserPlaylistTracksQuery
+>;
+export const userPlaylistTracksByUserId = /* GraphQL */ `query UserPlaylistTracksByUserId(
+  $userId: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelUserPlaylistTrackFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  userPlaylistTracksByUserId(
+    userId: $userId
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      playlistId
+      trackCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyPlaylistUserTracksId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.UserPlaylistTracksByUserIdQueryVariables,
+  APITypes.UserPlaylistTracksByUserIdQuery
+>;
+export const userPlaylistTracksByPlaylistId = /* GraphQL */ `query UserPlaylistTracksByPlaylistId(
+  $playlistId: ID!
+  $sortDirection: ModelSortDirection
+  $filter: ModelUserPlaylistTrackFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  userPlaylistTracksByPlaylistId(
+    playlistId: $playlistId
+    sortDirection: $sortDirection
+    filter: $filter
+    limit: $limit
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      userId
+      playlistId
+      trackCount
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      spotifyPlaylistUserTracksId
+      __typename
+    }
+    nextToken
+    startedAt
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.UserPlaylistTracksByPlaylistIdQueryVariables,
+  APITypes.UserPlaylistTracksByPlaylistIdQuery
 >;

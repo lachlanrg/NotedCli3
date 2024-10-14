@@ -1541,6 +1541,8 @@ PODS:
     - React-utils (= 0.75.4)
   - RNCAsyncStorage (2.0.0):
     - React-Core
+  - RNCPicker (2.8.1):
+    - React-Core
   - RNGestureHandler (2.18.1):
     - DoubleConversion
     - glog
@@ -1754,6 +1756,7 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
@@ -1909,6 +1912,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCPicker:
+    :path: "../node_modules/@react-native-picker/picker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNKeychain:
@@ -1998,6 +2003,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 4bcb34e6b5ebf6eef5cee34f55aa39991ea1c1f1
   ReactCommon: 6a952e50c2a4b694731d7682aaa6c79bc156e4ad
   RNCAsyncStorage: d35c79ffba52c1013013e16b1fc295aec2feabb6
+  RNCPicker: 0b6860a6b208d4046227d2f626ad0722f99a969c
   RNGestureHandler: 939f21fabf5d45a725c0bf175eb819dd25cf2e70
   RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
   RNReactNativeHapticFeedback: 2bdbd63bcdbb52c4ae81a7b0c48ab1f00c06980a
