@@ -94,7 +94,7 @@ const AddTrackPlaylistBottomSheetModal = forwardRef<BottomSheetModal, AddTrackPl
             // console.log('User track count:', newTrackCount);
           } else {
             setUserTrackCount(0);
-            console.log('User track count: 0 (no existing track data)');
+            // console.log('User track count: 0 (no existing track data)');
           }
         } catch (error) {
           console.error('Error fetching user track count:', error);

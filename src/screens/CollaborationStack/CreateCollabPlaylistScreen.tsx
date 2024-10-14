@@ -44,7 +44,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
       
       if (createdPlaylist && createdPlaylist.spotifyPlaylistId) {
         await updatePlaylistCoverImage(createdPlaylist.spotifyPlaylistId);
-        Alert.alert('Success', 'Collaborative playlist created successfully!');
+        Alert.alert('Success', 'Collab playlist created successfully!');
         navigation.goBack();
       } else {
         throw new Error('Failed to get spotifyPlaylistId from created playlist');
@@ -82,7 +82,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
         variables: { input: playlistDetails }
       });
 
-      console.log('Playlist created in GraphQL:', result.data.createSpotifyPlaylist);
+      // console.log('Playlist created in GraphQL:', result.data.createSpotifyPlaylist);
       return result.data.createSpotifyPlaylist;
     } catch (error) {
       console.error('Error creating playlist in GraphQL:', error);
@@ -92,10 +92,10 @@ const CreateCollabPlaylistScreen: React.FC = () => {
 
   const updatePlaylistCoverImage = async (spotifyPlaylistId: string) => {
     try {
-      console.log('Updating playlist cover image for playlist ID:', spotifyPlaylistId);
-      console.log('Image data length:', imageAssets.collabImageBase64.length);
+      // console.log('Updating playlist cover image for playlist ID:', spotifyPlaylistId);
+      // console.log('Image data length:', imageAssets.collabImageBase64.length);
       await updatePlaylistImage(spotifyPlaylistId, imageAssets.collabImageBase64);
-      console.log('Playlist cover image updated successfully');
+      // console.log('Playlist cover image updated successfully');
     } catch (error) {
       console.error('Error updating playlist cover image:', error);
       if (error instanceof Error) {
