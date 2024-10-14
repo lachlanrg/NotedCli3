@@ -32,6 +32,13 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
+    "addTracksRestrictedCollabLambda": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "sendNotificationsoundcred": {
       "Arn": "string",
       "LambdaExecutionRole": "string",

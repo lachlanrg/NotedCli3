@@ -328,6 +328,12 @@ export const createSpotifyPlaylist = /* GraphQL */ `mutation CreateSpotifyPlayli
       startedAt
       __typename
     }
+    trackLimitPerUser
+    userTracks {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -381,6 +387,12 @@ export const updateSpotifyPlaylist = /* GraphQL */ `mutation UpdateSpotifyPlayli
       startedAt
       __typename
     }
+    trackLimitPerUser
+    userTracks {
+      nextToken
+      startedAt
+      __typename
+    }
     createdAt
     updatedAt
     _version
@@ -430,6 +442,12 @@ export const deleteSpotifyPlaylist = /* GraphQL */ `mutation DeleteSpotifyPlayli
     likedBy
     likesCount
     comments {
+      nextToken
+      startedAt
+      __typename
+    }
+    trackLimitPerUser
+    userTracks {
       nextToken
       startedAt
       __typename
@@ -1089,6 +1107,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -1247,6 +1266,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -1405,6 +1425,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       followers
       likedBy
       likesCount
+      trackLimitPerUser
       createdAt
       updatedAt
       _version
@@ -2383,4 +2404,70 @@ export const deleteNotificationSettings = /* GraphQL */ `mutation DeleteNotifica
 ` as GeneratedMutation<
   APITypes.DeleteNotificationSettingsMutationVariables,
   APITypes.DeleteNotificationSettingsMutation
+>;
+export const createUserPlaylistTrack = /* GraphQL */ `mutation CreateUserPlaylistTrack(
+  $input: CreateUserPlaylistTrackInput!
+  $condition: ModelUserPlaylistTrackConditionInput
+) {
+  createUserPlaylistTrack(input: $input, condition: $condition) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateUserPlaylistTrackMutationVariables,
+  APITypes.CreateUserPlaylistTrackMutation
+>;
+export const updateUserPlaylistTrack = /* GraphQL */ `mutation UpdateUserPlaylistTrack(
+  $input: UpdateUserPlaylistTrackInput!
+  $condition: ModelUserPlaylistTrackConditionInput
+) {
+  updateUserPlaylistTrack(input: $input, condition: $condition) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateUserPlaylistTrackMutationVariables,
+  APITypes.UpdateUserPlaylistTrackMutation
+>;
+export const deleteUserPlaylistTrack = /* GraphQL */ `mutation DeleteUserPlaylistTrack(
+  $input: DeleteUserPlaylistTrackInput!
+  $condition: ModelUserPlaylistTrackConditionInput
+) {
+  deleteUserPlaylistTrack(input: $input, condition: $condition) {
+    id
+    userId
+    playlistId
+    trackCount
+    createdAt
+    updatedAt
+    _version
+    _deleted
+    _lastChangedAt
+    spotifyPlaylistUserTracksId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteUserPlaylistTrackMutationVariables,
+  APITypes.DeleteUserPlaylistTrackMutation
 >;

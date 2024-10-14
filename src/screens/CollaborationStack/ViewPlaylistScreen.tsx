@@ -7,7 +7,8 @@ import { dark, light, gray, lgray, spotifyGreen } from '../../components/colorMo
 import { getPlaylistById } from '../../utils/spotifyPlaylistAPI';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import AddTrackPlaylistBottomSheetModal from '../../components/BottomSheets/AddTrackPlaylistBottomSheetModal';
-
+import { generateClient } from 'aws-amplify/api';
+import { getSpotifyPlaylist, listSpotifyPlaylists } from '../../graphql/queries';
 
 type ViewPlaylistScreenRouteProp = RouteProp<CollaborationStackParamList, 'ViewPlaylist'>;
 
@@ -24,6 +25,7 @@ type Props = {
 const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
   const { playlistId } = route.params;
   const [playlist, setPlaylist] = useState<any>(null);
+  const [playlistType, setPlaylistType] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const addTrackBottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -32,6 +34,17 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
     try {
       const playlistData = await getPlaylistById(playlistId);
       setPlaylist(playlistData);
+
+      // Fetch playlist type from our database
+      const client = generateClient();
+      const response = await client.graphql({
+        query: listSpotifyPlaylists,
+        variables: { filter: { spotifyPlaylistId: { eq: playlistId } } }
+      });
+      const dbPlaylist = response.data.listSpotifyPlaylists.items[0];
+      if (dbPlaylist) {
+        setPlaylistType(dbPlaylist.type);
+      }
     } catch (error) {
       console.error('Error refreshing playlist details:', error);
     } finally {
@@ -90,6 +103,8 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
     );
   }
 
+  const isCollaborative = playlistType === 'COLLABORATIVE' || playlistType === 'RESTRICTED_COLLABORATIVE';
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -104,20 +119,24 @@ const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
           </View>
         </View>
       </View>
-      <TouchableOpacity style={styles.addMusicButton} onPress={handleAddTrack}>
-        <Text style={styles.addMusicButtonText}>Add Your Music</Text>
-      </TouchableOpacity>
+      {isCollaborative && (
+        <TouchableOpacity style={styles.addMusicButton} onPress={handleAddTrack}>
+          <Text style={styles.addMusicButtonText}>Add Your Music</Text>
+        </TouchableOpacity>
+      )}
       <FlatList
         data={playlist.tracks.items}
         renderItem={renderTrackItem}
         keyExtractor={(item, index) => `${item.track.id || item.track.name}-${index}`}
         style={styles.trackList}
       />
-      <AddTrackPlaylistBottomSheetModal 
-        ref={addTrackBottomSheetModalRef}
-        playlistId={playlistId}
-        onTracksAdded={handleTracksAdded}
-      />
+      {(playlistType === 'COLLABORATIVE' || playlistType === 'RESTRICTED_COLLABORATIVE') && (
+        <AddTrackPlaylistBottomSheetModal 
+          ref={addTrackBottomSheetModalRef}
+          playlistId={playlistId}
+          onTracksAdded={handleTracksAdded}
+        />
+      )}
     </SafeAreaView>
   );
 };

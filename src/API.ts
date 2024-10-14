@@ -244,7 +244,7 @@ export type SpotifyPlaylist = {
   userSpotifyPlaylistsId: string,
   username: string,
   type: string,
-  spotifyPlaylistId?: string | null,
+  spotifyPlaylistId: string,
   spotifyUserId?: string | null,
   spotifyExternalUrl?: string | null,
   imageUrl?: string | null,
@@ -253,11 +253,34 @@ export type SpotifyPlaylist = {
   likedBy?: Array< string > | null,
   likesCount: number,
   comments?: ModelCommentConnection | null,
+  trackLimitPerUser?: string | null,
+  userTracks?: ModelUserPlaylistTrackConnection | null,
   createdAt: string,
   updatedAt: string,
   _version: number,
   _deleted?: boolean | null,
   _lastChangedAt: number,
+};
+
+export type ModelUserPlaylistTrackConnection = {
+  __typename: "ModelUserPlaylistTrackConnection",
+  items:  Array<UserPlaylistTrack | null >,
+  nextToken?: string | null,
+  startedAt?: number | null,
+};
+
+export type UserPlaylistTrack = {
+  __typename: "UserPlaylistTrack",
+  id: string,
+  userId: string,
+  playlistId: string,
+  trackCount: number,
+  createdAt: string,
+  updatedAt: string,
+  _version: number,
+  _deleted?: boolean | null,
+  _lastChangedAt: number,
+  spotifyPlaylistUserTracksId?: string | null,
 };
 
 export type ModelRepostConnection = {
@@ -432,7 +455,7 @@ export type CreateSpotifyPlaylistInput = {
   userSpotifyPlaylistsId: string,
   username: string,
   type: string,
-  spotifyPlaylistId?: string | null,
+  spotifyPlaylistId: string,
   spotifyUserId?: string | null,
   spotifyExternalUrl?: string | null,
   imageUrl?: string | null,
@@ -440,6 +463,7 @@ export type CreateSpotifyPlaylistInput = {
   followers?: number | null,
   likedBy?: Array< string > | null,
   likesCount: number,
+  trackLimitPerUser?: string | null,
   _version?: number | null,
 };
 
@@ -457,6 +481,7 @@ export type ModelSpotifyPlaylistConditionInput = {
   followers?: ModelIntInput | null,
   likedBy?: ModelIDInput | null,
   likesCount?: ModelIntInput | null,
+  trackLimitPerUser?: ModelStringInput | null,
   and?: Array< ModelSpotifyPlaylistConditionInput | null > | null,
   or?: Array< ModelSpotifyPlaylistConditionInput | null > | null,
   not?: ModelSpotifyPlaylistConditionInput | null,
@@ -492,6 +517,7 @@ export type UpdateSpotifyPlaylistInput = {
   followers?: number | null,
   likedBy?: Array< string > | null,
   likesCount?: number | null,
+  trackLimitPerUser?: string | null,
   _version?: number | null,
 };
 
@@ -1089,6 +1115,42 @@ export type DeleteNotificationSettingsInput = {
   _version?: number | null,
 };
 
+export type CreateUserPlaylistTrackInput = {
+  id?: string | null,
+  userId: string,
+  playlistId: string,
+  trackCount: number,
+  _version?: number | null,
+  spotifyPlaylistUserTracksId?: string | null,
+};
+
+export type ModelUserPlaylistTrackConditionInput = {
+  userId?: ModelIDInput | null,
+  playlistId?: ModelIDInput | null,
+  trackCount?: ModelIntInput | null,
+  and?: Array< ModelUserPlaylistTrackConditionInput | null > | null,
+  or?: Array< ModelUserPlaylistTrackConditionInput | null > | null,
+  not?: ModelUserPlaylistTrackConditionInput | null,
+  _deleted?: ModelBooleanInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  spotifyPlaylistUserTracksId?: ModelIDInput | null,
+};
+
+export type UpdateUserPlaylistTrackInput = {
+  id: string,
+  userId?: string | null,
+  playlistId?: string | null,
+  trackCount?: number | null,
+  _version?: number | null,
+  spotifyPlaylistUserTracksId?: string | null,
+};
+
+export type DeleteUserPlaylistTrackInput = {
+  id: string,
+  _version?: number | null,
+};
+
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
@@ -1129,6 +1191,7 @@ export type ModelSpotifyPlaylistFilterInput = {
   followers?: ModelIntInput | null,
   likedBy?: ModelIDInput | null,
   likesCount?: ModelIntInput | null,
+  trackLimitPerUser?: ModelStringInput | null,
   createdAt?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   and?: Array< ModelSpotifyPlaylistFilterInput | null > | null,
@@ -1136,6 +1199,12 @@ export type ModelSpotifyPlaylistFilterInput = {
   not?: ModelSpotifyPlaylistFilterInput | null,
   _deleted?: ModelBooleanInput | null,
 };
+
+export enum ModelSortDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
+
 
 export type ModelFriendshipFilterInput = {
   id?: ModelIDInput | null,
@@ -1275,12 +1344,6 @@ export type ModelStringKeyConditionInput = {
   beginsWith?: string | null,
 };
 
-export enum ModelSortDirection {
-  ASC = "ASC",
-  DESC = "DESC",
-}
-
-
 export type ModelSpotifyTokensFilterInput = {
   id?: ModelIDInput | null,
   userId?: ModelIDInput | null,
@@ -1295,6 +1358,16 @@ export type ModelSpotifyTokensFilterInput = {
   not?: ModelSpotifyTokensFilterInput | null,
   _deleted?: ModelBooleanInput | null,
   userSpotifyTokensId?: ModelIDInput | null,
+};
+
+export type ModelIDKeyConditionInput = {
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
 };
 
 export type ModelUserDeviceTokenFilterInput = {
@@ -1378,14 +1451,18 @@ export type ModelNotificationSettingsConnection = {
   startedAt?: number | null,
 };
 
-export type ModelIDKeyConditionInput = {
-  eq?: string | null,
-  le?: string | null,
-  lt?: string | null,
-  ge?: string | null,
-  gt?: string | null,
-  between?: Array< string | null > | null,
-  beginsWith?: string | null,
+export type ModelUserPlaylistTrackFilterInput = {
+  id?: ModelIDInput | null,
+  userId?: ModelIDInput | null,
+  playlistId?: ModelIDInput | null,
+  trackCount?: ModelIntInput | null,
+  createdAt?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  and?: Array< ModelUserPlaylistTrackFilterInput | null > | null,
+  or?: Array< ModelUserPlaylistTrackFilterInput | null > | null,
+  not?: ModelUserPlaylistTrackFilterInput | null,
+  _deleted?: ModelBooleanInput | null,
+  spotifyPlaylistUserTracksId?: ModelIDInput | null,
 };
 
 export type ModelSubscriptionUserFilterInput = {
@@ -1465,12 +1542,14 @@ export type ModelSubscriptionSpotifyPlaylistFilterInput = {
   followers?: ModelSubscriptionIntInput | null,
   likedBy?: ModelSubscriptionIDInput | null,
   likesCount?: ModelSubscriptionIntInput | null,
+  trackLimitPerUser?: ModelSubscriptionStringInput | null,
   createdAt?: ModelSubscriptionStringInput | null,
   updatedAt?: ModelSubscriptionStringInput | null,
   and?: Array< ModelSubscriptionSpotifyPlaylistFilterInput | null > | null,
   or?: Array< ModelSubscriptionSpotifyPlaylistFilterInput | null > | null,
   _deleted?: ModelBooleanInput | null,
   spotifyPlaylistCommentsId?: ModelSubscriptionIDInput | null,
+  spotifyPlaylistUserTracksId?: ModelSubscriptionIDInput | null,
 };
 
 export type ModelSubscriptionIntInput = {
@@ -1680,6 +1759,18 @@ export type ModelSubscriptionNotificationSettingsFilterInput = {
   updatedAt?: ModelSubscriptionStringInput | null,
   and?: Array< ModelSubscriptionNotificationSettingsFilterInput | null > | null,
   or?: Array< ModelSubscriptionNotificationSettingsFilterInput | null > | null,
+  _deleted?: ModelBooleanInput | null,
+};
+
+export type ModelSubscriptionUserPlaylistTrackFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  userId?: ModelSubscriptionIDInput | null,
+  playlistId?: ModelSubscriptionIDInput | null,
+  trackCount?: ModelSubscriptionIntInput | null,
+  createdAt?: ModelSubscriptionStringInput | null,
+  updatedAt?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionUserPlaylistTrackFilterInput | null > | null,
+  or?: Array< ModelSubscriptionUserPlaylistTrackFilterInput | null > | null,
   _deleted?: ModelBooleanInput | null,
 };
 
@@ -1990,7 +2081,7 @@ export type CreateSpotifyPlaylistMutation = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -2000,6 +2091,12 @@ export type CreateSpotifyPlaylistMutation = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -2042,7 +2139,7 @@ export type UpdateSpotifyPlaylistMutation = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -2052,6 +2149,12 @@ export type UpdateSpotifyPlaylistMutation = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -2094,7 +2197,7 @@ export type DeleteSpotifyPlaylistMutation = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -2104,6 +2207,12 @@ export type DeleteSpotifyPlaylistMutation = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -2745,7 +2854,7 @@ export type CreateCommentMutation = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -2753,6 +2862,7 @@ export type CreateCommentMutation = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -2902,7 +3012,7 @@ export type UpdateCommentMutation = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -2910,6 +3020,7 @@ export type UpdateCommentMutation = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -3059,7 +3170,7 @@ export type DeleteCommentMutation = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -3067,6 +3178,7 @@ export type DeleteCommentMutation = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -4020,6 +4132,69 @@ export type DeleteNotificationSettingsMutation = {
   } | null,
 };
 
+export type CreateUserPlaylistTrackMutationVariables = {
+  input: CreateUserPlaylistTrackInput,
+  condition?: ModelUserPlaylistTrackConditionInput | null,
+};
+
+export type CreateUserPlaylistTrackMutation = {
+  createUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
+  } | null,
+};
+
+export type UpdateUserPlaylistTrackMutationVariables = {
+  input: UpdateUserPlaylistTrackInput,
+  condition?: ModelUserPlaylistTrackConditionInput | null,
+};
+
+export type UpdateUserPlaylistTrackMutation = {
+  updateUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
+  } | null,
+};
+
+export type DeleteUserPlaylistTrackMutationVariables = {
+  input: DeleteUserPlaylistTrackInput,
+  condition?: ModelUserPlaylistTrackConditionInput | null,
+};
+
+export type DeleteUserPlaylistTrackMutation = {
+  deleteUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
+  } | null,
+};
+
 export type GetUserQueryVariables = {
   id: string,
 };
@@ -4204,7 +4379,7 @@ export type GetSpotifyPlaylistQuery = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -4214,6 +4389,12 @@ export type GetSpotifyPlaylistQuery = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -4242,7 +4423,7 @@ export type ListSpotifyPlaylistsQuery = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -4250,6 +4431,7 @@ export type ListSpotifyPlaylistsQuery = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -4279,7 +4461,7 @@ export type SyncSpotifyPlaylistsQuery = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -4287,6 +4469,46 @@ export type SyncSpotifyPlaylistsQuery = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SpotifyPlaylistBySpotifyPlaylistIdQueryVariables = {
+  spotifyPlaylistId: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelSpotifyPlaylistFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type SpotifyPlaylistBySpotifyPlaylistIdQuery = {
+  spotifyPlaylistBySpotifyPlaylistId?:  {
+    __typename: "ModelSpotifyPlaylistConnection",
+    items:  Array< {
+      __typename: "SpotifyPlaylist",
+      id: string,
+      name: string,
+      description?: string | null,
+      userSpotifyPlaylistsId: string,
+      username: string,
+      type: string,
+      spotifyPlaylistId: string,
+      spotifyUserId?: string | null,
+      spotifyExternalUrl?: string | null,
+      imageUrl?: string | null,
+      tracks?: number | null,
+      followers?: number | null,
+      likedBy?: Array< string > | null,
+      likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -4773,7 +4995,7 @@ export type GetCommentQuery = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -4781,6 +5003,7 @@ export type GetCommentQuery = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -5316,6 +5539,38 @@ export type SyncSpotifyTokensQuery = {
   } | null,
 };
 
+export type SpotifyTokensByUserIdAndIdQueryVariables = {
+  userId: string,
+  id?: ModelIDKeyConditionInput | null,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelSpotifyTokensFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type SpotifyTokensByUserIdAndIdQuery = {
+  spotifyTokensByUserIdAndId?:  {
+    __typename: "ModelSpotifyTokensConnection",
+    items:  Array< {
+      __typename: "SpotifyTokens",
+      id: string,
+      userId: string,
+      spotifyUserId: string,
+      spotifyAccessToken: string,
+      spotifyRefreshToken: string,
+      tokenExpiration: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      userSpotifyTokensId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
 export type GetUserDeviceTokenQueryVariables = {
   id: string,
 };
@@ -5784,6 +6039,139 @@ export type NotificationSettingsByUserIdAndIdQuery = {
   } | null,
 };
 
+export type GetUserPlaylistTrackQueryVariables = {
+  id: string,
+};
+
+export type GetUserPlaylistTrackQuery = {
+  getUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
+  } | null,
+};
+
+export type ListUserPlaylistTracksQueryVariables = {
+  filter?: ModelUserPlaylistTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListUserPlaylistTracksQuery = {
+  listUserPlaylistTracks?:  {
+    __typename: "ModelUserPlaylistTrackConnection",
+    items:  Array< {
+      __typename: "UserPlaylistTrack",
+      id: string,
+      userId: string,
+      playlistId: string,
+      trackCount: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyPlaylistUserTracksId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type SyncUserPlaylistTracksQueryVariables = {
+  filter?: ModelUserPlaylistTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+  lastSync?: number | null,
+};
+
+export type SyncUserPlaylistTracksQuery = {
+  syncUserPlaylistTracks?:  {
+    __typename: "ModelUserPlaylistTrackConnection",
+    items:  Array< {
+      __typename: "UserPlaylistTrack",
+      id: string,
+      userId: string,
+      playlistId: string,
+      trackCount: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyPlaylistUserTracksId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type UserPlaylistTracksByUserIdQueryVariables = {
+  userId: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelUserPlaylistTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type UserPlaylistTracksByUserIdQuery = {
+  userPlaylistTracksByUserId?:  {
+    __typename: "ModelUserPlaylistTrackConnection",
+    items:  Array< {
+      __typename: "UserPlaylistTrack",
+      id: string,
+      userId: string,
+      playlistId: string,
+      trackCount: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyPlaylistUserTracksId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
+export type UserPlaylistTracksByPlaylistIdQueryVariables = {
+  playlistId: string,
+  sortDirection?: ModelSortDirection | null,
+  filter?: ModelUserPlaylistTrackFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type UserPlaylistTracksByPlaylistIdQuery = {
+  userPlaylistTracksByPlaylistId?:  {
+    __typename: "ModelUserPlaylistTrackConnection",
+    items:  Array< {
+      __typename: "UserPlaylistTrack",
+      id: string,
+      userId: string,
+      playlistId: string,
+      trackCount: number,
+      createdAt: string,
+      updatedAt: string,
+      _version: number,
+      _deleted?: boolean | null,
+      _lastChangedAt: number,
+      spotifyPlaylistUserTracksId?: string | null,
+    } | null >,
+    nextToken?: string | null,
+    startedAt?: number | null,
+  } | null,
+};
+
 export type OnCreateUserSubscriptionVariables = {
   filter?: ModelSubscriptionUserFilterInput | null,
 };
@@ -6087,7 +6475,7 @@ export type OnCreateSpotifyPlaylistSubscription = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -6097,6 +6485,12 @@ export type OnCreateSpotifyPlaylistSubscription = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -6138,7 +6532,7 @@ export type OnUpdateSpotifyPlaylistSubscription = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -6148,6 +6542,12 @@ export type OnUpdateSpotifyPlaylistSubscription = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -6189,7 +6589,7 @@ export type OnDeleteSpotifyPlaylistSubscription = {
     userSpotifyPlaylistsId: string,
     username: string,
     type: string,
-    spotifyPlaylistId?: string | null,
+    spotifyPlaylistId: string,
     spotifyUserId?: string | null,
     spotifyExternalUrl?: string | null,
     imageUrl?: string | null,
@@ -6199,6 +6599,12 @@ export type OnDeleteSpotifyPlaylistSubscription = {
     likesCount: number,
     comments?:  {
       __typename: "ModelCommentConnection",
+      nextToken?: string | null,
+      startedAt?: number | null,
+    } | null,
+    trackLimitPerUser?: string | null,
+    userTracks?:  {
+      __typename: "ModelUserPlaylistTrackConnection",
       nextToken?: string | null,
       startedAt?: number | null,
     } | null,
@@ -6830,7 +7236,7 @@ export type OnCreateCommentSubscription = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -6838,6 +7244,7 @@ export type OnCreateCommentSubscription = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -6986,7 +7393,7 @@ export type OnUpdateCommentSubscription = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -6994,6 +7401,7 @@ export type OnUpdateCommentSubscription = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -7142,7 +7550,7 @@ export type OnDeleteCommentSubscription = {
       userSpotifyPlaylistsId: string,
       username: string,
       type: string,
-      spotifyPlaylistId?: string | null,
+      spotifyPlaylistId: string,
       spotifyUserId?: string | null,
       spotifyExternalUrl?: string | null,
       imageUrl?: string | null,
@@ -7150,6 +7558,7 @@ export type OnDeleteCommentSubscription = {
       followers?: number | null,
       likedBy?: Array< string > | null,
       likesCount: number,
+      trackLimitPerUser?: string | null,
       createdAt: string,
       updatedAt: string,
       _version: number,
@@ -8079,5 +8488,65 @@ export type OnDeleteNotificationSettingsSubscription = {
     _version: number,
     _deleted?: boolean | null,
     _lastChangedAt: number,
+  } | null,
+};
+
+export type OnCreateUserPlaylistTrackSubscriptionVariables = {
+  filter?: ModelSubscriptionUserPlaylistTrackFilterInput | null,
+};
+
+export type OnCreateUserPlaylistTrackSubscription = {
+  onCreateUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
+  } | null,
+};
+
+export type OnUpdateUserPlaylistTrackSubscriptionVariables = {
+  filter?: ModelSubscriptionUserPlaylistTrackFilterInput | null,
+};
+
+export type OnUpdateUserPlaylistTrackSubscription = {
+  onUpdateUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
+  } | null,
+};
+
+export type OnDeleteUserPlaylistTrackSubscriptionVariables = {
+  filter?: ModelSubscriptionUserPlaylistTrackFilterInput | null,
+};
+
+export type OnDeleteUserPlaylistTrackSubscription = {
+  onDeleteUserPlaylistTrack?:  {
+    __typename: "UserPlaylistTrack",
+    id: string,
+    userId: string,
+    playlistId: string,
+    trackCount: number,
+    createdAt: string,
+    updatedAt: string,
+    _version: number,
+    _deleted?: boolean | null,
+    _lastChangedAt: number,
+    spotifyPlaylistUserTracksId?: string | null,
   } | null,
 };

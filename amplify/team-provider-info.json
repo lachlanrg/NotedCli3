@@ -47,6 +47,10 @@
         "sendNotificationsoundcred": {
           "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
           "s3Key": "amplify-builds/sendNotificationsoundcred-4c57725273796877585a-build.zip"
+        },
+        "addTracksRestrictedCollabLambda": {
+          "deploymentBucketName": "amplify-notedaws-stagingtwo-50fbd-deployment",
+          "s3Key": "amplify-builds/addTracksRestrictedCollabLambda-39495943707469755445-build.zip"
         }
       },
       "analytics": {

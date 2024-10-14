@@ -65,6 +65,11 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "addTracksRestrictedCollabLambda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "sendNotificationsoundcred": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -117,6 +122,22 @@
         {
           "category": "function",
           "resourceName": "SpotifyRecentlyPlayedLambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_addTracksRestrictedCollabLambda_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "addTracksRestrictedCollabLambda"
+        }
+      ]
+    },
+    "AMPLIFY_function_addTracksRestrictedCollabLambda_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "addTracksRestrictedCollabLambda"
         }
       ]
     },

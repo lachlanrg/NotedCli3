@@ -9,8 +9,10 @@ import {
   Alert, 
   TouchableWithoutFeedback,
   Keyboard,
+  Platform,
 } from 'react-native';
-import { dark, light, placeholder } from '../../components/colorModes';
+import { Picker } from '@react-native-picker/picker';
+import { dark, light, placeholder, lgray, spotifyGreen } from '../../components/colorModes';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CollaborationStackParamList } from '../../components/types';
@@ -19,6 +21,8 @@ import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { createSpotifyPlaylist as createSpotifyPlaylistMutation } from '../../graphql/mutations';
 import imageAssets from '../../assets/imageAssets.json';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 
 type CreateCollabPlaylistScreenNavigationProp = NativeStackNavigationProp<
@@ -30,11 +34,13 @@ const CreateCollabPlaylistScreen: React.FC = () => {
   const navigation = useNavigation<CreateCollabPlaylistScreenNavigationProp>();
   const [playlistName, setPlaylistName] = useState('');
   const [playlistDescription, setPlaylistDescription] = useState('');
+  const [trackLimit, setTrackLimit] = useState<string>("5");
 
   const handleCreatePlaylist = async () => {
     try {
-      const newPlaylist = await createSpotifyPlaylist(playlistName, playlistDescription);
-      const createdPlaylist = await createSpotifyPlaylistInGraphQL(newPlaylist);
+      const playlistType = trackLimit === "unlimited" ? 'COLLABORATIVE' : 'RESTRICTED_COLLABORATIVE';
+      const newPlaylist = await createSpotifyPlaylist(playlistName, playlistDescription, playlistType);
+      const createdPlaylist = await createSpotifyPlaylistInGraphQL(newPlaylist, playlistType);
       
       if (createdPlaylist && createdPlaylist.spotifyPlaylistId) {
         await updatePlaylistCoverImage(createdPlaylist.spotifyPlaylistId);
@@ -49,7 +55,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
     }
   };
 
-  const createSpotifyPlaylistInGraphQL = async (playlist: any) => {
+  const createSpotifyPlaylistInGraphQL = async (playlist: any, playlistType: 'COLLABORATIVE' | 'RESTRICTED_COLLABORATIVE') => {
     try {
       const client = generateClient();
       const { userId, username } = await getCurrentUser();
@@ -58,7 +64,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
         name: playlist.name,
         description: playlist.description,
         userSpotifyPlaylistsId: userId,
-        type: playlist.public ? 'PUBLIC' : (playlist.collaborative ? 'COLLABORATIVE' : 'PRIVATE'),
+        type: playlistType,
         spotifyPlaylistId: playlist.id,
         username: username,
         spotifyUserId: playlist.owner.id,
@@ -68,6 +74,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
         followers: playlist.followers.total,
         likedBy: [],
         likesCount: 0,
+        trackLimitPerUser: trackLimit,
       };
 
       const result = await client.graphql({
@@ -127,6 +134,26 @@ const CreateCollabPlaylistScreen: React.FC = () => {
             returnKeyType="done"
             onSubmitEditing={dismissKeyboard}
           />
+          <Text style={styles.label}>Set track per user limit</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={trackLimit}
+              onValueChange={(itemValue) => setTrackLimit(itemValue)}
+              style={styles.picker}
+              itemStyle={styles.pickerItem}
+            >
+              <Picker.Item label="5 tracks" value="5" />
+              <Picker.Item label="10 tracks" value="10" />
+              <Picker.Item label="20 tracks" value="20" />
+              <Picker.Item label="Unlimited" value="unlimited" />
+            </Picker>
+          </View>
+          <View style={styles.infoContainer}>
+            <FontAwesomeIcon icon={faInfoCircle} size={16} color={spotifyGreen} style={styles.infoIcon} />
+            <Text style={styles.infoText}>
+              Numerical limit creates a public playlist, not modifiable via Spotify App, unlimited creates a Collaborative playlist allowing full control by friends.
+            </Text>
+          </View>
           <TouchableOpacity style={styles.button} onPress={handleCreatePlaylist}>
             <Text style={styles.buttonText}>Create Playlist</Text>
           </TouchableOpacity>
@@ -141,7 +168,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: dark,
   },
-
   container: {
     flex: 1,
     padding: 20,
@@ -164,6 +190,22 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
   },
+  label: {
+    fontSize: 16,
+    color: light,
+    // marginBottom: 5,
+  },
+  pickerContainer: {
+    // backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 5,
+    // marginBottom: 15,
+  },
+  picker: {
+    color: light,
+  },
+  pickerItem: {
+    color: light,
+  },
   button: {
     backgroundColor: light,
     paddingHorizontal: 20,
@@ -175,6 +217,22 @@ const styles = StyleSheet.create({
     color: dark,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  infoIcon: {
+    marginRight: 10,
+    marginTop: 2,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 12,
+    color: lgray,
+    lineHeight: 16,
   },
 });
 

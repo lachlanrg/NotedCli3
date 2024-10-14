@@ -75,7 +75,7 @@ const PostPlaylistScreen: React.FC<Props> = ({ route, navigation }) => {
         variables: { input: PlaylistDetails }
       });
 
-      console.log('New Playlist created successfully!', result.data.createSpotifyPlaylist);
+      console.log('New Existing Playlist added successfully!', result.data.createSpotifyPlaylist);
       navigation.navigate('Collaboration');
     } catch (error) {
       console.error('Error creating playlist:', error);
