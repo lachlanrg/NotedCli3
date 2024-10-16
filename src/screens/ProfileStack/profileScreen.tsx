@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Animated, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, RefreshControl, SafeAreaView, Animated, FlatList, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../components/types';
 
@@ -27,6 +27,7 @@ import { getUser, listSpotifyRecentlyPlayedTracks } from '../../graphql/queries'
 import { generateClient } from 'aws-amplify/api';
 import { SpotifyRecentlyPlayedTrack } from '../../models';
 import ProfileLinkBottomSheetModal from '../../components/BottomSheets/ProfileLinkBottomSheetModal';
+import UserPlaylistList from '../../components/userPlaylistList';
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<any>;
@@ -54,6 +55,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const flatListRef = useRef<FlatList>(null);
   const profileLinkBottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const [activeTab, setActiveTab] = useState(0);
+  const mainScrollViewRef = useRef<ScrollView>(null);
+  const horizontalScrollViewRef = useRef<ScrollView>(null);
+  const [lastActiveTab, setLastActiveTab] = useState(0);
+  const screenWidth = Dimensions.get('window').width;
+
+  const [scrollPosition, setScrollPosition] = useState(0);
+
 
   const handleTopPress = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
@@ -239,9 +249,37 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     profileLinkBottomSheetRef.current?.present();
   };
 
+  const handleMainScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setScrollPosition(event.nativeEvent.contentOffset.y);
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollPosition = event.nativeEvent.contentOffset.x;
+    const index = Math.round(scrollPosition / screenWidth);
+    
+    if (index !== lastActiveTab) {
+      setActiveTab(index);
+      setLastActiveTab(index);
+      // Reset the main ScrollView to the top only if the user has scrolled down
+      if (scrollPosition > 0) {
+        mainScrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+      }
+    }
+  };
+
+  const handleTabPress = (index: number) => {
+    setActiveTab(index);
+    horizontalScrollViewRef.current?.scrollTo({ x: index * screenWidth, animated: true });
+    // Reset the main ScrollView to the top only if the user has scrolled down
+    if (scrollPosition > 0) {
+      mainScrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+    }
+  };
+
+
   return (
-    <SafeAreaView style={styles.safeAreaContainer}> 
-      <View style={[styles.container]}>
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <View style={styles.container}>
         <TouchableOpacity style={styles.topButton} onPress={handleTopPress}>
           <View style={styles.topButtonArea} />
         </TouchableOpacity>
@@ -268,96 +306,121 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           </View>
         </View>
 
-        <FlatList
-          ref={flatListRef}
-          style={styles.scrollViewContent}
+        <ScrollView
+          ref={mainScrollViewRef}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onScroll={handleMainScroll}
           scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={() => (
-            <>
-              <View style={styles.statsContainer}>
-                <TouchableOpacity 
-                  style={styles.statItem}
-                  onPress={() => handleFollowListNavigation('following')}
-                  activeOpacity={1} 
-                >
-                  <Text style={styles.statNumber}>{formatNumber(followCounts.following)}</Text>
-                  <Text style={styles.statLabel}>Following</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.statItem}
-                  onPress={() => handleFollowListNavigation('followers')}
-                  activeOpacity={1}
-                >
-                  <Text style={styles.statNumber}>{formatNumber(followCounts.followers)}</Text>
-                  <Text style={styles.statLabel}>Followers</Text>
-                </TouchableOpacity>
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
-                  <Text style={styles.statLabel}>Posts</Text>
-                </View>
-                <TouchableOpacity onPress={handleNavigateToUserSearch} activeOpacity={1}>
-                  <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
-                  
-                </TouchableOpacity>
-              </View>
+        >
+          <View style={styles.statsContainer}>
+            <TouchableOpacity 
+              style={styles.statItem}
+              onPress={() => handleFollowListNavigation('following')}
+              activeOpacity={1} 
+            >
+              <Text style={styles.statNumber}>{formatNumber(followCounts.following)}</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.statItem}
+              onPress={() => handleFollowListNavigation('followers')}
+              activeOpacity={1}
+            >
+              <Text style={styles.statNumber}>{formatNumber(followCounts.followers)}</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </TouchableOpacity>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{formatNumber(postsCount)}</Text>
+              <Text style={styles.statLabel}>Posts</Text>
+            </View>
+            <TouchableOpacity onPress={handleNavigateToUserSearch} activeOpacity={1}>
+              <FontAwesomeIcon icon={faUserPlus} size={20} color={light} />
+              
+            </TouchableOpacity>
+          </View>
 
-              {recentlyPlayedTrack && !recentlyPlayedDisabled && recentlyPlayedTrack && ( 
-                <GestureHandlerRootView>
-                  <LongPressGestureHandler
-                    onHandlerStateChange={({ nativeEvent }) => {
-                      if (nativeEvent.state === State.ACTIVE) {
-                        handleLongPress();
-                      }
-                    }}
-                    minDurationMs={500}
-                  >
-                    <Animated.View
-                      style={[
-                        styles.recentlyPlayedBox,
-                        { transform: [{ scale: scaleAnim }] },
-                        { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }
-                      ]}
+          {recentlyPlayedTrack && !recentlyPlayedDisabled && (
+            <GestureHandlerRootView>
+              <LongPressGestureHandler
+                onHandlerStateChange={({ nativeEvent }) => {
+                  if (nativeEvent.state === State.ACTIVE) {
+                    handleLongPress();
+                  }
+                }}
+                minDurationMs={500}
+              >
+                <Animated.View
+                  style={[
+                    styles.recentlyPlayedBox,
+                    { transform: [{ scale: scaleAnim }] },
+                    { width: '95%', alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center' }
+                  ]}
+                >
+                  <View style={styles.spotifyIcon}>
+                    <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                  </View>
+                  <View style={styles.recentlyPlayedContent}>
+                  <Text style={styles.rpTitle}>My Recently Played</Text>
+                    <ScrollView 
+                      horizontal={true} 
+                      showsHorizontalScrollIndicator={false} 
+                      style={styles.recentlyPlayedContent}
+                      contentContainerStyle={styles.recentlyPlayedContentContainer}
                     >
-                      <View style={styles.spotifyIcon}>
-                        <FontAwesomeIcon icon={spotifyIcon} size={32} color={light}/>
+                      <View>
+                        <Text style={styles.recentlyPlayedText}>
+                          {recentlyPlayedTrack.trackName} - {recentlyPlayedTrack.artistName} 
+                        </Text>
                       </View>
-                      <View style={styles.recentlyPlayedContent}>
-                      <Text style={styles.rpTitle}>My Recently Played</Text>
-                        <ScrollView 
-                          horizontal={true} 
-                          showsHorizontalScrollIndicator={false} 
-                          style={styles.recentlyPlayedContent}
-                          contentContainerStyle={styles.recentlyPlayedContentContainer}
-                        >
-                          <View>
-                            <Text style={styles.recentlyPlayedText}>
-                              {recentlyPlayedTrack.trackName} - {recentlyPlayedTrack.artistName} 
-                            </Text>
-                          </View>
-                        </ScrollView>
-                      </View>
-                      <View style={styles.waveformContainer}>
-                        <LiveWaveform />
-                      </View>
-                    </Animated.View>
-                  </LongPressGestureHandler>
-                </GestureHandlerRootView>
-              )}
-            </>
+                    </ScrollView>
+                  </View>
+                  <View style={styles.waveformContainer}>
+                    <LiveWaveform />
+                  </View>
+                </Animated.View>
+              </LongPressGestureHandler>
+            </GestureHandlerRootView>
           )}
-          data={[{ key: 'userPostList' }]}
-          renderItem={() => (
-            <UserPostList 
-              key={refreshKey}
-              userId={userInfo?.userId} 
-              onPostPress={handlePostPress}
-              onPostLongPress={handlePostLongPress}
-              onPostsCountUpdate={handlePostsCountUpdate}
-            />
-          )}
-        />
+
+          <View style={styles.tabBar}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 0 && styles.activeTab]}
+              onPress={() => handleTabPress(0)}
+            >
+              <Text style={[styles.tabText, activeTab === 0 && styles.activeTabText]}>Posts</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 1 && styles.activeTab]}
+              onPress={() => handleTabPress(1)}
+            >
+              <Text style={[styles.tabText, activeTab === 1 && styles.activeTabText]}>Playlists</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            ref={horizontalScrollViewRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+          >
+            <View style={[styles.tabContent, { width: screenWidth }]}>
+              <UserPostList
+                key={refreshKey}
+                userId={userInfo?.userId}
+                onPostPress={handlePostPress}
+                onPostLongPress={handlePostLongPress}
+                onPostsCountUpdate={handlePostsCountUpdate}
+              />
+            </View>
+            <View style={[styles.tabContent, { width: screenWidth }]}>
+              <UserPlaylistList 
+                userId={userInfo?.userId}
+              />
+            </View>
+          </ScrollView>
+        </ScrollView>
 
         <SettingsBottomSheet ref={settingsBottomSheetRef} />
         <ProfilePostBottomSheetModal 
@@ -528,6 +591,33 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   topButtonArea: {
+    flex: 1,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderBottomWidth: 1,
+    borderBottomColor: gray,
+    marginTop: 10, // Add some space above the tab bar
+  },
+  tab: {
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: light,
+  },
+  tabText: {
+    color: lgray,
+    fontSize: 16,
+  },
+  activeTabText: {
+    color: light,
+    fontWeight: 'bold',
+  },
+  tabContent: {
     flex: 1,
   },
 });

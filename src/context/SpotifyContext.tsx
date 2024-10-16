@@ -1,6 +1,10 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshAccessToken } from '../utils/spotifyAuth'; 
+import { generateClient } from 'aws-amplify/api';
+import { updateSpotifyTokens } from '../graphql/mutations';
+import { listSpotifyTokens } from '../graphql/queries';
+import { getCurrentUser } from 'aws-amplify/auth';
 
 type SpotifyUser = {
   id: string;
@@ -91,6 +95,10 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
         await AsyncStorage.setItem('spotifyAccessToken', accessToken);
         await AsyncStorage.setItem('spotifyTokenExpiration', (Date.now() + expiresIn * 1000).toString());
         console.log("New Spotify Access Token: ", accessToken);
+
+        // Update the SpotifyTokens table
+        await updateSpotifyTokensTable(accessToken, refreshToken, expiresIn);
+
         return accessToken;
       } catch (error) {
         console.log('Failed to refresh Spotify token:', error);
@@ -98,6 +106,44 @@ export const SpotifyProvider: React.FC<SpotifyProviderProps> = ({ children }) =>
       }
     }
     return null;
+  };
+
+  const updateSpotifyTokensTable = async (accessToken: string, refreshToken: string, expiresIn: number) => {
+    try {
+      const client = generateClient();
+      const { userId } = await getCurrentUser();
+
+      // Fetch the current SpotifyTokens entry for the user
+      const tokensData = await client.graphql({
+        query: listSpotifyTokens,
+        variables: { filter: { userId: { eq: userId } } }
+      });
+
+      const currentTokens = tokensData.data.listSpotifyTokens.items[0];
+
+      if (currentTokens) {
+        // Update existing entry
+        await client.graphql({
+          query: updateSpotifyTokens,
+          variables: {
+            input: {
+              id: currentTokens.id,
+              spotifyAccessToken: accessToken,
+              spotifyRefreshToken: refreshToken,
+              tokenExpiration: Date.now() + expiresIn * 1000,
+              _version: currentTokens._version
+            }
+          }
+        });
+      } else {
+        // Create new entry if it doesn't exist (this shouldn't happen in normal circumstances)
+        console.warn('No existing SpotifyTokens entry found for the user. This is unexpected.');
+      }
+
+      console.log('Client Side SpotifyTokens updated with new tokens');
+    } catch (error) {
+      console.error('Error updating SpotifyTokens table:', error);
+    }
   };
 
   return (
