@@ -1,0 +1,10 @@
+// export const CLIENT_ID = SPOTIFY_CLIENT_ID;
+// export const CLIENT_SECRET = SPOTIFY_CLIENT_SECRET
+// export const REDIRECT_URI = SPOTIFY_REDIRECT_URI;
+
+export const CLIENT_SECRET = '10aaf71e5e98438c99d93c293c863c52';
+export const REDIRECT_URI = 'notedcli3://auth-callback';
+export const CLIENT_ID = 'c9a085186c7649f4bfd532599be6ecad';
+
+
+//git filter-branch --index-filter 'git rm --cached --ignore-unmatch config.js' HEAD
