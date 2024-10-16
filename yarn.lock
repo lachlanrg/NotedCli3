@@ -3982,7 +3982,7 @@ aws-amplify@^6.0.27:
     "@aws-amplify/storage" "6.6.10"
     tslib "^2.5.0"
 
-axios@^1.6.7, axios@^1.6.8:
+axios@^1.6.7, axios@^1.7.7:
   version "1.7.7"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.7.7.tgz#2f554296f9892a72ac8d8e4c5b79c14a91d0a47f"
   integrity sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==
