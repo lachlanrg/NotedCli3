@@ -200,9 +200,9 @@ const UserPostList: React.FC<UserPostListProps> = ({ userId, onPostsCountUpdate,
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       {posts.map(renderPostItem)}
-    </ScrollView>
+    </View>
   );
 };
 
