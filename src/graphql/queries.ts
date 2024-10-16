@@ -203,6 +203,7 @@ export const getSpotifyPlaylist = /* GraphQL */ `query GetSpotifyPlaylist($id: I
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -237,6 +238,7 @@ export const listSpotifyPlaylists = /* GraphQL */ `query ListSpotifyPlaylists(
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -281,6 +283,7 @@ export const syncSpotifyPlaylists = /* GraphQL */ `query SyncSpotifyPlaylists(
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -327,6 +330,7 @@ export const spotifyPlaylistBySpotifyPlaylistId = /* GraphQL */ `query SpotifyPl
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -830,6 +834,7 @@ export const getComment = /* GraphQL */ `query GetComment($id: ID!) {
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
