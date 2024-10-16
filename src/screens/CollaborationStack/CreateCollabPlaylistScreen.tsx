@@ -186,7 +186,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
             </Text>
           </View>
           
-          <TouchableOpacity style={styles.genreButton} onPress={toggleGenreSelection}>
+          <TouchableOpacity style={styles.genreButton} onPress={toggleGenreSelection} activeOpacity={0.8}>
             <Text style={styles.genreButtonText}>
               {showGenres ? 'Hide Genres' : 'Select Genres'}
             </Text>
@@ -328,6 +328,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 20,
+    justifyContent: 'center',
   },
   genreBubble: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',

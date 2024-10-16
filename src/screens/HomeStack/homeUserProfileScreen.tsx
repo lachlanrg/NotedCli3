@@ -2,7 +2,7 @@
 // ** Almost identical copy of userSearchProfileScreen.tsx
 
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, SafeAreaView, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, SafeAreaView, Animated, Dimensions, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
@@ -34,7 +34,8 @@ import RPBottomSheetModal from '../../components/BottomSheets/RPBottomSheetModal
 import { mediumImpact } from '../../utils/hapticFeedback';
 import { faLink } from '@fortawesome/free-solid-svg-icons'; // Add this import
 import UserSearchLinkBottomSheetModal from '../../components/BottomSheets/UserSearchLinkBottomSheetModal';
-
+import { sendRequestNotification } from '../../notifications/sendRequestNotification';
+import UserPlaylistList from '../../components/userPlaylistList';
 
 const spotifyIcon = faSpotify as IconProp;
 
@@ -68,7 +69,13 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
 
   const linkBottomSheetRef = useRef<BottomSheetModal>(null);
 
+  const [activeTab, setActiveTab] = useState(0);
+  const mainScrollViewRef = useRef<ScrollView>(null);
+  const horizontalScrollViewRef = useRef<ScrollView>(null);
+  const [lastActiveTab, setLastActiveTab] = useState(0);
+  const screenWidth = Dimensions.get('window').width;
 
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   const client = generateClient();
 
@@ -267,6 +274,9 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
           console.log('Automatically followed successfully!');
           setFriendRequestStatus('Following');
           setExistingFriendRequest(response.data.updateFriendRequest);
+          
+          // Send notification for public profile follow
+          sendRequestNotification(user.id, currentAuthUserInfo.username, false);
         } else {
           console.error('Failed to follow:', response.errors);
         }
@@ -288,6 +298,9 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             console.log('Automatically followed successfully!');
             setFriendRequestStatus('Following');
             setExistingFriendRequest(response.data.createFriendRequest);
+            
+            // Send notification for public profile follow
+            sendRequestNotification(user.id, currentAuthUserInfo.username, false);
           } else {
             console.error('Failed to follow:', response.errors);
           }
@@ -313,9 +326,12 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
           });
   
           if (response.data.updateFriendRequest) {
-            console.log('Friend Request sent successfully!', response.data.updateFriendRequest);
+            console.log('Friend Request sent successfully!');
             setFriendRequestStatus('Requested');
             setExistingFriendRequest(response.data.updateFriendRequest);
+            
+            // Send notification for private profile request
+            sendRequestNotification(user.id, currentAuthUserInfo.username, true);
           } else {
             console.error('Failed to send friend request:', response.errors);
           }
@@ -336,6 +352,9 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             console.log('Friend Request created successfully!', response.data.createFriendRequest);
             setFriendRequestStatus('Requested');
             setExistingFriendRequest(response.data.createFriendRequest);
+            
+            // Send notification for private profile request
+            sendRequestNotification(user.id, currentAuthUserInfo.username, true);
           } else {
             console.error('Failed to create friend request:', response.errors);
           }
@@ -397,7 +416,7 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
         });
   
         if (response.data.updateFriendRequest) {
-          console.log('Unfollowed successfully!', response.data.updateFriendRequest);
+          console.log('Unfollowed successfully!');
           setFriendRequestStatus('Follow'); 
           setExistingFriendRequest(response.data.updateFriendRequest);
           setIsModalVisible(false); // Close the modal when the "Cancel" button is pressed
@@ -477,8 +496,37 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
     rpBottomSheetRef.current?.present();
   };
 
+  const canViewProfile = user?.publicProfile || friendRequestStatus === 'Following';
+
   const handleLinkPress = () => {
-    linkBottomSheetRef.current?.present();
+    if (canViewProfile) {
+      linkBottomSheetRef.current?.present();
+    }
+  };
+
+  const handleMainScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setScrollPosition(event.nativeEvent.contentOffset.y);
+  };
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollPosition = event.nativeEvent.contentOffset.x;
+    const index = Math.round(scrollPosition / screenWidth);
+    
+    if (index !== lastActiveTab) {
+      setActiveTab(index);
+      setLastActiveTab(index);
+      if (scrollPosition > 0) {
+        mainScrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+      }
+    }
+  };
+
+  const handleTabPress = (index: number) => {
+    setActiveTab(index);
+    horizontalScrollViewRef.current?.scrollTo({ x: index * screenWidth, animated: true });
+    if (scrollPosition > 0) {
+      mainScrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+    }
   };
 
   return (
@@ -490,14 +538,22 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
           </TouchableOpacity>
           <View style={styles.usernameContainer}>
             <Text style={styles.username}>{user.username}</Text>
-            <TouchableOpacity onPress={handleLinkPress} style={styles.linkButton}>
-            <FontAwesomeIcon icon={faLink} size={24} color={light} />
-          </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={handleLinkPress} 
+              style={[styles.linkButton, !canViewProfile && styles.disabledButton]}
+              disabled={!canViewProfile}
+            >
+              <FontAwesomeIcon icon={faLink} size={24} color={canViewProfile ? light : dgray} />
+            </TouchableOpacity>
           </View>
-         
         </View>
 
-        <ScrollView>
+        <ScrollView
+          ref={mainScrollViewRef}
+          onScroll={handleMainScroll}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.profileContainer}>
             <View style={styles.statsContainer}>
               <TouchableOpacity 
@@ -531,7 +587,8 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
             </View>
 
             {/* Spotify Recently Played - renders if there is a recentlyPlayedTarack available, user hasnt disabled, or following/public account*/}
-             {!isLoading && recentlyPlayedTrack && !recentlyPlayedDisabled && (friendRequestStatus === 'Following' || user.publicProfile) && ( 
+             {!isLoading && recentlyPlayedTrack && !recentlyPlayedDisabled && 
+              (friendRequestStatus === 'Following' || user.publicProfile) && ( 
                 <GestureHandlerRootView>
                     <LongPressGestureHandler
                       onHandlerStateChange={({ nativeEvent }) => {
@@ -575,23 +632,52 @@ const HomeUserProfileScreen: React.FC<HomeUserProfileScreenProps> = ({ route, na
                 )}
 
           </View>
-           {/* Show posts only if following the user */}
-           {(friendRequestStatus === 'Following' || user.publicProfile) && (
-              <UserPostList userId={userId} onPostPress={handlePresentPostModalPress} />
-            )}
 
-          {/* Show "no posts" message if needed */}
-          {!(friendRequestStatus === 'Following' || user.publicProfile) && (
+          {canViewProfile && (
+            <>
+              <View style={styles.tabBar}>
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 0 && styles.activeTab]}
+                  onPress={() => handleTabPress(0)}
+                >
+                  <Text style={[styles.tabText, activeTab === 0 && styles.activeTabText]}>Posts</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 1 && styles.activeTab]}
+                  onPress={() => handleTabPress(1)}
+                >
+                  <Text style={[styles.tabText, activeTab === 1 && styles.activeTabText]}>Playlists</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView
+                ref={horizontalScrollViewRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onScroll={handleScroll}
+                scrollEventThrottle={16}
+              >
+                <View style={[styles.tabContent, { width: screenWidth }]}>
+                  <UserPostList userId={userId} onPostPress={handlePresentPostModalPress} />
+                </View>
+                <View style={[styles.tabContent, { width: screenWidth }]}>
+                  <UserPlaylistList userId={userId} />
+                </View>
+              </ScrollView>
+            </>
+          )}
+
+          {!canViewProfile && (
             <View style={styles.noPostsContainer}>
               <Text style={styles.noPostsText}>
                 {user.publicProfile
                   ? "This user hasn't posted yet."
-                  : "Follow this user to see their posts."}
+                  : "Follow this user to see their posts and playlists."}
               </Text>
             </View>
           )}
-          
-          </ScrollView>
+        </ScrollView>
 
         {/* Modal to confirm cancellation/unfollow */}
         <Modal 
@@ -867,6 +953,36 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 300,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    borderBottomWidth: 1,
+    borderBottomColor: gray,
+    marginTop: 10,
+  },
+  tab: {
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: light,
+  },
+  tabText: {
+    color: lgray,
+    fontSize: 16,
+  },
+  activeTabText: {
+    color: light,
+    fontWeight: 'bold',
+  },
+  tabContent: {
+    flex: 1,
   },
 });
 
