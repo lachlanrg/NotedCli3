@@ -442,6 +442,14 @@ export const schema = {
                         ]
                     }
                 },
+                "genres": {
+                    "name": "genres",
+                    "isArray": true,
+                    "type": "String",
+                    "isRequired": false,
+                    "attributes": [],
+                    "isArrayNullable": true
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -2201,5 +2209,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "e34e4038525ab01ab12d108cceadd887"
+    "version": "0f76900fd40dac387761ff40e70d7bcd"
 };

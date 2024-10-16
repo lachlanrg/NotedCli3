@@ -53,7 +53,7 @@ import CreateCollabPlaylistScreen from './src/screens/CollaborationStack/CreateC
 import UsersSpotifyPlaylistsScreen from './src/screens/CollaborationStack/UsersSpotifyPlaylistsScreen';
 import PostPlaylistScreen from './src/screens/CollaborationStack/PostPlaylistScreen';
 import ViewPlaylistScreen from './src/screens/CollaborationStack/ViewPlaylistScreen';
-
+import ProfileViewPlaylistScreen from './src/screens/ProfileStack/profileViewPlaylistScreen';
 //Initialise Amplify Config
 import { Amplify } from 'aws-amplify';
 import awsconfig from './src/aws-exports';
@@ -140,6 +140,7 @@ const ProfileStackNavigator = () => {
       <ProfileStack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="FollowList" component={FollowListScreen} options={{ headerShown: false }} />
       <ProfileStack.Screen name="ProfilePost" component={ProfilePostScreen} options={{ headerShown: false }} />
+      <ProfileStack.Screen name="ProfileViewPlaylist" component={ProfileViewPlaylistScreen} options={{ headerShown: false }} />
     </ProfileStack.Navigator>
   );
 };

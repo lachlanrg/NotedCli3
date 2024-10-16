@@ -93,6 +93,7 @@ type EagerSpotifyPlaylist = {
   readonly comments?: (Comment | null)[] | null;
   readonly trackLimitPerUser?: string | null;
   readonly userTracks?: (UserPlaylistTrack | null)[] | null;
+  readonly genres?: (string | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
@@ -120,6 +121,7 @@ type LazySpotifyPlaylist = {
   readonly comments: AsyncCollection<Comment>;
   readonly trackLimitPerUser?: string | null;
   readonly userTracks: AsyncCollection<UserPlaylistTrack>;
+  readonly genres?: (string | null)[] | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

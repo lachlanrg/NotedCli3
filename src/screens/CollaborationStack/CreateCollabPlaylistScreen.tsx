@@ -10,6 +10,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { dark, light, placeholder, lgray, spotifyGreen } from '../../components/colorModes';
@@ -22,8 +23,16 @@ import { getCurrentUser } from 'aws-amplify/auth';
 import { createSpotifyPlaylist as createSpotifyPlaylistMutation } from '../../graphql/mutations';
 import imageAssets from '../../assets/imageAssets.json';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
+// Add this array of genres
+const genres = [
+  'Pop', 'Hip-Hop', 'R&B', 'Rap', 'House', 'Electronic', 
+  'Dance', 'Indie', 'Alternative', 'Country', 'Jazz', 'Classical', 
+  'Rock', 'Metal', 'Blues', 'Reggae', 'Folk'
+];
+
+const MAX_GENRES = 3;
 
 type CreateCollabPlaylistScreenNavigationProp = NativeStackNavigationProp<
   CollaborationStackParamList,
@@ -35,6 +44,8 @@ const CreateCollabPlaylistScreen: React.FC = () => {
   const [playlistName, setPlaylistName] = useState('');
   const [playlistDescription, setPlaylistDescription] = useState('');
   const [trackLimit, setTrackLimit] = useState<string>("5");
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [showGenres, setShowGenres] = useState(false);
 
   const handleCreatePlaylist = async () => {
     try {
@@ -75,6 +86,7 @@ const CreateCollabPlaylistScreen: React.FC = () => {
         likedBy: [],
         likesCount: 0,
         trackLimitPerUser: trackLimit,
+        genres: selectedGenres,
       };
 
       const result = await client.graphql({
@@ -82,7 +94,6 @@ const CreateCollabPlaylistScreen: React.FC = () => {
         variables: { input: playlistDetails }
       });
 
-      // console.log('Playlist created in GraphQL:', result.data.createSpotifyPlaylist);
       return result.data.createSpotifyPlaylist;
     } catch (error) {
       console.error('Error creating playlist in GraphQL:', error);
@@ -110,10 +121,30 @@ const CreateCollabPlaylistScreen: React.FC = () => {
     Keyboard.dismiss();
   };
 
+  const toggleGenreSelection = () => {
+    setShowGenres(!showGenres);
+  };
+
+  const toggleGenre = (genre: string) => {
+    setSelectedGenres(prevGenres => {
+      if (prevGenres.includes(genre)) {
+        // If the genre is already selected, remove it
+        return prevGenres.filter(g => g !== genre);
+      } else if (prevGenres.length < MAX_GENRES) {
+        // If the genre is not selected and we haven't reached the limit, add it
+        return [...prevGenres, genre];
+      } else {
+        // If we've reached the limit, show an alert and don't change the selection
+        Alert.alert('Genre Limit Reached', `You can only select up to ${MAX_GENRES} genres.`);
+        return prevGenres;
+      }
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View style={styles.container}>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
           <Text style={styles.title}>Create Collaborative Playlist</Text>
           <TextInput
             style={styles.input}
@@ -154,10 +185,50 @@ const CreateCollabPlaylistScreen: React.FC = () => {
               Numerical limit creates a public playlist, not modifiable via Spotify App, unlimited creates a Collaborative playlist allowing full control by friends.
             </Text>
           </View>
+          
+          <TouchableOpacity style={styles.genreButton} onPress={toggleGenreSelection}>
+            <Text style={styles.genreButtonText}>
+              {showGenres ? 'Hide Genres' : 'Select Genres'}
+            </Text>
+            {/* <Text style={styles.genreCount}>
+              {selectedGenres.length}/{MAX_GENRES}
+            </Text> */}
+            <FontAwesomeIcon 
+              icon={showGenres ? faChevronUp : faChevronDown} 
+              size={16} 
+              color={light} 
+            />
+          </TouchableOpacity>
+          
+          {showGenres && (
+            <View style={styles.genreContainer}>
+              {genres.map(genre => (
+                <TouchableOpacity
+                  key={genre}
+                  style={[
+                    styles.genreBubble,
+                    selectedGenres.includes(genre) && styles.selectedGenreBubble,
+                    selectedGenres.length >= MAX_GENRES && !selectedGenres.includes(genre) && styles.disabledGenreBubble
+                  ]}
+                  onPress={() => toggleGenre(genre)}
+                  disabled={selectedGenres.length >= MAX_GENRES && !selectedGenres.includes(genre)}
+                >
+                  <Text style={[
+                    styles.genreText,
+                    selectedGenres.includes(genre) && styles.selectedGenreText,
+                    selectedGenres.length >= MAX_GENRES && !selectedGenres.includes(genre) && styles.disabledGenreText
+                  ]}>
+                    {genre}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+          
           <TouchableOpacity style={styles.button} onPress={handleCreatePlaylist}>
             <Text style={styles.buttonText}>Create Playlist</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </TouchableWithoutFeedback>
     </SafeAreaView>
   );
@@ -212,6 +283,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 50,
   },
   buttonText: {
     color: dark,
@@ -233,6 +305,52 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: lgray,
     lineHeight: 16,
+  },
+  genreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  genreButtonText: {
+    color: light,
+    fontSize: 16,
+  },
+  genreCount: {
+    color: lgray,
+    fontSize: 14,
+    marginRight: 10,
+  },
+  genreContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 20,
+  },
+  genreBubble: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    margin: 4,
+  },
+  selectedGenreBubble: {
+    backgroundColor: spotifyGreen,
+  },
+  disabledGenreBubble: {
+    opacity: 0.5,
+  },
+  genreText: {
+    color: light,
+    fontSize: 14,
+  },
+  selectedGenreText: {
+    color: dark,
+  },
+  disabledGenreText: {
+    color: lgray,
   },
 });
 

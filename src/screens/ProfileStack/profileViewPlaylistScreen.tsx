@@ -1,8 +1,10 @@
+// An Exact Copy of ViewPlaylistScreen in CollaborationStack
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CollaborationStackParamList } from '../../components/types';
+import { ProfileStackParamList } from '../../components/types';
 import { dark, light, gray, lgray, spotifyGreen, mediumgray } from '../../components/colorModes';
 import { getPlaylistById } from '../../utils/spotifyPlaylistAPI';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
@@ -17,19 +19,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 const spotifyIcon: IconProp = faSpotify;
 
-type ViewPlaylistScreenRouteProp = RouteProp<CollaborationStackParamList, 'ViewPlaylist'>;
+type ProfileViewPlaylistScreenRouteProp = RouteProp<ProfileStackParamList, 'ProfileViewPlaylist'>;
 
-type ViewPlaylistScreenNavigationProp = NativeStackNavigationProp<
-  CollaborationStackParamList,
-  'ViewPlaylist'
+type ProfileViewPlaylistScreenNavigationProp = NativeStackNavigationProp<
+  ProfileStackParamList,
+  'ProfileViewPlaylist'
 >;
 
 type Props = {
-  route: ViewPlaylistScreenRouteProp;
-  navigation: ViewPlaylistScreenNavigationProp;
+  route: ProfileViewPlaylistScreenRouteProp;
+  navigation: ProfileViewPlaylistScreenNavigationProp;
 };
 
-const ViewPlaylistScreen: React.FC<Props> = ({ route }) => {
+const ProfileViewPlaylistScreen: React.FC<Props> = ({ route }) => {
   const { playlistId } = route.params;
   const [playlist, setPlaylist] = useState<any>(null);
   const [playlistType, setPlaylistType] = useState<string>('');
@@ -350,4 +352,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ViewPlaylistScreen;
+export default ProfileViewPlaylistScreen;

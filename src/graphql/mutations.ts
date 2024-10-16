@@ -334,6 +334,7 @@ export const createSpotifyPlaylist = /* GraphQL */ `mutation CreateSpotifyPlayli
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -393,6 +394,7 @@ export const updateSpotifyPlaylist = /* GraphQL */ `mutation UpdateSpotifyPlayli
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -452,6 +454,7 @@ export const deleteSpotifyPlaylist = /* GraphQL */ `mutation DeleteSpotifyPlayli
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -1108,6 +1111,7 @@ export const createComment = /* GraphQL */ `mutation CreateComment(
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -1267,6 +1271,7 @@ export const updateComment = /* GraphQL */ `mutation UpdateComment(
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -1426,6 +1431,7 @@ export const deleteComment = /* GraphQL */ `mutation DeleteComment(
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version

@@ -39,6 +39,7 @@ type SpotifyPlaylist @model @auth(rules: [{allow: public}]) {
   comments: [Comment] @hasMany
   trackLimitPerUser: String
   userTracks: [UserPlaylistTrack] @hasMany
+  genres: [String]
 }
 
 type Friendship @model @auth(rules: [{allow: public}]) {

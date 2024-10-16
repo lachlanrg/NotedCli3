@@ -324,6 +324,7 @@ export const onCreateSpotifyPlaylist = /* GraphQL */ `subscription OnCreateSpoti
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -382,6 +383,7 @@ export const onUpdateSpotifyPlaylist = /* GraphQL */ `subscription OnUpdateSpoti
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -440,6 +442,7 @@ export const onDeleteSpotifyPlaylist = /* GraphQL */ `subscription OnDeleteSpoti
       startedAt
       __typename
     }
+    genres
     createdAt
     updatedAt
     _version
@@ -1078,6 +1081,7 @@ export const onCreateComment = /* GraphQL */ `subscription OnCreateComment($filt
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -1234,6 +1238,7 @@ export const onUpdateComment = /* GraphQL */ `subscription OnUpdateComment($filt
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
@@ -1390,6 +1395,7 @@ export const onDeleteComment = /* GraphQL */ `subscription OnDeleteComment($filt
       likedBy
       likesCount
       trackLimitPerUser
+      genres
       createdAt
       updatedAt
       _version
