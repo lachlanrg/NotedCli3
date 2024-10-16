@@ -131,7 +131,7 @@ const UserPlaylistList: React.FC<UserPlaylistListProps> = ({
           )}
           <View style={styles.playlistInfo}>
             <Text style={styles.playlistName}>{item.name}</Text>
-            <Text style={styles.playlistUsername}>By {item.username}</Text>
+            {/* <Text style={styles.playlistUsername}>By {item.username}</Text> */}
             <Text style={styles.playlistDetails}>
               {item.tracks} tracks • {item.followers} followers
             </Text>
@@ -240,9 +240,9 @@ const styles = StyleSheet.create({
   },
   noPlaylistsContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 100,
+    alignItems: 'center',
+    marginTop : 50,
   },
   noPlaylistsText: {
     fontSize: 16,
